@@ -1,0 +1,303 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1676 4800" font-family="Inter,system-ui,sans-serif">
+<defs>
+<marker id="arrow" markerWidth="10" markerHeight="8" refX="8" refY="4" orient="auto"><path d="M0,0 L10,4 L0,8 L2,4 Z" fill="#94a3b8"/></marker>
+<marker id="arrow-dashed" markerWidth="10" markerHeight="8" refX="8" refY="4" orient="auto"><path d="M0,0 L10,4 L0,8 L2,4 Z" fill="#5eead4"/></marker>
+</defs>
+<rect x="0" y="0" width="1676" height="4800" fill="#0f172a"/>
+<rect x="20" y="14" width="1636" height="36" rx="8" fill="#1e293b"/>
+<text x="36" y="37" fill="#e2e8f0" font-size="15" font-weight="700">Diagram B: Project and Site Management</text>
+<rect x="700.5" y="92.0" width="909.5" height="4358.0" rx="12" fill="#f59e0b" opacity="0.06" stroke="#f59e0b" stroke-width="2" stroke-dasharray="10,5"/>
+<rect x="1062.2" y="58.0" width="186.2" height="26" rx="6" fill="#1e293b" stroke="#f59e0b" stroke-width="1.5"/>
+<text x="1155.3" y="76.0" text-anchor="middle" fill="#f59e0b" font-size="12" font-weight="700">Drone Mapping Service</text>
+<line x1="165.0" y1="136.0" x2="165.0" y2="4454.0" stroke="#334155" stroke-width="2"/>
+<rect x="90.0" y="96.0" width="149.9" height="40" rx="7" fill="#3b82f6"/>
+<text x="165.0" y="120.0" text-anchor="middle" fill="#fff" font-size="11.5" font-weight="700">User (PM / Admin)</text>
+<rect x="90.0" y="4454.0" width="149.9" height="30" rx="7" fill="#3b82f6" opacity="0.55"/>
+<text x="165.0" y="4473.0" text-anchor="middle" fill="#fff" font-size="10.5" font-weight="700">User (PM / Admin)</text>
+<line x1="563.5" y1="136.0" x2="563.5" y2="4454.0" stroke="#334155" stroke-width="2"/>
+<rect x="498.5" y="96.0" width="130.0" height="40" rx="7" fill="#8b5cf6"/>
+<text x="563.5" y="120.0" text-anchor="middle" fill="#fff" font-size="11.5" font-weight="700">API Gateway</text>
+<rect x="498.5" y="4454.0" width="130.0" height="30" rx="7" fill="#8b5cf6" opacity="0.55"/>
+<text x="563.5" y="4473.0" text-anchor="middle" fill="#fff" font-size="10.5" font-weight="700">API Gateway</text>
+<line x1="813.1" y1="136.0" x2="813.1" y2="4454.0" stroke="#334155" stroke-width="2"/>
+<rect x="724.5" y="96.0" width="177.2" height="40" rx="7" fill="#f59e0b"/>
+<text x="813.1" y="120.0" text-anchor="middle" fill="#fff" font-size="11.5" font-weight="700">Access Control Module</text>
+<rect x="724.5" y="4454.0" width="177.2" height="30" rx="7" fill="#f59e0b" opacity="0.55"/>
+<text x="813.1" y="4473.0" text-anchor="middle" fill="#fff" font-size="10.5" font-weight="700">Access Control Module</text>
+<line x1="1065.9" y1="136.0" x2="1065.9" y2="4454.0" stroke="#334155" stroke-width="2"/>
+<rect x="997.8" y="96.0" width="136.3" height="40" rx="7" fill="#f97316"/>
+<text x="1065.9" y="120.0" text-anchor="middle" fill="#fff" font-size="11.5" font-weight="700">Projects Module</text>
+<rect x="997.8" y="4454.0" width="136.3" height="30" rx="7" fill="#f97316" opacity="0.55"/>
+<text x="1065.9" y="4473.0" text-anchor="middle" fill="#fff" font-size="10.5" font-weight="700">Projects Module</text>
+<line x1="1295.0" y1="136.0" x2="1295.0" y2="4454.0" stroke="#334155" stroke-width="2"/>
+<rect x="1230.0" y="96.0" width="130.0" height="40" rx="7" fill="#ec4899"/>
+<text x="1295.0" y="120.0" text-anchor="middle" fill="#fff" font-size="11.5" font-weight="700">Audit Module</text>
+<rect x="1230.0" y="4454.0" width="130.0" height="30" rx="7" fill="#ec4899" opacity="0.55"/>
+<text x="1295.0" y="4473.0" text-anchor="middle" fill="#fff" font-size="10.5" font-weight="700">Audit Module</text>
+<line x1="1521.0" y1="136.0" x2="1521.0" y2="4454.0" stroke="#334155" stroke-width="2"/>
+<rect x="1456.0" y="96.0" width="130.0" height="40" rx="7" fill="#10b981"/>
+<text x="1521.0" y="120.0" text-anchor="middle" fill="#fff" font-size="11.5" font-weight="700">PostgreSQL</text>
+<rect x="1456.0" y="4454.0" width="130.0" height="30" rx="7" fill="#10b981" opacity="0.55"/>
+<text x="1521.0" y="4473.0" text-anchor="middle" fill="#fff" font-size="10.5" font-weight="700">PostgreSQL</text>
+<line x1="70" y1="162.0" x2="1606" y2="162.0" stroke="#334155" stroke-width="1" stroke-dasharray="4,4"/>
+<rect x="663.2" y="149.0" width="349.5" height="22" rx="11" fill="#334155"/>
+<text x="838.0" y="164.0" text-anchor="middle" fill="#cbd5e1" font-size="10.5" font-weight="700">Create Project (PM self-owns, or Admin assigns PM)</text>
+<line x1="237.9" y1="216.0" x2="500.5" y2="216.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="247.9" y="192.0" width="242.6" height="18" rx="4" fill="#0f172a"/>
+<text x="369.2" y="205.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">POST /api/v1/projects {name, project_manager_id?} (cookie)</text>
+<line x1="626.5" y1="270.0" x2="726.5" y2="270.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="636.5" y="246.0" width="80.0" height="18" rx="4" fill="#0f172a"/>
+<text x="676.5" y="259.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">Forward request + cookie</text>
+<path d="M813.1,324.0 C859.1,324.0 859.1,354.0 813.1,354.0" fill="none" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
+<rect x="855.1" y="326.0" width="278.7" height="20" rx="5" fill="#1e293b" stroke="#334155"/>
+<text x="994.5" y="340.0" text-anchor="middle" fill="#94a3b8" font-size="9.5">Validate cookie + CSRF + check role (PM or Admin)</text>
+<path d="M813.1,392.0 C859.1,392.0 859.1,422.0 813.1,422.0" fill="none" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
+<rect x="855.1" y="394.0" width="294.6" height="20" rx="5" fill="#1e293b" stroke="#334155"/>
+<text x="1002.5" y="408.0" text-anchor="middle" fill="#94a3b8" font-size="9.5">If Admin, require explicit active project_manager_id</text>
+<line x1="899.8" y1="460.0" x2="999.8" y2="460.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="909.8" y="436.0" width="80.0" height="18" rx="4" fill="#0f172a"/>
+<text x="949.8" y="449.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">Call Projects Module</text>
+<line x1="1132.1" y1="514.0" x2="1458.0" y2="514.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="1142.1" y="490.0" width="306.0" height="18" rx="4" fill="#0f172a"/>
+<text x="1295.1" y="503.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">Resolve project manager (self if PM, or given active PM)</text>
+<line x1="1458.0" y1="568.0" x2="1132.1" y2="568.0" stroke="#5eead4" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)"/>
+<rect x="1200.9" y="544.0" width="188.2" height="18" rx="4" fill="#0f172a"/>
+<text x="1295.1" y="557.0" text-anchor="middle" fill="#5eead4" font-size="9.5">project_manager confirmed active</text>
+<line x1="1132.1" y1="622.0" x2="1458.0" y2="622.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="1153.1" y="598.0" width="284.0" height="18" rx="4" fill="#0f172a"/>
+<text x="1295.1" y="611.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">INSERT project (status=active, project_manager_id)</text>
+<line x1="1458.0" y1="676.0" x2="1132.1" y2="676.0" stroke="#5eead4" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)"/>
+<rect x="1248.8" y="652.0" width="92.5" height="18" rx="4" fill="#0f172a"/>
+<text x="1295.1" y="665.0" text-anchor="middle" fill="#5eead4" font-size="9.5">project_id = 1</text>
+<line x1="1132.1" y1="730.0" x2="1232.0" y2="730.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="1142.1" y="706.0" width="80.0" height="18" rx="4" fill="#0f172a"/>
+<text x="1182.1" y="719.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">Log PROJECT_CREATED</text>
+<line x1="1358.0" y1="784.0" x2="1458.0" y2="784.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="1368.0" y="760.0" width="80.0" height="18" rx="4" fill="#0f172a"/>
+<text x="1408.0" y="773.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">INSERT audit_log</text>
+<line x1="1458.0" y1="838.0" x2="1358.0" y2="838.0" stroke="#5eead4" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)"/>
+<rect x="1393.7" y="814.0" width="28.6" height="18" rx="4" fill="#0f172a"/>
+<text x="1408.0" y="827.0" text-anchor="middle" fill="#5eead4" font-size="9.5">OK</text>
+<line x1="999.8" y1="892.0" x2="899.8" y2="892.0" stroke="#5eead4" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)"/>
+<rect x="909.8" y="868.0" width="80.0" height="18" rx="4" fill="#0f172a"/>
+<text x="949.8" y="881.0" text-anchor="middle" fill="#5eead4" font-size="9.5">201 {project}</text>
+<line x1="726.5" y1="946.0" x2="626.5" y2="946.0" stroke="#5eead4" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)"/>
+<rect x="651.6" y="922.0" width="49.9" height="18" rx="4" fill="#0f172a"/>
+<text x="676.5" y="935.0" text-anchor="middle" fill="#5eead4" font-size="9.5">201 OK</text>
+<line x1="500.5" y1="1000.0" x2="237.9" y2="1000.0" stroke="#5eead4" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)"/>
+<rect x="325.7" y="976.0" width="87.2" height="18" rx="4" fill="#0f172a"/>
+<text x="369.2" y="989.0" text-anchor="middle" fill="#5eead4" font-size="9.5">201 {project}</text>
+<line x1="70" y1="1040.0" x2="1606" y2="1040.0" stroke="#334155" stroke-width="1" stroke-dasharray="4,4"/>
+<rect x="663.2" y="1027.0" width="349.5" height="22" rx="11" fill="#334155"/>
+<text x="838.0" y="1042.0" text-anchor="middle" fill="#cbd5e1" font-size="10.5" font-weight="700">Update / Archive Project (Admin or Owning PM only)</text>
+<line x1="237.9" y1="1094.0" x2="500.5" y2="1094.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="248.5" y="1070.0" width="241.4" height="18" rx="4" fill="#0f172a"/>
+<text x="369.2" y="1083.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">PATCH /api/v1/projects/1 {fields} (cookie)</text>
+<line x1="626.5" y1="1148.0" x2="726.5" y2="1148.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="636.5" y="1124.0" width="80.0" height="18" rx="4" fill="#0f172a"/>
+<text x="676.5" y="1137.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">Forward request + cookie</text>
+<path d="M813.1,1202.0 C859.1,1202.0 859.1,1232.0 813.1,1232.0" fill="none" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
+<rect x="855.1" y="1204.0" width="315.9" height="20" rx="5" fill="#1e293b" stroke="#334155"/>
+<text x="1013.1" y="1218.0" text-anchor="middle" fill="#94a3b8" font-size="9.5">Validate cookie + CSRF + check role (Admin or owning PM)</text>
+<line x1="899.8" y1="1270.0" x2="999.8" y2="1270.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="909.8" y="1246.0" width="80.0" height="18" rx="4" fill="#0f172a"/>
+<text x="949.8" y="1259.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">Call Projects Module</text>
+<line x1="1132.1" y1="1324.0" x2="1458.0" y2="1324.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="1230.2" y="1300.0" width="129.7" height="18" rx="4" fill="#0f172a"/>
+<text x="1295.1" y="1313.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">UPDATE project fields</text>
+<line x1="1458.0" y1="1378.0" x2="1132.1" y2="1378.0" stroke="#5eead4" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)"/>
+<rect x="1280.7" y="1354.0" width="28.6" height="18" rx="4" fill="#0f172a"/>
+<text x="1295.1" y="1367.0" text-anchor="middle" fill="#5eead4" font-size="9.5">OK</text>
+<line x1="1132.1" y1="1432.0" x2="1232.0" y2="1432.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="1142.1" y="1408.0" width="80.0" height="18" rx="4" fill="#0f172a"/>
+<text x="1182.1" y="1421.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">Log PROJECT_UPDATED</text>
+<line x1="1358.0" y1="1486.0" x2="1458.0" y2="1486.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="1368.0" y="1462.0" width="80.0" height="18" rx="4" fill="#0f172a"/>
+<text x="1408.0" y="1475.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">INSERT audit_log</text>
+<line x1="1458.0" y1="1540.0" x2="1358.0" y2="1540.0" stroke="#5eead4" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)"/>
+<rect x="1393.7" y="1516.0" width="28.6" height="18" rx="4" fill="#0f172a"/>
+<text x="1408.0" y="1529.0" text-anchor="middle" fill="#5eead4" font-size="9.5">OK</text>
+<line x1="999.8" y1="1594.0" x2="899.8" y2="1594.0" stroke="#5eead4" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)"/>
+<rect x="909.8" y="1570.0" width="80.0" height="18" rx="4" fill="#0f172a"/>
+<text x="949.8" y="1583.0" text-anchor="middle" fill="#5eead4" font-size="9.5">200 {project}</text>
+<line x1="726.5" y1="1648.0" x2="626.5" y2="1648.0" stroke="#5eead4" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)"/>
+<rect x="651.6" y="1624.0" width="49.9" height="18" rx="4" fill="#0f172a"/>
+<text x="676.5" y="1637.0" text-anchor="middle" fill="#5eead4" font-size="9.5">200 OK</text>
+<line x1="500.5" y1="1702.0" x2="237.9" y2="1702.0" stroke="#5eead4" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)"/>
+<rect x="325.7" y="1678.0" width="87.2" height="18" rx="4" fill="#0f172a"/>
+<text x="369.2" y="1691.0" text-anchor="middle" fill="#5eead4" font-size="9.5">200 {project}</text>
+<line x1="237.9" y1="1756.0" x2="500.5" y2="1756.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="269.8" y="1732.0" width="198.9" height="18" rx="4" fill="#0f172a"/>
+<text x="369.2" y="1745.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">DELETE /api/v1/projects/1 (cookie)</text>
+<line x1="626.5" y1="1810.0" x2="726.5" y2="1810.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="636.5" y="1786.0" width="80.0" height="18" rx="4" fill="#0f172a"/>
+<text x="676.5" y="1799.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">Forward request + cookie</text>
+<path d="M813.1,1864.0 C859.1,1864.0 859.1,1894.0 813.1,1894.0" fill="none" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
+<rect x="855.1" y="1866.0" width="315.9" height="20" rx="5" fill="#1e293b" stroke="#334155"/>
+<text x="1013.1" y="1880.0" text-anchor="middle" fill="#94a3b8" font-size="9.5">Validate cookie + CSRF + check role (Admin or owning PM)</text>
+<line x1="899.8" y1="1932.0" x2="999.8" y2="1932.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="909.8" y="1908.0" width="80.0" height="18" rx="4" fill="#0f172a"/>
+<text x="949.8" y="1921.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">Call Projects Module</text>
+<line x1="1132.1" y1="1986.0" x2="1458.0" y2="1986.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="1158.4" y="1962.0" width="273.4" height="18" rx="4" fill="#0f172a"/>
+<text x="1295.1" y="1975.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">UPDATE project SET status=archived (soft delete)</text>
+<line x1="1458.0" y1="2040.0" x2="1132.1" y2="2040.0" stroke="#5eead4" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)"/>
+<rect x="1280.7" y="2016.0" width="28.6" height="18" rx="4" fill="#0f172a"/>
+<text x="1295.1" y="2029.0" text-anchor="middle" fill="#5eead4" font-size="9.5">OK</text>
+<line x1="1132.1" y1="2094.0" x2="1232.0" y2="2094.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="1142.1" y="2070.0" width="80.0" height="18" rx="4" fill="#0f172a"/>
+<text x="1182.1" y="2083.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">Log PROJECT_ARCHIVED</text>
+<line x1="1358.0" y1="2148.0" x2="1458.0" y2="2148.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="1368.0" y="2124.0" width="80.0" height="18" rx="4" fill="#0f172a"/>
+<text x="1408.0" y="2137.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">INSERT audit_log</text>
+<line x1="1458.0" y1="2202.0" x2="1358.0" y2="2202.0" stroke="#5eead4" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)"/>
+<rect x="1393.7" y="2178.0" width="28.6" height="18" rx="4" fill="#0f172a"/>
+<text x="1408.0" y="2191.0" text-anchor="middle" fill="#5eead4" font-size="9.5">OK</text>
+<line x1="999.8" y1="2256.0" x2="899.8" y2="2256.0" stroke="#5eead4" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)"/>
+<rect x="909.8" y="2232.0" width="80.0" height="18" rx="4" fill="#0f172a"/>
+<text x="949.8" y="2245.0" text-anchor="middle" fill="#5eead4" font-size="9.5">204 No Content</text>
+<line x1="726.5" y1="2310.0" x2="626.5" y2="2310.0" stroke="#5eead4" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)"/>
+<rect x="636.5" y="2286.0" width="80.0" height="18" rx="4" fill="#0f172a"/>
+<text x="676.5" y="2299.0" text-anchor="middle" fill="#5eead4" font-size="9.5">204 No Content</text>
+<line x1="500.5" y1="2364.0" x2="237.9" y2="2364.0" stroke="#5eead4" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)"/>
+<rect x="323.0" y="2340.0" width="92.5" height="18" rx="4" fill="#0f172a"/>
+<text x="369.2" y="2353.0" text-anchor="middle" fill="#5eead4" font-size="9.5">204 No Content</text>
+<line x1="70" y1="2404.0" x2="1606" y2="2404.0" stroke="#334155" stroke-width="1" stroke-dasharray="4,4"/>
+<rect x="643.7" y="2391.0" width="388.6" height="22" rx="11" fill="#334155"/>
+<text x="838.0" y="2406.0" text-anchor="middle" fill="#cbd5e1" font-size="10.5" font-weight="700">Create / Update / Delete Site (Admin or Owning PM only)</text>
+<line x1="237.9" y1="2458.0" x2="500.5" y2="2458.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="247.9" y="2434.0" width="242.6" height="18" rx="4" fill="#0f172a"/>
+<text x="369.2" y="2447.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">POST /api/v1/projects/1/sites {fields} (cookie)</text>
+<line x1="626.5" y1="2512.0" x2="726.5" y2="2512.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="636.5" y="2488.0" width="80.0" height="18" rx="4" fill="#0f172a"/>
+<text x="676.5" y="2501.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">Forward request + cookie</text>
+<path d="M813.1,2566.0 C859.1,2566.0 859.1,2596.0 813.1,2596.0" fill="none" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
+<rect x="855.1" y="2568.0" width="315.9" height="20" rx="5" fill="#1e293b" stroke="#334155"/>
+<text x="1013.1" y="2582.0" text-anchor="middle" fill="#94a3b8" font-size="9.5">Validate cookie + CSRF + check role (Admin or owning PM)</text>
+<line x1="899.8" y1="2634.0" x2="999.8" y2="2634.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="909.8" y="2610.0" width="80.0" height="18" rx="4" fill="#0f172a"/>
+<text x="949.8" y="2623.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">Call Projects Module</text>
+<line x1="1132.1" y1="2688.0" x2="1458.0" y2="2688.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="1256.8" y="2664.0" width="76.5" height="18" rx="4" fill="#0f172a"/>
+<text x="1295.1" y="2677.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">INSERT site</text>
+<line x1="1458.0" y1="2742.0" x2="1132.1" y2="2742.0" stroke="#5eead4" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)"/>
+<rect x="1256.8" y="2718.0" width="76.5" height="18" rx="4" fill="#0f172a"/>
+<text x="1295.1" y="2731.0" text-anchor="middle" fill="#5eead4" font-size="9.5">site_id = 2</text>
+<line x1="1132.1" y1="2796.0" x2="1232.0" y2="2796.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="1142.1" y="2772.0" width="80.0" height="18" rx="4" fill="#0f172a"/>
+<text x="1182.1" y="2785.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">Log SITE_CREATED</text>
+<line x1="1358.0" y1="2850.0" x2="1458.0" y2="2850.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="1368.0" y="2826.0" width="80.0" height="18" rx="4" fill="#0f172a"/>
+<text x="1408.0" y="2839.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">INSERT audit_log</text>
+<line x1="1458.0" y1="2904.0" x2="1358.0" y2="2904.0" stroke="#5eead4" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)"/>
+<rect x="1393.7" y="2880.0" width="28.6" height="18" rx="4" fill="#0f172a"/>
+<text x="1408.0" y="2893.0" text-anchor="middle" fill="#5eead4" font-size="9.5">OK</text>
+<line x1="999.8" y1="2958.0" x2="899.8" y2="2958.0" stroke="#5eead4" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)"/>
+<rect x="914.2" y="2934.0" width="71.2" height="18" rx="4" fill="#0f172a"/>
+<text x="949.8" y="2947.0" text-anchor="middle" fill="#5eead4" font-size="9.5">201 {site}</text>
+<line x1="726.5" y1="3012.0" x2="626.5" y2="3012.0" stroke="#5eead4" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)"/>
+<rect x="651.6" y="2988.0" width="49.9" height="18" rx="4" fill="#0f172a"/>
+<text x="676.5" y="3001.0" text-anchor="middle" fill="#5eead4" font-size="9.5">201 OK</text>
+<line x1="500.5" y1="3066.0" x2="237.9" y2="3066.0" stroke="#5eead4" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)"/>
+<rect x="333.6" y="3042.0" width="71.2" height="18" rx="4" fill="#0f172a"/>
+<text x="369.2" y="3055.0" text-anchor="middle" fill="#5eead4" font-size="9.5">201 {site}</text>
+<line x1="237.9" y1="3120.0" x2="500.5" y2="3120.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="247.9" y="3096.0" width="242.6" height="18" rx="4" fill="#0f172a"/>
+<text x="369.2" y="3109.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">PATCH /api/v1/projects/1/sites/2 {fields} (cookie)</text>
+<line x1="626.5" y1="3174.0" x2="726.5" y2="3174.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="636.5" y="3150.0" width="80.0" height="18" rx="4" fill="#0f172a"/>
+<text x="676.5" y="3163.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">Forward request + cookie</text>
+<path d="M813.1,3228.0 C859.1,3228.0 859.1,3258.0 813.1,3258.0" fill="none" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
+<rect x="855.1" y="3230.0" width="315.9" height="20" rx="5" fill="#1e293b" stroke="#334155"/>
+<text x="1013.1" y="3244.0" text-anchor="middle" fill="#94a3b8" font-size="9.5">Validate cookie + CSRF + check role (Admin or owning PM)</text>
+<line x1="899.8" y1="3296.0" x2="999.8" y2="3296.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="909.8" y="3272.0" width="80.0" height="18" rx="4" fill="#0f172a"/>
+<text x="949.8" y="3285.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">Call Projects Module</text>
+<line x1="1132.1" y1="3350.0" x2="1458.0" y2="3350.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="1238.2" y="3326.0" width="113.8" height="18" rx="4" fill="#0f172a"/>
+<text x="1295.1" y="3339.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">UPDATE site fields</text>
+<line x1="1458.0" y1="3404.0" x2="1132.1" y2="3404.0" stroke="#5eead4" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)"/>
+<rect x="1280.7" y="3380.0" width="28.6" height="18" rx="4" fill="#0f172a"/>
+<text x="1295.1" y="3393.0" text-anchor="middle" fill="#5eead4" font-size="9.5">OK</text>
+<line x1="1132.1" y1="3458.0" x2="1232.0" y2="3458.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="1142.1" y="3434.0" width="80.0" height="18" rx="4" fill="#0f172a"/>
+<text x="1182.1" y="3447.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">Log SITE_UPDATED</text>
+<line x1="1358.0" y1="3512.0" x2="1458.0" y2="3512.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="1368.0" y="3488.0" width="80.0" height="18" rx="4" fill="#0f172a"/>
+<text x="1408.0" y="3501.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">INSERT audit_log</text>
+<line x1="1458.0" y1="3566.0" x2="1358.0" y2="3566.0" stroke="#5eead4" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)"/>
+<rect x="1393.7" y="3542.0" width="28.6" height="18" rx="4" fill="#0f172a"/>
+<text x="1408.0" y="3555.0" text-anchor="middle" fill="#5eead4" font-size="9.5">OK</text>
+<line x1="999.8" y1="3620.0" x2="899.8" y2="3620.0" stroke="#5eead4" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)"/>
+<rect x="914.2" y="3596.0" width="71.2" height="18" rx="4" fill="#0f172a"/>
+<text x="949.8" y="3609.0" text-anchor="middle" fill="#5eead4" font-size="9.5">200 {site}</text>
+<line x1="726.5" y1="3674.0" x2="626.5" y2="3674.0" stroke="#5eead4" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)"/>
+<rect x="651.6" y="3650.0" width="49.9" height="18" rx="4" fill="#0f172a"/>
+<text x="676.5" y="3663.0" text-anchor="middle" fill="#5eead4" font-size="9.5">200 OK</text>
+<line x1="500.5" y1="3728.0" x2="237.9" y2="3728.0" stroke="#5eead4" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)"/>
+<rect x="333.6" y="3704.0" width="71.2" height="18" rx="4" fill="#0f172a"/>
+<text x="369.2" y="3717.0" text-anchor="middle" fill="#5eead4" font-size="9.5">200 {site}</text>
+<line x1="237.9" y1="3782.0" x2="500.5" y2="3782.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="248.5" y="3758.0" width="241.4" height="18" rx="4" fill="#0f172a"/>
+<text x="369.2" y="3771.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">DELETE /api/v1/projects/1/sites/2 (cookie)</text>
+<line x1="626.5" y1="3836.0" x2="726.5" y2="3836.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="636.5" y="3812.0" width="80.0" height="18" rx="4" fill="#0f172a"/>
+<text x="676.5" y="3825.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">Forward request + cookie</text>
+<path d="M813.1,3890.0 C859.1,3890.0 859.1,3920.0 813.1,3920.0" fill="none" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
+<rect x="855.1" y="3892.0" width="315.9" height="20" rx="5" fill="#1e293b" stroke="#334155"/>
+<text x="1013.1" y="3906.0" text-anchor="middle" fill="#94a3b8" font-size="9.5">Validate cookie + CSRF + check role (Admin or owning PM)</text>
+<line x1="899.8" y1="3958.0" x2="999.8" y2="3958.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="909.8" y="3934.0" width="80.0" height="18" rx="4" fill="#0f172a"/>
+<text x="949.8" y="3947.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">Call Projects Module</text>
+<line x1="1132.1" y1="4012.0" x2="1458.0" y2="4012.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="1166.4" y="3988.0" width="257.4" height="18" rx="4" fill="#0f172a"/>
+<text x="1295.1" y="4001.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">DELETE site WHERE id=2</text>
+<line x1="1458.0" y1="4066.0" x2="1132.1" y2="4066.0" stroke="#5eead4" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)"/>
+<rect x="1280.7" y="4042.0" width="28.6" height="18" rx="4" fill="#0f172a"/>
+<text x="1295.1" y="4055.0" text-anchor="middle" fill="#5eead4" font-size="9.5">OK</text>
+<line x1="1132.1" y1="4120.0" x2="1232.0" y2="4120.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="1142.1" y="4096.0" width="80.0" height="18" rx="4" fill="#0f172a"/>
+<text x="1182.1" y="4109.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">Log SITE_DELETED</text>
+<line x1="1358.0" y1="4174.0" x2="1458.0" y2="4174.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="1368.0" y="4150.0" width="80.0" height="18" rx="4" fill="#0f172a"/>
+<text x="1408.0" y="4163.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">INSERT audit_log</text>
+<line x1="1458.0" y1="4228.0" x2="1358.0" y2="4228.0" stroke="#5eead4" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)"/>
+<rect x="1393.7" y="4204.0" width="28.6" height="18" rx="4" fill="#0f172a"/>
+<text x="1408.0" y="4217.0" text-anchor="middle" fill="#5eead4" font-size="9.5">OK</text>
+<line x1="999.8" y1="4282.0" x2="899.8" y2="4282.0" stroke="#5eead4" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)"/>
+<rect x="909.8" y="4258.0" width="80.0" height="18" rx="4" fill="#0f172a"/>
+<text x="949.8" y="4271.0" text-anchor="middle" fill="#5eead4" font-size="9.5">204 No Content</text>
+<line x1="726.5" y1="4336.0" x2="626.5" y2="4336.0" stroke="#5eead4" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)"/>
+<rect x="636.5" y="4312.0" width="80.0" height="18" rx="4" fill="#0f172a"/>
+<text x="676.5" y="4325.0" text-anchor="middle" fill="#5eead4" font-size="9.5">204 No Content</text>
+<line x1="500.5" y1="4390.0" x2="237.9" y2="4390.0" stroke="#5eead4" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)"/>
+<rect x="323.0" y="4366.0" width="92.5" height="18" rx="4" fill="#0f172a"/>
+<text x="369.2" y="4379.0" text-anchor="middle" fill="#5eead4" font-size="9.5">204 No Content</text>
+<rect x="30.0" y="4510.0" width="522.7" height="174.0" rx="10" fill="#1e293b" stroke="#334155" stroke-width="1.5" stroke-dasharray="6,4"/>
+<text x="44.0" y="4534.0" fill="#e2e8f0" font-size="12" font-weight="700">Error Flows:</text>
+<text x="44.0" y="4556.0" fill="#94a3b8" font-size="9.5">- Admin creates project without project_manager_id: 400</text>
+<text x="44.0" y="4574.0" fill="#94a3b8" font-size="9.5">  PROJECT_MANAGER_REQUIRED</text>
+<text x="44.0" y="4592.0" fill="#94a3b8" font-size="9.5">- project_manager_id refers to inactive/non-PM user: 400</text>
+<text x="44.0" y="4610.0" fill="#94a3b8" font-size="9.5">  INVALID_PROJECT_MANAGER</text>
+<text x="44.0" y="4628.0" fill="#94a3b8" font-size="9.5">- SE or Viewer attempts create/update/archive: 403 Forbidden</text>
+<text x="44.0" y="4646.0" fill="#94a3b8" font-size="9.5">- Non-owning PM attempts update/archive: 403 Forbidden</text>
+<text x="44.0" y="4664.0" fill="#94a3b8" font-size="9.5">- Unsafe request without valid CSRF token: 403 CSRF_FAILURE</text>
+<rect x="576.7" y="4510.0" width="522.7" height="210.0" rx="10" fill="#1e293b" stroke="#334155" stroke-width="1.5" stroke-dasharray="6,4"/>
+<text x="590.7" y="4534.0" fill="#e2e8f0" font-size="12" font-weight="700">Authorization Model (Projects / Sites):</text>
+<text x="590.7" y="4556.0" fill="#94a3b8" font-size="9.5">- Active PM creating a project always becomes its PM</text>
+<text x="590.7" y="4574.0" fill="#94a3b8" font-size="9.5">- Active Admin creating a project must explicitly assign</text>
+<text x="590.7" y="4592.0" fill="#94a3b8" font-size="9.5">  an active PM; Admin does not become the PM itself</text>
+<text x="590.7" y="4610.0" fill="#94a3b8" font-size="9.5">- Only Admin or the owning PM may update, archive, or</text>
+<text x="590.7" y="4628.0" fill="#94a3b8" font-size="9.5">  manage sites for a project</text>
+<text x="590.7" y="4646.0" fill="#94a3b8" font-size="9.5">- SE / Viewer may hold explicit project membership for</text>
+<text x="590.7" y="4664.0" fill="#94a3b8" font-size="9.5">  read access only; they cannot manage projects or sites</text>
+<text x="590.7" y="4682.0" fill="#94a3b8" font-size="9.5">- Project DELETE archives (soft delete); Site DELETE</text>
+<text x="590.7" y="4700.0" fill="#94a3b8" font-size="9.5">  permanently deletes the Site record</text>
+<rect x="1123.3" y="4510.0" width="522.7" height="138.0" rx="10" fill="#1e293b" stroke="#334155" stroke-width="1.5" stroke-dasharray="6,4"/>
+<text x="1137.3" y="4534.0" fill="#e2e8f0" font-size="12" font-weight="700">Module Interactions (Drone Mapping Service):</text>
+<text x="1137.3" y="4556.0" fill="#94a3b8" font-size="9.5">- Project and Site audit events are written synchronously</text>
+<text x="1137.3" y="4574.0" fill="#94a3b8" font-size="9.5">  and are append-only, matching the pattern used across</text>
+<text x="1137.3" y="4592.0" fill="#94a3b8" font-size="9.5">  every module in this service</text>
+<text x="1137.3" y="4610.0" fill="#94a3b8" font-size="9.5">- Auth is via HttpOnly cookie (hitech_access_token), not</text>
+<text x="1137.3" y="4628.0" fill="#94a3b8" font-size="9.5">  an Authorization header</text>
+</svg>

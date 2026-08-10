@@ -97,7 +97,7 @@
 <text x="44.0" y="1318.0" fill="#94a3b8" font-size="9.5">- JWT signature invalid or expired: 401 Unauthorized</text>
 <text x="44.0" y="1336.0" fill="#94a3b8" font-size="9.5">- Missing required claim (sub/email/role/exp): 401</text>
 <text x="44.0" y="1354.0" fill="#94a3b8" font-size="9.5">  INVALID_TOKEN</text>
-<text x="44.0" y="1372.0" fill="#94a3b8" font-size="9.5">- No matching active local user: 403 ACCOUNT_NOT_PROVISIONED</text>
+<text x="44.0" y="1372.0" fill="#94a3b8" font-size="9.5">- No matching active local user: 401 Unauthorized</text>
 <text x="44.0" y="1390.0" fill="#94a3b8" font-size="9.5">- Unsafe request without valid CSRF token: 403 CSRF_FAILURE</text>
 <rect x="611.3" y="1254.0" width="557.3" height="210.0" rx="10" fill="#1e293b" stroke="#334155" stroke-width="1.5" stroke-dasharray="6,4"/>
 <text x="625.3" y="1278.0" fill="#e2e8f0" font-size="12" font-weight="700">Module Interactions (Drone Mapping Service):</text>

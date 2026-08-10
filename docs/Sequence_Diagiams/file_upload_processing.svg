@@ -80,10 +80,10 @@
 <text x="1396.9" y="570.0" text-anchor="middle" fill="#94a3b8" font-size="9.5">Validate primary file + confirm assets are OBJ-only</text>
 <line x1="1273.2" y1="622.0" x2="1750.5" y2="622.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
 <rect x="1377.8" y="598.0" width="268.0" height="18" rx="4" fill="#0f172a"/>
-<text x="1511.8" y="611.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">Stream-upload primary file to staging (private)</text>
+<text x="1511.8" y="611.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">Stream-upload primary + optional OBJ assets to staging (private)</text>
 <line x1="1750.5" y1="676.0" x2="1273.2" y2="676.0" stroke="#5eead4" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)"/>
 <rect x="1457.6" y="652.0" width="108.4" height="18" rx="4" fill="#0f172a"/>
-<text x="1511.8" y="665.0" text-anchor="middle" fill="#5eead4" font-size="9.5">staging_key, etag</text>
+<text x="1511.8" y="665.0" text-anchor="middle" fill="#5eead4" font-size="9.5">staging_key(s), etag(s)</text>
 <path d="M1210.2,730.0 C1256.2,730.0 1256.2,760.0 1210.2,760.0" fill="none" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
 <rect x="1252.2" y="732.0" width="230.8" height="20" rx="5" fill="#1e293b" stroke="#334155"/>
 <text x="1367.6" y="746.0" text-anchor="middle" fill="#94a3b8" font-size="9.5">Compute SHA-256 checksum of primary file</text>
@@ -93,21 +93,21 @@
 <line x1="1524.5" y1="852.0" x2="1273.2" y2="852.0" stroke="#5eead4" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)"/>
 <rect x="1342.0" y="828.0" width="113.8" height="18" rx="4" fill="#0f172a"/>
 <text x="1398.8" y="841.0" text-anchor="middle" fill="#5eead4" font-size="9.5">no duplicate found</text>
-<line x1="1273.2" y1="906.0" x2="1750.5" y2="906.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
-<rect x="1375.2" y="882.0" width="273.4" height="18" rx="4" fill="#0f172a"/>
-<text x="1511.8" y="895.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">Promote staged primary file to canonical storage</text>
-<line x1="1750.5" y1="960.0" x2="1273.2" y2="960.0" stroke="#5eead4" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)"/>
-<rect x="1447.0" y="936.0" width="129.7" height="18" rx="4" fill="#0f172a"/>
-<text x="1511.8" y="949.0" text-anchor="middle" fill="#5eead4" font-size="9.5">canonical storage_key</text>
+<line x1="1273.2" y1="906.0" x2="1524.5" y2="906.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="1283.2" y="882.0" width="406.0" height="18" rx="4" fill="#0f172a"/>
+<text x="1486.2" y="895.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">BEGIN transaction; INSERT SurveyFile + optional SurveyFileAsset + ProcessingJob (queued)</text>
+<line x1="1524.5" y1="960.0" x2="1273.2" y2="960.0" stroke="#5eead4" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)"/>
+<rect x="1320.0" y="936.0" width="158.0" height="18" rx="4" fill="#0f172a"/>
+<text x="1399.0" y="949.0" text-anchor="middle" fill="#5eead4" font-size="9.5">records created (uncommitted)</text>
 <line x1="1273.2" y1="1014.0" x2="1750.5" y2="1014.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
-<rect x="1380.5" y="990.0" width="262.7" height="18" rx="4" fill="#0f172a"/>
-<text x="1511.8" y="1003.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">Stream-upload + promote OBJ companion asset(s)</text>
+<rect x="1332.0" y="990.0" width="359.6" height="18" rx="4" fill="#0f172a"/>
+<text x="1511.8" y="1003.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">Promote staged primary + optional OBJ assets to canonical private storage</text>
 <line x1="1750.5" y1="1068.0" x2="1273.2" y2="1068.0" stroke="#5eead4" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)"/>
-<rect x="1449.6" y="1044.0" width="124.4" height="18" rx="4" fill="#0f172a"/>
-<text x="1511.8" y="1057.0" text-anchor="middle" fill="#5eead4" font-size="9.5">asset storage_key(s)</text>
+<rect x="1443.0" y="1044.0" width="137.6" height="18" rx="4" fill="#0f172a"/>
+<text x="1511.8" y="1057.0" text-anchor="middle" fill="#5eead4" font-size="9.5">canonical storage_key(s)</text>
 <line x1="1273.2" y1="1122.0" x2="1524.5" y2="1122.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
-<rect x="1283.2" y="1098.0" width="231.3" height="18" rx="4" fill="#0f172a"/>
-<text x="1398.8" y="1111.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">INSERT SurveyFile + SurveyFileAsset(s) + ProcessingJob</text>
+<rect x="1283.2" y="1098.0" width="294.0" height="18" rx="4" fill="#0f172a"/>
+<text x="1430.2" y="1111.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">UPDATE canonical storage keys within same transaction</text>
 <line x1="1273.2" y1="1176.0" x2="2702.2" y2="1176.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
 <rect x="1933.5" y="1152.0" width="108.4" height="18" rx="4" fill="#0f172a"/>
 <text x="1987.7" y="1165.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">Log FILE_UPLOADED</text>
@@ -125,7 +125,7 @@
 <text x="1399.5" y="1408.0" text-anchor="middle" fill="#94a3b8" font-size="9.5">Register Celery dispatch via transaction.on_commit()</text>
 <line x1="1273.2" y1="1460.0" x2="2044.2" y2="1460.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
 <rect x="1500.7" y="1436.0" width="315.9" height="18" rx="4" fill="#0f172a"/>
-<text x="1658.7" y="1449.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">SEND TASK process_file(file_id=456, job_id=789, kind=2D)</text>
+<text x="1658.7" y="1449.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">SEND TASK process_2d_file(...) or process_3d_file(...), selected by file type</text>
 <line x1="1147.2" y1="1514.0" x2="935.5" y2="1514.0" stroke="#5eead4" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)"/>
 <rect x="945.5" y="1490.0" width="191.7" height="18" rx="4" fill="#0f172a"/>
 <text x="1041.3" y="1503.0" text-anchor="middle" fill="#5eead4" font-size="9.5">202 Accepted {file_id=456, job_id=789}</text>
@@ -149,7 +149,7 @@
 <text x="1041.3" y="1813.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">Call Files Module</text>
 <line x1="1273.2" y1="1878.0" x2="1750.5" y2="1878.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
 <rect x="1377.8" y="1854.0" width="268.0" height="18" rx="4" fill="#0f172a"/>
-<text x="1511.8" y="1867.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">Stream-upload primary file to staging (private)</text>
+<text x="1511.8" y="1867.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">Stream-upload primary + optional OBJ assets to staging (private)</text>
 <path d="M1210.2,1932.0 C1256.2,1932.0 1256.2,1962.0 1210.2,1962.0" fill="none" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
 <rect x="1252.2" y="1934.0" width="230.8" height="20" rx="5" fill="#1e293b" stroke="#334155"/>
 <text x="1367.6" y="1948.0" text-anchor="middle" fill="#94a3b8" font-size="9.5">Compute SHA-256 checksum of primary file</text>
@@ -176,7 +176,7 @@
 <text x="1460.0" y="2326.0" text-anchor="middle" fill="#cbd5e1" font-size="10.5" font-weight="700">Async Processing Pipeline (Celery Worker)</text>
 <line x1="2251.5" y1="2378.0" x2="2394.8" y2="2378.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
 <rect x="2261.5" y="2354.0" width="123.4" height="18" rx="4" fill="#0f172a"/>
-<text x="2323.2" y="2367.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">RECEIVE task process_file</text>
+<text x="2323.2" y="2367.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">RECEIVE selected process_2d_file / process_3d_file task</text>
 <path d="M2498.5,2432.0 C2544.5,2432.0 2544.5,2462.0 2498.5,2462.0" fill="none" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
 <rect x="2540.5" y="2434.0" width="326.6" height="20" rx="5" fill="#1e293b" stroke="#334155"/>
 <text x="2703.8" y="2448.0" text-anchor="middle" fill="#94a3b8" font-size="9.5">Check existing ProcessingJob:789 state (idempotency guard)</text>
@@ -245,7 +245,7 @@
 <text x="2650.6" y="3596.0" text-anchor="middle" fill="#94a3b8" font-size="9.5">Processing task raises transient error</text>
 <line x1="2394.8" y1="3648.0" x2="1650.5" y2="3648.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
 <rect x="1880.7" y="3624.0" width="284.0" height="18" rx="4" fill="#0f172a"/>
-<text x="2022.7" y="3637.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">UPDATE job: status=retry_scheduled, retry_count+=1</text>
+<text x="2022.7" y="3637.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">UPDATE job: status=queued, retry_count+=1</text>
 <line x1="2602.2" y1="3702.0" x2="2702.2" y2="3702.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
 <rect x="2612.2" y="3678.0" width="80.0" height="18" rx="4" fill="#0f172a"/>
 <text x="2652.2" y="3691.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">Log PROCESSING_RETRY</text>
@@ -266,7 +266,7 @@
 <text x="2674.5" y="4002.0" text-anchor="middle" fill="#94a3b8" font-size="9.5">Re-attempt processing on existing ProcessingJob</text>
 <line x1="2394.8" y1="4054.0" x2="1650.5" y2="4054.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
 <rect x="1870.0" y="4030.0" width="305.3" height="18" rx="4" fill="#0f172a"/>
-<text x="2022.7" y="4043.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">UPDATE job: status=FAILED_PERMANENT (after 3 attempts)</text>
+<text x="2022.7" y="4043.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">UPDATE job: status=failed (retry limit exhausted)</text>
 <line x1="2602.2" y1="4108.0" x2="2702.2" y2="4108.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
 <rect x="2612.2" y="4084.0" width="80.0" height="18" rx="4" fill="#0f172a"/>
 <text x="2652.2" y="4097.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">Log PROCESSING_FAILED</text>
@@ -293,7 +293,7 @@
 <text x="1665.2" y="4475.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">Call Processing Module (manual retry)</text>
 <path d="M2498.5,4540.0 C2544.5,4540.0 2544.5,4570.0 2498.5,4570.0" fill="none" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
 <rect x="2540.5" y="4542.0" width="315.9" height="20" rx="5" fill="#1e293b" stroke="#334155"/>
-<text x="2698.5" y="4556.0" text-anchor="middle" fill="#94a3b8" font-size="9.5">Check job status=FAILED_PERMANENT + retry_count &lt; max</text>
+<text x="2698.5" y="4556.0" text-anchor="middle" fill="#94a3b8" font-size="9.5">Validate job status=failed + retry_count &lt; max</text>
 <line x1="2394.8" y1="4608.0" x2="1650.5" y2="4608.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
 <rect x="1851.4" y="4584.0" width="342.5" height="18" rx="4" fill="#0f172a"/>
 <text x="2022.7" y="4597.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">UPDATE job: status=queued, retry_count+=1, error_message=NULL</text>
@@ -314,10 +314,10 @@
 <text x="2687.8" y="4894.0" text-anchor="middle" fill="#94a3b8" font-size="9.5">Register Celery dispatch via transaction.on_commit()</text>
 <line x1="2394.8" y1="4946.0" x2="2251.5" y2="4946.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
 <rect x="2261.5" y="4922.0" width="123.4" height="18" rx="4" fill="#0f172a"/>
-<text x="2323.2" y="4935.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">SEND TASK process_file(job_id=789) (manual retry)</text>
+<text x="2323.2" y="4935.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">SEND selected process_2d_file / process_3d_file task (manual retry)</text>
 <line x1="2251.5" y1="5000.0" x2="2394.8" y2="5000.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
 <rect x="2261.5" y="4976.0" width="123.4" height="18" rx="4" fill="#0f172a"/>
-<text x="2323.2" y="4989.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">RECEIVE task process_file (manual retry)</text>
+<text x="2323.2" y="4989.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">RECEIVE selected process_2d_file / process_3d_file task (manual retry)</text>
 <line x1="2394.8" y1="5054.0" x2="935.5" y2="5054.0" stroke="#5eead4" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)"/>
 <rect x="1624.2" y="5030.0" width="81.8" height="18" rx="4" fill="#0f172a"/>
 <text x="1665.2" y="5043.0" text-anchor="middle" fill="#5eead4" font-size="9.5">202 Accepted</text>
@@ -334,16 +334,16 @@
 <text x="44.0" y="5364.0" fill="#94a3b8" font-size="9.5">- Non-OBJ file in 'assets': 400 UNSUPPORTED_ASSET_TYPE</text>
 <text x="44.0" y="5382.0" fill="#94a3b8" font-size="9.5">- Unsupported file type / bad MIME: 400 INVALID_FILE_TYPE</text>
 <text x="44.0" y="5400.0" fill="#94a3b8" font-size="9.5">- File exceeds max size: 400 FILE_TOO_LARGE</text>
-<text x="44.0" y="5418.0" fill="#94a3b8" font-size="9.5">- Manual retry while job is not FAILED_PERMANENT: 409</text>
+<text x="44.0" y="5418.0" fill="#94a3b8" font-size="9.5">- Manual retry while job is not failed: 400</text>
 <text x="44.0" y="5436.0" fill="#94a3b8" font-size="9.5">  INVALID_STATE</text>
-<text x="44.0" y="5454.0" fill="#94a3b8" font-size="9.5">- Manual retry beyond configured max: 429 RETRY_LIMIT_EXCEEDED</text>
+<text x="44.0" y="5454.0" fill="#94a3b8" font-size="9.5">- Manual retry beyond configured max: 400 RETRY_LIMIT_EXCEEDED</text>
 <text x="44.0" y="5472.0" fill="#94a3b8" font-size="9.5">- Upload to unassigned project: 403 Forbidden</text>
 <text x="44.0" y="5490.0" fill="#94a3b8" font-size="9.5">- Unsafe request without valid CSRF token: 403 CSRF_FAILURE</text>
 <rect x="991.3" y="5282.0" width="937.3" height="246.0" rx="10" fill="#1e293b" stroke="#334155" stroke-width="1.5" stroke-dasharray="6,4"/>
 <text x="1005.3" y="5306.0" fill="#e2e8f0" font-size="12" font-weight="700">Module Interactions (Drone Mapping Service):</text>
-<text x="1005.3" y="5328.0" fill="#94a3b8" font-size="9.5">- Files Module streams to a private staging area first,</text>
-<text x="1005.3" y="5346.0" fill="#94a3b8" font-size="9.5">  then promotes to canonical private storage only after</text>
-<text x="1005.3" y="5364.0" fill="#94a3b8" font-size="9.5">  checksum confirms no duplicate exists</text>
+<text x="1005.3" y="5328.0" fill="#94a3b8" font-size="9.5">- Files Module stages primary + optional assets privately,</text>
+<text x="1005.3" y="5346.0" fill="#94a3b8" font-size="9.5">  creates file / asset / queued job records in one DB</text>
+<text x="1005.3" y="5364.0" fill="#94a3b8" font-size="9.5">  transaction, then promotes them to canonical storage</text>
 <text x="1005.3" y="5382.0" fill="#94a3b8" font-size="9.5">- Duplicate checksum short-circuits before any SurveyFile,</text>
 <text x="1005.3" y="5400.0" fill="#94a3b8" font-size="9.5">  SurveyFileAsset, or ProcessingJob is created</text>
 <text x="1005.3" y="5418.0" fill="#94a3b8" font-size="9.5">- One SurveyFile maps to exactly one ProcessingJob; retries</text>

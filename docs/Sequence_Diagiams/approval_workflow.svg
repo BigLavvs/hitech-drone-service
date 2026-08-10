@@ -136,12 +136,12 @@
 <path d="M1050.2,1660.0 C1096.2,1660.0 1096.2,1690.0 1050.2,1690.0" fill="none" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
 <rect x="1092.2" y="1662.0" width="315.9" height="20" rx="5" fill="#1e293b" stroke="#334155"/>
 <text x="1250.2" y="1676.0" text-anchor="middle" fill="#94a3b8" font-size="9.5">Validate cookie + CSRF + check role (Admin or owning PM)</text>
-<path d="M1050.2,1728.0 C1096.2,1728.0 1096.2,1758.0 1050.2,1758.0" fill="none" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
-<rect x="1092.2" y="1730.0" width="273.4" height="20" rx="5" fill="#1e293b" stroke="#334155"/>
-<text x="1228.9" y="1744.0" text-anchor="middle" fill="#94a3b8" font-size="9.5">Guard: reviewer must not be the survey's creator</text>
-<line x1="1136.8" y1="1796.0" x2="1236.8" y2="1796.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
-<rect x="1146.8" y="1772.0" width="80.0" height="18" rx="4" fill="#0f172a"/>
-<text x="1186.8" y="1785.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">Call Approvals Module</text>
+<line x1="1136.8" y1="1728.0" x2="1236.8" y2="1728.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="1146.8" y="1704.0" width="80.0" height="18" rx="4" fill="#0f172a"/>
+<text x="1186.8" y="1717.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">Call Approvals Module</text>
+<path d="M1306.4,1796.0 C1352.4,1796.0 1352.4,1826.0 1306.4,1826.0" fill="none" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
+<rect x="1348.4" y="1798.0" width="273.4" height="20" rx="5" fill="#1e293b" stroke="#334155"/>
+<text x="1485.1" y="1812.0" text-anchor="middle" fill="#94a3b8" font-size="9.5">Review validation: reviewer must not be survey creator</text>
 <line x1="1375.9" y1="1850.0" x2="1578.1" y2="1850.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
 <rect x="1385.9" y="1826.0" width="182.2" height="18" rx="4" fill="#0f172a"/>
 <text x="1477.0" y="1839.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">Verify survey status=PENDING_APPROVAL</text>
@@ -183,13 +183,13 @@
 <text x="913.6" y="2473.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">Forward request + cookie</text>
 <path d="M1050.2,2538.0 C1096.2,2538.0 1096.2,2568.0 1050.2,2568.0" fill="none" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
 <rect x="1092.2" y="2540.0" width="273.4" height="20" rx="5" fill="#1e293b" stroke="#334155"/>
-<text x="1228.9" y="2554.0" text-anchor="middle" fill="#94a3b8" font-size="9.5">Validate cookie + CSRF + check role, not creator</text>
+<text x="1228.9" y="2554.0" text-anchor="middle" fill="#94a3b8" font-size="9.5">Validate cookie + CSRF + check reviewer role</text>
 <line x1="1136.8" y1="2606.0" x2="1236.8" y2="2606.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
 <rect x="1146.8" y="2582.0" width="80.0" height="18" rx="4" fill="#0f172a"/>
 <text x="1186.8" y="2595.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">Call Approvals Module</text>
 <path d="M1306.4,2660.0 C1352.4,2660.0 1352.4,2690.0 1306.4,2690.0" fill="none" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
 <rect x="1348.4" y="2662.0" width="220.2" height="20" rx="5" fill="#1e293b" stroke="#334155"/>
-<text x="1458.5" y="2676.0" text-anchor="middle" fill="#94a3b8" font-size="9.5">Validate rejection reason is non-empty</text>
+<text x="1458.5" y="2676.0" text-anchor="middle" fill="#94a3b8" font-size="9.5">Review validation: reviewer != creator; reason non-empty</text>
 <line x1="1375.9" y1="2728.0" x2="1578.1" y2="2728.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
 <rect x="1385.9" y="2704.0" width="182.2" height="18" rx="4" fill="#0f172a"/>
 <text x="1477.0" y="2717.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">Verify survey status=PENDING_APPROVAL</text>
@@ -274,8 +274,8 @@
 <text x="781.3" y="4064.0" fill="#94a3b8" font-size="9.5">  new one for each review</text>
 <text x="781.3" y="4082.0" fill="#94a3b8" font-size="9.5">- ApprovalHistory is append-only and grows with every</text>
 <text x="781.3" y="4100.0" fill="#94a3b8" font-size="9.5">  transition (submitted, approved/rejected)</text>
-<text x="781.3" y="4118.0" fill="#94a3b8" font-size="9.5">- Access Control Module enforces 'cannot review own</text>
-<text x="781.3" y="4136.0" fill="#94a3b8" font-size="9.5">  survey' before Approvals Module is even called</text>
+<text x="781.3" y="4118.0" fill="#94a3b8" font-size="9.5">- Approvals Module enforces 'cannot review own survey'</text>
+<text x="781.3" y="4136.0" fill="#94a3b8" font-size="9.5">  during review validation after the module is called</text>
 <text x="781.3" y="4154.0" fill="#94a3b8" font-size="9.5">- Auth is via HttpOnly cookie, not an Authorization header</text>
 <rect x="1504.7" y="3982.0" width="713.3" height="120.0" rx="10" fill="#1e293b" stroke="#334155" stroke-width="1.5" stroke-dasharray="6,4"/>
 <text x="1518.7" y="4006.0" fill="#e2e8f0" font-size="12" font-weight="700">Legend:</text>
