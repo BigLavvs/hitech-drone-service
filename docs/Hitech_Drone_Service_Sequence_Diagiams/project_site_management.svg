@@ -1,0 +1,146 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1553 2008" font-family="Inter,system-ui,sans-serif">
+<defs>
+<marker id="arrow" markerWidth="10" markerHeight="8" refX="8" refY="4" orient="auto"><path d="M0,0 L10,4 L0,8 L2,4 Z" fill="#94a3b8"/></marker>
+<marker id="arrow-dashed" markerWidth="10" markerHeight="8" refX="8" refY="4" orient="auto"><path d="M0,0 L10,4 L0,8 L2,4 Z" fill="#5eead4"/></marker>
+</defs>
+<rect x="0" y="0" width="1553" height="2008" fill="#0f172a"/>
+<rect x="20" y="14" width="1513" height="36" rx="8" fill="#1e293b"/>
+<text x="36" y="37" fill="#e2e8f0" font-size="15" font-weight="700">Diagram B: Project and Site Management</text>
+<rect x="578.2" y="92.0" width="909.5" height="1602.0" rx="12" fill="#f59e0b" opacity="0.06" stroke="#f59e0b" stroke-width="2" stroke-dasharray="10,5"/>
+<rect x="939.8" y="58.0" width="186.2" height="26" rx="6" fill="#1e293b" stroke="#f59e0b" stroke-width="1.5"/>
+<text x="1032.9" y="76.0" text-anchor="middle" fill="#f59e0b" font-size="12" font-weight="700">Drone Mapping Service</text>
+<line x1="165.0" y1="136.0" x2="165.0" y2="1698.0" stroke="#334155" stroke-width="2"/>
+<rect x="90.0" y="96.0" width="149.9" height="40" rx="7" fill="#3b82f6"/>
+<text x="165.0" y="120.0" text-anchor="middle" fill="#fff" font-size="11.5" font-weight="700">User (PM / Admin)</text>
+<rect x="90.0" y="1698.0" width="149.9" height="30" rx="7" fill="#3b82f6" opacity="0.55"/>
+<text x="165.0" y="1717.0" text-anchor="middle" fill="#fff" font-size="10.5" font-weight="700">User (PM / Admin)</text>
+<line x1="441.2" y1="136.0" x2="441.2" y2="1698.0" stroke="#334155" stroke-width="2"/>
+<rect x="376.2" y="96.0" width="130.0" height="40" rx="7" fill="#8b5cf6"/>
+<text x="441.2" y="120.0" text-anchor="middle" fill="#fff" font-size="11.5" font-weight="700">API Gateway</text>
+<rect x="376.2" y="1698.0" width="130.0" height="30" rx="7" fill="#8b5cf6" opacity="0.55"/>
+<text x="441.2" y="1717.0" text-anchor="middle" fill="#fff" font-size="10.5" font-weight="700">API Gateway</text>
+<line x1="690.8" y1="136.0" x2="690.8" y2="1698.0" stroke="#334155" stroke-width="2"/>
+<rect x="602.2" y="96.0" width="177.2" height="40" rx="7" fill="#f59e0b"/>
+<text x="690.8" y="120.0" text-anchor="middle" fill="#fff" font-size="11.5" font-weight="700">Access Control Module</text>
+<rect x="602.2" y="1698.0" width="177.2" height="30" rx="7" fill="#f59e0b" opacity="0.55"/>
+<text x="690.8" y="1717.0" text-anchor="middle" fill="#fff" font-size="10.5" font-weight="700">Access Control Module</text>
+<line x1="943.5" y1="136.0" x2="943.5" y2="1698.0" stroke="#334155" stroke-width="2"/>
+<rect x="875.4" y="96.0" width="136.3" height="40" rx="7" fill="#f97316"/>
+<text x="943.5" y="120.0" text-anchor="middle" fill="#fff" font-size="11.5" font-weight="700">Projects Module</text>
+<rect x="875.4" y="1698.0" width="136.3" height="30" rx="7" fill="#f97316" opacity="0.55"/>
+<text x="943.5" y="1717.0" text-anchor="middle" fill="#fff" font-size="10.5" font-weight="700">Projects Module</text>
+<line x1="1172.7" y1="136.0" x2="1172.7" y2="1698.0" stroke="#334155" stroke-width="2"/>
+<rect x="1107.7" y="96.0" width="130.0" height="40" rx="7" fill="#ec4899"/>
+<text x="1172.7" y="120.0" text-anchor="middle" fill="#fff" font-size="11.5" font-weight="700">Audit Module</text>
+<rect x="1107.7" y="1698.0" width="130.0" height="30" rx="7" fill="#ec4899" opacity="0.55"/>
+<text x="1172.7" y="1717.0" text-anchor="middle" fill="#fff" font-size="10.5" font-weight="700">Audit Module</text>
+<line x1="1398.7" y1="136.0" x2="1398.7" y2="1698.0" stroke="#334155" stroke-width="2"/>
+<rect x="1333.7" y="96.0" width="130.0" height="40" rx="7" fill="#10b981"/>
+<text x="1398.7" y="120.0" text-anchor="middle" fill="#fff" font-size="11.5" font-weight="700">PostgreSQL</text>
+<rect x="1333.7" y="1698.0" width="130.0" height="30" rx="7" fill="#10b981" opacity="0.55"/>
+<text x="1398.7" y="1717.0" text-anchor="middle" fill="#fff" font-size="10.5" font-weight="700">PostgreSQL</text>
+<line x1="70" y1="162.0" x2="1483" y2="162.0" stroke="#334155" stroke-width="1" stroke-dasharray="4,4"/>
+<rect x="718.9" y="149.0" width="115.1" height="22" rx="11" fill="#334155"/>
+<text x="776.5" y="164.0" text-anchor="middle" fill="#cbd5e1" font-size="10.5" font-weight="700">Create Project</text>
+<line x1="237.9" y1="216.0" x2="378.2" y2="216.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="247.9" y="192.0" width="120.2" height="18" rx="4" fill="#0f172a"/>
+<text x="308.1" y="205.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">POST /projects Bearer {jwt}</text>
+<line x1="504.2" y1="270.0" x2="604.2" y2="270.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="514.2" y="246.0" width="80.0" height="18" rx="4" fill="#0f172a"/>
+<text x="554.2" y="259.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">Forward request + token</text>
+<path d="M690.8,324.0 C736.8,324.0 736.8,354.0 690.8,354.0" fill="none" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
+<rect x="732.8" y="326.0" width="151.0" height="20" rx="5" fill="#1e293b" stroke="#334155"/>
+<text x="808.3" y="340.0" text-anchor="middle" fill="#94a3b8" font-size="9.5">Validate JWT + check role</text>
+<line x1="777.4" y1="392.0" x2="877.4" y2="392.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="787.4" y="368.0" width="80.0" height="18" rx="4" fill="#0f172a"/>
+<text x="827.4" y="381.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">Call Projects Module</text>
+<line x1="1009.7" y1="446.0" x2="1335.7" y2="446.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="1126.5" y="422.0" width="92.5" height="18" rx="4" fill="#0f172a"/>
+<text x="1172.7" y="435.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">INSERT project</text>
+<line x1="1335.7" y1="500.0" x2="1009.7" y2="500.0" stroke="#5eead4" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)"/>
+<rect x="1126.5" y="476.0" width="92.5" height="18" rx="4" fill="#0f172a"/>
+<text x="1172.7" y="489.0" text-anchor="middle" fill="#5eead4" font-size="9.5">project_id = 1</text>
+<line x1="1009.7" y1="554.0" x2="1109.7" y2="554.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="1019.7" y="530.0" width="80.0" height="18" rx="4" fill="#0f172a"/>
+<text x="1059.7" y="543.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">Log PROJECT_CREATED</text>
+<line x1="1235.7" y1="608.0" x2="1335.7" y2="608.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="1245.7" y="584.0" width="80.0" height="18" rx="4" fill="#0f172a"/>
+<text x="1285.7" y="597.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">INSERT audit_log</text>
+<line x1="1335.7" y1="662.0" x2="1235.7" y2="662.0" stroke="#5eead4" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)"/>
+<rect x="1271.4" y="638.0" width="28.6" height="18" rx="4" fill="#0f172a"/>
+<text x="1285.7" y="651.0" text-anchor="middle" fill="#5eead4" font-size="9.5">OK</text>
+<line x1="1109.7" y1="716.0" x2="1009.7" y2="716.0" stroke="#5eead4" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)"/>
+<rect x="1045.4" y="692.0" width="28.6" height="18" rx="4" fill="#0f172a"/>
+<text x="1059.7" y="705.0" text-anchor="middle" fill="#5eead4" font-size="9.5">OK</text>
+<line x1="877.4" y1="770.0" x2="777.4" y2="770.0" stroke="#5eead4" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)"/>
+<rect x="794.5" y="746.0" width="65.9" height="18" rx="4" fill="#0f172a"/>
+<text x="827.4" y="759.0" text-anchor="middle" fill="#5eead4" font-size="9.5">{project}</text>
+<line x1="604.2" y1="824.0" x2="504.2" y2="824.0" stroke="#5eead4" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)"/>
+<rect x="514.2" y="800.0" width="80.0" height="18" rx="4" fill="#0f172a"/>
+<text x="554.2" y="813.0" text-anchor="middle" fill="#5eead4" font-size="9.5">201 {project}</text>
+<line x1="378.2" y1="878.0" x2="237.9" y2="878.0" stroke="#5eead4" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)"/>
+<rect x="264.5" y="854.0" width="87.2" height="18" rx="4" fill="#0f172a"/>
+<text x="308.1" y="867.0" text-anchor="middle" fill="#5eead4" font-size="9.5">201 {project}</text>
+<line x1="70" y1="918.0" x2="1483" y2="918.0" stroke="#334155" stroke-width="1" stroke-dasharray="4,4"/>
+<rect x="676.6" y="905.0" width="199.8" height="22" rx="11" fill="#334155"/>
+<text x="776.5" y="920.0" text-anchor="middle" fill="#cbd5e1" font-size="10.5" font-weight="700">Create Site (under project)</text>
+<line x1="237.9" y1="972.0" x2="378.2" y2="972.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="247.9" y="948.0" width="120.2" height="18" rx="4" fill="#0f172a"/>
+<text x="308.1" y="961.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">POST /projects/1/sites Bearer {jwt}</text>
+<line x1="504.2" y1="1026.0" x2="604.2" y2="1026.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="514.2" y="1002.0" width="80.0" height="18" rx="4" fill="#0f172a"/>
+<text x="554.2" y="1015.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">Forward request + token</text>
+<path d="M690.8,1080.0 C736.8,1080.0 736.8,1110.0 690.8,1110.0" fill="none" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
+<rect x="732.8" y="1082.0" width="172.3" height="20" rx="5" fill="#1e293b" stroke="#334155"/>
+<text x="818.9" y="1096.0" text-anchor="middle" fill="#94a3b8" font-size="9.5">Validate JWT + project access</text>
+<line x1="777.4" y1="1148.0" x2="877.4" y2="1148.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="787.4" y="1124.0" width="80.0" height="18" rx="4" fill="#0f172a"/>
+<text x="827.4" y="1137.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">Call Projects Module</text>
+<line x1="1009.7" y1="1202.0" x2="1335.7" y2="1202.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="1134.4" y="1178.0" width="76.5" height="18" rx="4" fill="#0f172a"/>
+<text x="1172.7" y="1191.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">INSERT site</text>
+<line x1="1335.7" y1="1256.0" x2="1009.7" y2="1256.0" stroke="#5eead4" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)"/>
+<rect x="1134.4" y="1232.0" width="76.5" height="18" rx="4" fill="#0f172a"/>
+<text x="1172.7" y="1245.0" text-anchor="middle" fill="#5eead4" font-size="9.5">site_id = 2</text>
+<line x1="1009.7" y1="1310.0" x2="1109.7" y2="1310.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="1019.7" y="1286.0" width="80.0" height="18" rx="4" fill="#0f172a"/>
+<text x="1059.7" y="1299.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">Log SITE_CREATED</text>
+<line x1="1235.7" y1="1364.0" x2="1335.7" y2="1364.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="1245.7" y="1340.0" width="80.0" height="18" rx="4" fill="#0f172a"/>
+<text x="1285.7" y="1353.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">INSERT audit_log</text>
+<line x1="1335.7" y1="1418.0" x2="1235.7" y2="1418.0" stroke="#5eead4" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)"/>
+<rect x="1271.4" y="1394.0" width="28.6" height="18" rx="4" fill="#0f172a"/>
+<text x="1285.7" y="1407.0" text-anchor="middle" fill="#5eead4" font-size="9.5">OK</text>
+<line x1="1109.7" y1="1472.0" x2="1009.7" y2="1472.0" stroke="#5eead4" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)"/>
+<rect x="1045.4" y="1448.0" width="28.6" height="18" rx="4" fill="#0f172a"/>
+<text x="1059.7" y="1461.0" text-anchor="middle" fill="#5eead4" font-size="9.5">OK</text>
+<line x1="877.4" y1="1526.0" x2="777.4" y2="1526.0" stroke="#5eead4" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)"/>
+<rect x="802.4" y="1502.0" width="49.9" height="18" rx="4" fill="#0f172a"/>
+<text x="827.4" y="1515.0" text-anchor="middle" fill="#5eead4" font-size="9.5">{site}</text>
+<line x1="604.2" y1="1580.0" x2="504.2" y2="1580.0" stroke="#5eead4" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)"/>
+<rect x="518.6" y="1556.0" width="71.2" height="18" rx="4" fill="#0f172a"/>
+<text x="554.2" y="1569.0" text-anchor="middle" fill="#5eead4" font-size="9.5">201 {site}</text>
+<line x1="378.2" y1="1634.0" x2="237.9" y2="1634.0" stroke="#5eead4" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)"/>
+<rect x="272.5" y="1610.0" width="71.2" height="18" rx="4" fill="#0f172a"/>
+<text x="308.1" y="1623.0" text-anchor="middle" fill="#5eead4" font-size="9.5">201 {site}</text>
+<rect x="30.0" y="1754.0" width="481.7" height="102.0" rx="10" fill="#1e293b" stroke="#334155" stroke-width="1.5" stroke-dasharray="6,4"/>
+<text x="44.0" y="1778.0" fill="#e2e8f0" font-size="12" font-weight="700">Error Flows:</text>
+<text x="44.0" y="1800.0" fill="#94a3b8" font-size="9.5">- PM creates site on unassigned project: 403 Forbidden</text>
+<text x="44.0" y="1818.0" fill="#94a3b8" font-size="9.5">- PM updates another PM's project: 403 Forbidden</text>
+<text x="44.0" y="1836.0" fill="#94a3b8" font-size="9.5">- Invalid project_id in site URL: 404 Not Found</text>
+<rect x="535.7" y="1754.0" width="481.7" height="174.0" rx="10" fill="#1e293b" stroke="#334155" stroke-width="1.5" stroke-dasharray="6,4"/>
+<text x="549.7" y="1778.0" fill="#e2e8f0" font-size="12" font-weight="700">Module Interactions (Drone Mapping Service):</text>
+<text x="549.7" y="1800.0" fill="#94a3b8" font-size="9.5">- Access Control Module validates JWT, extracts roles,</text>
+<text x="549.7" y="1818.0" fill="#94a3b8" font-size="9.5">  and checks project ownership before any module runs</text>
+<text x="549.7" y="1836.0" fill="#94a3b8" font-size="9.5">- Projects Module owns Project and Site entities and</text>
+<text x="549.7" y="1854.0" fill="#94a3b8" font-size="9.5">  enforces business rules</text>
+<text x="549.7" y="1872.0" fill="#94a3b8" font-size="9.5">- Audit Module performs append-only logging, called</text>
+<text x="549.7" y="1890.0" fill="#94a3b8" font-size="9.5">  synchronously in the request path</text>
+<text x="549.7" y="1908.0" fill="#94a3b8" font-size="9.5">- All modules communicate through service interfaces</text>
+<rect x="1041.3" y="1754.0" width="481.7" height="120.0" rx="10" fill="#1e293b" stroke="#334155" stroke-width="1.5" stroke-dasharray="6,4"/>
+<text x="1055.3" y="1778.0" fill="#e2e8f0" font-size="12" font-weight="700">Legend:</text>
+<text x="1055.3" y="1800.0" fill="#94a3b8" font-size="9.5">- Solid arrow: request / forward</text>
+<text x="1055.3" y="1818.0" fill="#94a3b8" font-size="9.5">- Dashed arrow: response</text>
+<text x="1055.3" y="1836.0" fill="#94a3b8" font-size="9.5">- Dashed orange box: Drone Mapping Service boundary</text>
+<text x="1055.3" y="1854.0" fill="#94a3b8" font-size="9.5">- Colored modules inside the box are internal</text>
+</svg>

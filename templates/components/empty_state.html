@@ -1,0 +1,5 @@
+<section class="state-panel state-panel--empty">
+  <h2>{{ empty_title|default:"Nothing here yet" }}</h2>
+  <p>{{ empty_description|default:"Records will appear here when they are available." }}</p>
+  {% if empty_action %}<div class="state-action">{{ empty_action }}</div>{% endif %}
+</section>

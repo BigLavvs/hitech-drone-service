@@ -1,0 +1,8 @@
+<header class="page-header">
+  <div>
+    {% if eyebrow %}<p class="eyebrow">{{ eyebrow }}</p>{% endif %}
+    <h1>{{ page_heading }}</h1>
+    {% if page_description %}<p class="page-description">{{ page_description }}</p>{% endif %}
+  </div>
+  {% if page_actions %}<div class="page-actions">{{ page_actions }}</div>{% endif %}
+</header>

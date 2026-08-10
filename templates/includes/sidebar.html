@@ -1,0 +1,22 @@
+<aside class="sidebar" aria-label="Workspace navigation">
+  <nav class="sidebar-nav">
+    <a class="sidebar-link{% if active_nav == 'projects' %} is-active{% endif %}" href="/projects"{% if active_nav == "projects" %} aria-current="page"{% endif %}>
+      <span class="nav-icon" aria-hidden="true">P</span> Projects
+    </a>
+    <a class="sidebar-link{% if active_nav == 'admin' %} is-active{% endif %}" href="/admin" data-admin-nav hidden{% if active_nav == "admin" %} aria-current="page"{% endif %}>
+      <span class="nav-icon" aria-hidden="true">A</span> Administration
+    </a>
+    <a class="sidebar-link{% if active_nav == 'docs' %} is-active{% endif %}" href="/docs"{% if active_nav == "docs" %} aria-current="page"{% endif %}>
+      <span class="nav-icon" aria-hidden="true">?</span> API Documentation
+    </a>
+  </nav>
+
+  <div class="sidebar-user">
+    <span class="user-avatar" aria-hidden="true">{{ ui_user_initials|default:"AM" }}</span>
+    <div>
+      <strong>{{ ui_user_name|default:"Alex Morgan" }}</strong>
+      <span>{{ ui_user_role|default:"Project Manager" }}</span>
+    </div>
+    <a class="text-action" href="{{ logout_url|default:'#' }}" data-logout>Log out</a>
+  </div>
+</aside>

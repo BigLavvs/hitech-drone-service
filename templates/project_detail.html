@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+
+{% block page_header %}
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <a href="/projects">Projects</a>
+    <span aria-hidden="true">/</span>
+    <span aria-current="page">Project {{ project_id }}</span>
+  </nav>
+
+  <header class="page-header">
+    <div>
+      <p class="eyebrow">Project detail</p>
+      <h1>Project {{ project_id }}</h1>
+      <p class="page-description">This shared-shell page is prepared for the documented project detail flow and its child sites. Project metadata and site records will populate here when the authenticated project APIs are connected in a later step.</p>
+    </div>
+    <div class="page-actions" data-role-aware-actions>
+      {% if ui_can_edit_project %}
+        <button class="button" type="button">Edit Project</button>
+      {% endif %}
+      {% if ui_can_add_site %}
+        <button class="button button--primary" type="button">Add Site</button>
+      {% endif %}
+    </div>
+  </header>
+{% endblock %}
+
+{% block content %}
+  <div data-project-detail-page data-project-id="{{ project_id }}">
+  <div class="survey-inline-message" data-page-message hidden></div>
+  <section class="card">
+    <header class="card-header">
+      <div>
+        <p class="eyebrow">Metadata</p>
+        <h2>Project overview</h2>
+      </div>
+    </header>
+    <div class="card-body" data-project-overview-region>
+      <dl class="metadata-grid" data-project-overview-list hidden>
+        <div class="metadata-item">
+          <dt>Project name</dt>
+          <dd data-project-field="name">Loading...</dd>
+        </div>
+        <div class="metadata-item">
+          <dt>Location</dt>
+          <dd data-project-field="location">Loading...</dd>
+        </div>
+        <div class="metadata-item">
+          <dt>Description</dt>
+          <dd data-project-field="description">Loading...</dd>
+        </div>
+        <div class="metadata-item">
+          <dt>Status</dt>
+          <dd data-project-field="status">Loading...</dd>
+        </div>
+        <div class="metadata-item">
+          <dt>Project manager</dt>
+          <dd data-project-field="project_manager_id">Loading...</dd>
+        </div>
+      </dl>
+      <div data-project-overview-state>
+        {% include "components/loading_state.html" with loading_title="Loading project" loading_description="Fetching authenticated project metadata." %}
+      </div>
+    </div>
+  </section>
+
+  <section class="card detail-section">
+    <header class="card-header">
+      <div>
+        <p class="eyebrow">Sites</p>
+        <h2>Project sites</h2>
+      </div>
+    </header>
+    <div class="card-body card-body--flush">
+      <div data-site-table-region>
+        {% include "components/loading_state.html" with loading_title="Loading sites" loading_description="Fetching sites for this project." %}
+      </div>
+    </div>
+  </section>
+
+  <div class="pagination-bar" data-sites-pagination hidden></div>
+
+  <section class="card" data-project-edit-card hidden>
+    <header class="card-header">
+      <div>
+        <p class="eyebrow">Edit</p>
+        <h2>Update project</h2>
+      </div>
+    </header>
+    <div class="card-body">
+      <form class="stack-form" data-project-edit-form>
+        <div class="form-field">
+          <label for="project-edit-name">Project name</label>
+          <input id="project-edit-name" name="name" type="text" required>
+        </div>
+        <div class="form-field">
+          <label for="project-edit-location">Location</label>
+          <input id="project-edit-location" name="location" type="text">
+        </div>
+        <div class="form-field">
+          <label for="project-edit-description">Description</label>
+          <textarea id="project-edit-description" name="description"></textarea>
+        </div>
+        <div class="form-field" data-project-edit-manager-field hidden>
+          <label for="project-edit-manager-id">Project Manager user ID</label>
+          <input id="project-edit-manager-id" name="project_manager_id" type="number" min="1" step="1" inputmode="numeric">
+          <p class="field-help">Only administrators can transfer ownership by setting another active Project Manager ID.</p>
+        </div>
+        <div class="survey-action-row">
+          <button class="button button--primary" type="submit" data-project-edit-submit>Save project</button>
+          <button class="button button--danger" type="button" data-project-archive-button>Archive project</button>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <section class="card" data-site-create-card hidden>
+    <header class="card-header">
+      <div>
+        <p class="eyebrow">Sites</p>
+        <h2>Add site</h2>
+      </div>
+    </header>
+    <div class="card-body">
+      <form class="stack-form" data-site-create-form>
+        <div class="form-field">
+          <label for="site-name">Site name</label>
+          <input id="site-name" name="name" type="text" required>
+        </div>
+        <div class="form-field form-field--inline-grid">
+          <div>
+            <label for="site-latitude">Latitude</label>
+            <input id="site-latitude" name="lat" type="number" step="any" required>
+          </div>
+          <div>
+            <label for="site-longitude">Longitude</label>
+            <input id="site-longitude" name="lng" type="number" step="any" required>
+          </div>
+        </div>
+        <div class="survey-action-row">
+          <button class="button button--primary" type="submit" data-site-create-submit>Create site</button>
+        </div>
+      </form>
+    </div>
+  </section>
+  </div>
+{% endblock %}

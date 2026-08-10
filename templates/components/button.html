@@ -1,0 +1,3 @@
+<button class="button button--{{ button_variant|default:'primary' }}" type="{{ button_type|default:'button' }}"{% if button_disabled %} disabled{% endif %}{% if button_id %} id="{{ button_id }}"{% endif %}{% if button_modal_id %} data-modal-open="{{ button_modal_id }}"{% endif %}>
+  {{ button_label }}
+</button>

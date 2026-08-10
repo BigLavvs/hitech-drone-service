@@ -1,0 +1,307 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block page_header %}
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <a href="/projects">Projects</a>
+    <span aria-hidden="true">/</span>
+    <span aria-current="page">Survey {{ survey_id }}</span>
+  </nav>
+
+  <header class="page-header">
+    <div>
+      <p class="eyebrow">Survey workspace</p>
+      <h1>Survey {{ survey_id }}</h1>
+      <p class="page-description">Review survey metadata, files, processing state, and approval workflow for this survey.</p>
+    </div>
+  </header>
+{% endblock %}
+
+{% block content %}
+  <div data-survey-workspace data-survey-id="{{ survey_id }}">
+    <div class="survey-inline-message" data-workspace-session-message hidden></div>
+
+    <section class="card">
+      <header class="card-header">
+        <div>
+          <p class="eyebrow">Workspace</p>
+          <h2>Survey navigation</h2>
+        </div>
+      </header>
+      <div class="card-body">
+        <div class="tab-list" role="tablist" aria-label="Survey workspace tabs" data-tab-group="survey-workspace">
+          <button class="tab-button" type="button" role="tab" id="survey-tab-overview" aria-selected="true" aria-controls="survey-panel-overview" tabindex="0">Overview</button>
+          <button class="tab-button" type="button" role="tab" id="survey-tab-files" aria-selected="false" aria-controls="survey-panel-files" tabindex="-1">Files</button>
+          <button class="tab-button" type="button" role="tab" id="survey-tab-map-2d" aria-selected="false" aria-controls="survey-panel-map-2d" tabindex="-1">Map 2D</button>
+          <button class="tab-button" type="button" role="tab" id="survey-tab-model-3d" aria-selected="false" aria-controls="survey-panel-model-3d" tabindex="-1">Model 3D</button>
+          <button class="tab-button" type="button" role="tab" id="survey-tab-approval" aria-selected="false" aria-controls="survey-panel-approval" tabindex="-1">Approval</button>
+          <button class="tab-button" type="button" role="tab" id="survey-tab-audit" aria-selected="false" aria-controls="survey-panel-audit" tabindex="-1">Audit</button>
+        </div>
+      </div>
+    </section>
+
+    <div class="tab-panel-stack">
+      <section class="card" id="survey-panel-overview" role="tabpanel" aria-labelledby="survey-tab-overview" data-tab-panel data-tab-group="survey-workspace">
+        <header class="card-header">
+          <div>
+            <p class="eyebrow">Overview</p>
+            <h2>Survey overview</h2>
+          </div>
+        </header>
+        <div class="card-body">
+          <div class="survey-panel-message" data-overview-message hidden></div>
+          <dl class="metadata-grid">
+            <div class="metadata-item">
+              <dt>Project</dt>
+              <dd data-overview-field="project">Loading...</dd>
+            </div>
+            <div class="metadata-item">
+              <dt>Site</dt>
+              <dd data-overview-field="site">Loading...</dd>
+            </div>
+            <div class="metadata-item">
+              <dt>Survey date</dt>
+              <dd data-overview-field="survey_date">Loading...</dd>
+            </div>
+            <div class="metadata-item">
+              <dt>Drone model</dt>
+              <dd data-overview-field="drone_model">Loading...</dd>
+            </div>
+            <div class="metadata-item">
+              <dt>Pilot</dt>
+              <dd data-overview-field="pilot">Loading...</dd>
+            </div>
+            <div class="metadata-item">
+              <dt>CRS</dt>
+              <dd data-overview-field="coordinate_reference_system">Loading...</dd>
+            </div>
+            <div class="metadata-item">
+              <dt>Survey status</dt>
+              <dd data-overview-field="status">Loading...</dd>
+            </div>
+            <div class="metadata-item">
+              <dt>Processing status</dt>
+              <dd data-overview-field="processing_status">Loading...</dd>
+            </div>
+            <div class="metadata-item">
+              <dt>Notes</dt>
+              <dd data-overview-field="notes">Loading...</dd>
+            </div>
+            <div class="metadata-item">
+              <dt>Created by</dt>
+              <dd data-overview-field="created_by">Loading...</dd>
+            </div>
+            <div class="metadata-item">
+              <dt>Approved by</dt>
+              <dd data-overview-field="approved_by">Loading...</dd>
+            </div>
+          </dl>
+        </div>
+      </section>
+
+      <section class="card" id="survey-panel-files" role="tabpanel" aria-labelledby="survey-tab-files" data-tab-panel data-tab-group="survey-workspace" hidden>
+        <header class="card-header">
+          <div>
+            <p class="eyebrow">Files</p>
+            <h2>Survey files</h2>
+          </div>
+        </header>
+        <div class="card-body survey-panel-body">
+          <div class="survey-panel-message" data-files-message hidden></div>
+
+          <form class="survey-upload-form" data-upload-form hidden>
+            <div class="form-field">
+              <label for="survey-primary-file">Primary file</label>
+              <input id="survey-primary-file" name="file" type="file" required>
+              <p class="field-help">Upload one primary survey dataset file.</p>
+            </div>
+            <div class="form-field">
+              <label for="survey-asset-files">OBJ related assets</label>
+              <input id="survey-asset-files" name="assets" type="file" multiple>
+              <p class="field-help">Optional. Use only for an OBJ upload's MTL and texture assets.</p>
+            </div>
+            <div class="survey-action-row">
+              <button class="button button--primary" type="submit" data-upload-submit>Upload file</button>
+            </div>
+          </form>
+
+          <div data-files-content>
+            <section class="state-panel state-panel--loading" aria-live="polite" aria-busy="true">
+              <div class="loading-indicator" aria-hidden="true"></div>
+              <div>
+                <h2>Loading files</h2>
+                <p>Fetching file and processing status for this survey.</p>
+              </div>
+            </section>
+          </div>
+        </div>
+      </section>
+
+      <section class="card" id="survey-panel-map-2d" role="tabpanel" aria-labelledby="survey-tab-map-2d" data-tab-panel data-tab-group="survey-workspace" hidden>
+        <header class="card-header">
+          <div>
+            <p class="eyebrow">Map 2D</p>
+            <h2>2D map viewer</h2>
+          </div>
+        </header>
+        <div class="card-body survey-panel-body">
+          <div class="survey-panel-message" data-map-message hidden></div>
+          <section class="card card--nested">
+            <header class="card-header">
+              <div>
+                <p class="eyebrow">Measurements</p>
+                <h3>Map measurements</h3>
+              </div>
+            </header>
+            <div class="card-body survey-panel-body">
+              <div class="survey-panel-message" data-measurement-message hidden></div>
+              <form class="stack-form" data-measurement-form>
+                <div class="form-field form-field--inline-grid">
+                  <div>
+                    <label for="measurement-type">Measurement type</label>
+                    <select id="measurement-type" name="type">
+                      <option value="DISTANCE">Distance</option>
+                      <option value="AREA">Area</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label for="measurement-name">Measurement name</label>
+                    <input id="measurement-name" name="name" type="text" required>
+                  </div>
+                </div>
+                <p class="field-help" data-measurement-drawing-help>Select a type, then click the map to place points.</p>
+                <div class="survey-action-row">
+                  <button class="button button--primary" type="submit" data-measurement-save-submit>Save measurement</button>
+                  <button class="button" type="button" data-measurement-reset-button>Clear drawing</button>
+                </div>
+              </form>
+              <div data-measurements-content>
+                <section class="state-panel state-panel--loading" aria-live="polite" aria-busy="true">
+                  <div class="loading-indicator" aria-hidden="true"></div>
+                  <div>
+                    <h2>Loading measurements</h2>
+                    <p>Fetching saved measurements for this survey.</p>
+                  </div>
+                </section>
+              </div>
+            </div>
+          </section>
+          <div data-map-viewer></div>
+        </div>
+      </section>
+
+      <section class="card" id="survey-panel-model-3d" role="tabpanel" aria-labelledby="survey-tab-model-3d" data-tab-panel data-tab-group="survey-workspace" hidden>
+        <header class="card-header">
+          <div>
+            <p class="eyebrow">Model 3D</p>
+            <h2>3D model viewer</h2>
+          </div>
+        </header>
+        <div class="card-body survey-panel-body">
+          <div class="survey-panel-message" data-model-message hidden></div>
+          <div data-model-viewer></div>
+        </div>
+      </section>
+
+      <section class="card" id="survey-panel-approval" role="tabpanel" aria-labelledby="survey-tab-approval" data-tab-panel data-tab-group="survey-workspace" hidden>
+        <header class="card-header">
+          <div>
+            <p class="eyebrow">Approval</p>
+            <h2>Approval workflow</h2>
+          </div>
+        </header>
+        <div class="card-body survey-panel-body">
+          <div class="survey-panel-message" data-approval-message hidden></div>
+          <div class="survey-action-row" data-approval-actions></div>
+          <form class="survey-rejection-form" data-rejection-form hidden>
+            <div class="form-field">
+              <label for="survey-rejection-reason">Rejection reason</label>
+              <textarea id="survey-rejection-reason" name="reason" required></textarea>
+              <p class="field-help">A rejection reason is required.</p>
+              <p class="field-error" data-rejection-error hidden></p>
+            </div>
+            <div class="survey-action-row">
+              <button class="button button--danger" type="submit" data-reject-submit>Reject survey</button>
+            </div>
+          </form>
+          <div class="survey-approval-summary">
+            <div class="metadata-grid">
+              <div class="metadata-item">
+                <dt>Current status</dt>
+                <dd data-approval-field="current_status">Loading...</dd>
+              </div>
+              <div class="metadata-item">
+                <dt>Submitted at</dt>
+                <dd data-approval-field="submitted_at">Loading...</dd>
+              </div>
+              <div class="metadata-item">
+                <dt>Submitted by</dt>
+                <dd data-approval-field="submitted_by">Loading...</dd>
+              </div>
+              <div class="metadata-item">
+                <dt>Approved at</dt>
+                <dd data-approval-field="approved_at">Loading...</dd>
+              </div>
+              <div class="metadata-item">
+                <dt>Approved by</dt>
+                <dd data-approval-field="approved_by">Loading...</dd>
+              </div>
+              <div class="metadata-item">
+                <dt>Rejection reason</dt>
+                <dd data-approval-field="rejection_reason">Loading...</dd>
+              </div>
+            </div>
+          </div>
+          <div data-approval-history-content>
+            <section class="state-panel state-panel--loading" aria-live="polite" aria-busy="true">
+              <div class="loading-indicator" aria-hidden="true"></div>
+              <div>
+                <h2>Loading approval history</h2>
+                <p>Fetching approval state and prior actions for this survey.</p>
+              </div>
+            </section>
+          </div>
+        </div>
+      </section>
+
+      <section class="card" id="survey-panel-audit" role="tabpanel" aria-labelledby="survey-tab-audit" data-tab-panel data-tab-group="survey-workspace" hidden>
+        <header class="card-header">
+          <div>
+            <p class="eyebrow">Audit</p>
+            <h2>Audit timeline</h2>
+          </div>
+        </header>
+        <div class="card-body survey-panel-body">
+          <div class="survey-panel-message" data-audit-message hidden></div>
+          <form class="stack-form stack-form--inline" data-audit-filter-form>
+            <div class="form-field">
+              <label for="audit-action-filter">Action</label>
+              <input id="audit-action-filter" name="action" type="text" placeholder="e.g. SURVEY_CREATED">
+            </div>
+            <div class="form-field">
+              <label for="audit-from-date">From date</label>
+              <input id="audit-from-date" name="from_date" type="date">
+            </div>
+            <div class="form-field">
+              <label for="audit-to-date">To date</label>
+              <input id="audit-to-date" name="to_date" type="date">
+            </div>
+            <div class="survey-action-row">
+              <button class="button" type="submit">Apply filters</button>
+              <button class="button" type="button" data-audit-reset-button>Reset</button>
+            </div>
+          </form>
+          <div data-audit-content>
+            <section class="state-panel state-panel--loading" aria-live="polite" aria-busy="true">
+              <div class="loading-indicator" aria-hidden="true"></div>
+              <div>
+                <h2>Loading audit timeline</h2>
+                <p>Fetching survey-scoped audit events.</p>
+              </div>
+            </section>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+{% endblock %}

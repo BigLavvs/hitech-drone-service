@@ -1,0 +1,15 @@
+<div class="table-wrap">
+  <table class="data-table">
+    {% if table_caption %}<caption>{{ table_caption }}</caption>{% endif %}
+    <thead>
+      <tr>{% for heading in table_headings %}<th scope="col">{{ heading }}</th>{% endfor %}</tr>
+    </thead>
+    <tbody>
+      {% for row in table_rows %}
+        <tr>{% for cell in row %}<td>{{ cell }}</td>{% endfor %}</tr>
+      {% empty %}
+        <tr><td class="table-empty" colspan="{{ table_column_count|default:1 }}">{{ table_empty_text|default:"No records to display." }}</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>

@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <div class="page-stack" data-admin-page>
+    <section class="card">
+      <div class="page-header">
+        <div>
+          <p class="eyebrow">Administration</p>
+          <h1>User Management</h1>
+          <p>Manage local Hitech Auth subject mappings and review cross-project ownership.</p>
+        </div>
+      </div>
+      <p class="page-message" data-admin-message hidden></p>
+    </section>
+
+    <section class="card">
+      <div class="page-header">
+        <div>
+          <p class="eyebrow">Create User</p>
+          <h2>Add local user record</h2>
+        </div>
+      </div>
+      <form class="stack-form" data-admin-create-form>
+        <div class="form-grid">
+          <label>
+            <span>Email</span>
+            <input class="input" type="email" name="email" required>
+          </label>
+          <label>
+            <span>External ID</span>
+            <input class="input" type="text" name="external_id" required>
+          </label>
+          <label>
+            <span>Role</span>
+            <select class="select" name="role">
+              <option value="VIEWER">Viewer</option>
+              <option value="SURVEY_ENGINEER">Survey Engineer</option>
+              <option value="PROJECT_MANAGER">Project Manager</option>
+              <option value="ADMINISTRATOR">Administrator</option>
+            </select>
+          </label>
+          <label class="checkbox-inline">
+            <input type="checkbox" name="is_active" checked>
+            <span>Active</span>
+          </label>
+        </div>
+        <div>
+          <button class="button button--primary" type="submit" data-admin-create-submit>Create local user</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="card">
+      <div class="page-header">
+        <div>
+          <p class="eyebrow">Users</p>
+          <h2>Local user records</h2>
+          <p data-admin-user-summary>Loading users...</p>
+        </div>
+      </div>
+      <div data-admin-users-region></div>
+    </section>
+
+    <section class="card">
+      <div class="page-header">
+        <div>
+          <p class="eyebrow">Projects</p>
+          <h2>Cross-project oversight</h2>
+          <p data-admin-project-summary>Loading projects...</p>
+        </div>
+      </div>
+      <div data-admin-projects-region></div>
+    </section>
+  </div>
+{% endblock %}

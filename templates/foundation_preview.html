@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block page_header %}
+  {% include "components/page_header.html" with eyebrow="Frontend foundation" page_heading="Dashboard UI preview" page_description="A static demonstration of the shared layout and UI primitives. It does not read data or perform workflow actions." %}
+{% endblock %}
+
+{% block content %}
+  <div class="preview-grid">
+    <section class="card preview-card">
+      <header class="card-header"><div><p class="eyebrow">Card</p><h2>Shared workspace shell</h2></div>{% include "components/status_badge.html" with status_label="Ready" status_tone="success" %}</header>
+      <div class="card-body"><p class="preview-copy">Pages can compose the shared header, sidebar, actions, tables, states, and controls while keeping all data access in DRF API helpers.</p></div>
+    </section>
+
+    <section class="card preview-card">
+      <header class="card-header"><div><p class="eyebrow">Status badges</p><h2>Badge variants</h2></div></header>
+      <div class="card-body badge-row">
+        {% include "components/status_badge.html" with status_label="Neutral" status_tone="neutral" %}
+        {% include "components/status_badge.html" with status_label="Informational" status_tone="info" %}
+        {% include "components/status_badge.html" with status_label="Attention" status_tone="warning" %}
+        {% include "components/status_badge.html" with status_label="Success" status_tone="success" %}
+        {% include "components/status_badge.html" with status_label="Error" status_tone="danger" %}
+      </div>
+    </section>
+
+    <section class="card preview-card preview-card--wide">
+      <header class="card-header"><div><p class="eyebrow">Table</p><h2>Reusable data table</h2></div></header>
+      <div class="card-body card-body--flush">
+        {% include "components/data_table.html" with table_caption="Empty table example" table_headings=preview_table_headings table_column_count=3 table_empty_text="No rows are shown in this foundation preview." %}
+      </div>
+    </section>
+
+    <section class="card preview-card">
+      <header class="card-header"><div><p class="eyebrow">Form controls</p><h2>Consistent inputs</h2></div></header>
+      <div class="card-body preview-form">
+        {% include "components/form_field.html" with field_id="preview-name" field_name="preview-name" field_label="Example field" field_placeholder="No data is submitted" field_help="Form handling is added with the relevant API-backed feature." %}
+        {% include "components/button.html" with button_label="Open modal" button_modal_id="preview-modal" %}
+      </div>
+    </section>
+
+    <div class="preview-card--wide">
+      {% include "components/empty_state.html" with empty_title="No projects loaded" empty_description="This is the standard empty-state treatment for an API-backed list." %}
+    </div>
+  </div>
+{% endblock %}
+
+{% block modals %}
+  {% include "components/modal.html" with modal_id="preview-modal" modal_title="Shared modal" modal_content="Modal interactions are handled by the presentation layer only." %}
+{% endblock %}

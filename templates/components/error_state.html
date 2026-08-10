@@ -1,0 +1,5 @@
+<section class="state-panel state-panel--error" role="alert">
+  <h2>{{ error_title|default:"Something went wrong" }}</h2>
+  <p>{{ error_description|default:"The information could not be loaded. Try again shortly." }}</p>
+  {% if error_action %}<div class="state-action">{{ error_action }}</div>{% endif %}
+</section>

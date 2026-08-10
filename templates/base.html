@@ -1,0 +1,38 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>{% block title %}{{ page_title|default:"Hitech Drone Mapping" }}{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'css/app.css' %}">
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.167.1/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.167.1/examples/jsm/"
+      }
+    }
+  </script>
+  {% block extra_css %}{% endblock %}
+</head>
+<body class="app-shell{% block body_class %}{% endblock %}">
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  {% include "includes/header.html" %}
+
+  <div class="app-layout">
+    {% include "includes/sidebar.html" %}
+    <main class="main-content" id="main-content" tabindex="-1">
+      <div class="content-container">
+        {% block page_header %}{% endblock %}
+        {% block content %}{% endblock %}
+      </div>
+    </main>
+  </div>
+
+  {% block modals %}{% endblock %}
+  <script type="module" src="{% static 'js/app.js' %}"></script>
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

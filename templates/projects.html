@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+
+{% block page_header %}
+  <header class="page-header">
+    <div>
+      <p class="eyebrow">Projects</p>
+      <h1>Projects dashboard</h1>
+      <p class="page-description">This page is the authenticated landing workspace for projects you can access. Project data will populate here once the documented API and Auth Service integration are wired in later steps.</p>
+    </div>
+    <div class="page-actions" data-role-aware-actions>
+      {% if ui_user_is_admin %}
+        <a class="button" href="/admin">Manage users</a>
+      {% endif %}
+      {% if ui_can_create_project %}
+        <button class="button button--primary" type="button">Create project</button>
+      {% endif %}
+    </div>
+  </header>
+{% endblock %}
+
+{% block content %}
+  <div data-projects-page>
+  <div class="survey-inline-message" data-page-message hidden></div>
+  <section class="card">
+    <header class="card-header">
+      <div>
+        <p class="eyebrow">Overview</p>
+        <h2>Accessible projects</h2>
+      </div>
+      <div class="card-header-actions">
+        <span class="projects-summary" data-projects-summary>Loading projects...</span>
+      </div>
+    </header>
+    <div class="card-body card-body--flush">
+      <div data-projects-table-region>
+        {% include "components/loading_state.html" with loading_title="Loading projects" loading_description="Fetching the authenticated projects list." %}
+      </div>
+    </div>
+  </section>
+
+  <section class="card" data-project-create-card hidden>
+    <header class="card-header">
+      <div>
+        <p class="eyebrow">Create</p>
+        <h2>Create project</h2>
+      </div>
+    </header>
+    <div class="card-body">
+      <form class="stack-form" data-project-create-form>
+        <div class="form-field">
+          <label for="project-name">Project name</label>
+          <input id="project-name" name="name" type="text" required>
+        </div>
+        <div class="form-field">
+          <label for="project-location">Location</label>
+          <input id="project-location" name="location" type="text">
+        </div>
+        <div class="form-field">
+          <label for="project-description">Description</label>
+          <textarea id="project-description" name="description"></textarea>
+        </div>
+        <div class="form-field" data-project-manager-field hidden>
+          <label for="project-manager-id">Project Manager user ID</label>
+          <input id="project-manager-id" name="project_manager_id" type="number" min="1" step="1" inputmode="numeric">
+          <p class="field-help">Administrators must provide the existing Project Manager identifier. No user directory endpoint is exposed here.</p>
+        </div>
+        <div class="survey-action-row">
+          <button class="button button--primary" type="submit" data-project-create-submit>Create project</button>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <section class="card">
+    <header class="card-header">
+      <div>
+        <p class="eyebrow">Role-aware hooks</p>
+        <h2>Prepared for later authorization-backed UI</h2>
+      </div>
+    </header>
+    <div class="card-body">
+      <ul class="projects-role-list">
+        <li>Administrator: can create a project when an existing Project Manager ID is supplied.</li>
+        <li>Project Manager: can create a project and becomes its owner automatically.</li>
+        <li>Survey Engineer and Viewer: assigned-project, read-only experience.</li>
+      </ul>
+    </div>
+  </section>
+  </div>
+{% endblock %}

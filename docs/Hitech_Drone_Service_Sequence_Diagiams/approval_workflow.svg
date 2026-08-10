@@ -1,0 +1,268 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2188 3956" font-family="Inter,system-ui,sans-serif">
+<defs>
+<marker id="arrow" markerWidth="10" markerHeight="8" refX="8" refY="4" orient="auto"><path d="M0,0 L10,4 L0,8 L2,4 Z" fill="#94a3b8"/></marker>
+<marker id="arrow-dashed" markerWidth="10" markerHeight="8" refX="8" refY="4" orient="auto"><path d="M0,0 L10,4 L0,8 L2,4 Z" fill="#5eead4"/></marker>
+</defs>
+<rect x="0" y="0" width="2188" height="3956" fill="#0f172a"/>
+<rect x="20" y="14" width="2148" height="36" rx="8" fill="#1e293b"/>
+<text x="36" y="37" fill="#e2e8f0" font-size="15" font-weight="700">Diagram E: Approval Workflow</text>
+<rect x="878.1" y="92.0" width="1244.5" height="3532.0" rx="12" fill="#f59e0b" opacity="0.06" stroke="#f59e0b" stroke-width="2" stroke-dasharray="10,5"/>
+<rect x="1407.3" y="58.0" width="186.2" height="26" rx="6" fill="#1e293b" stroke="#f59e0b" stroke-width="1.5"/>
+<text x="1500.4" y="76.0" text-anchor="middle" fill="#f59e0b" font-size="12" font-weight="700">Drone Mapping Service</text>
+<line x1="158.2" y1="136.0" x2="158.2" y2="3628.0" stroke="#334155" stroke-width="2"/>
+<rect x="90.0" y="96.0" width="136.3" height="40" rx="7" fill="#3b82f6"/>
+<text x="158.2" y="120.0" text-anchor="middle" fill="#fff" font-size="11.5" font-weight="700">Survey Engineer</text>
+<rect x="90.0" y="3628.0" width="136.3" height="30" rx="7" fill="#3b82f6" opacity="0.55"/>
+<text x="158.2" y="3647.0" text-anchor="middle" fill="#fff" font-size="10.5" font-weight="700">Survey Engineer</text>
+<line x1="390.5" y1="136.0" x2="390.5" y2="3628.0" stroke="#334155" stroke-width="2"/>
+<rect x="322.3" y="96.0" width="136.3" height="40" rx="7" fill="#6366f1"/>
+<text x="390.5" y="120.0" text-anchor="middle" fill="#fff" font-size="11.5" font-weight="700">Project Manager</text>
+<rect x="322.3" y="3628.0" width="136.3" height="30" rx="7" fill="#6366f1" opacity="0.55"/>
+<text x="390.5" y="3647.0" text-anchor="middle" fill="#fff" font-size="10.5" font-weight="700">Project Manager</text>
+<line x1="741.1" y1="136.0" x2="741.1" y2="3628.0" stroke="#334155" stroke-width="2"/>
+<rect x="676.1" y="96.0" width="130.0" height="40" rx="7" fill="#8b5cf6"/>
+<text x="741.1" y="120.0" text-anchor="middle" fill="#fff" font-size="11.5" font-weight="700">API Gateway</text>
+<rect x="676.1" y="3628.0" width="130.0" height="30" rx="7" fill="#8b5cf6" opacity="0.55"/>
+<text x="741.1" y="3647.0" text-anchor="middle" fill="#fff" font-size="10.5" font-weight="700">API Gateway</text>
+<line x1="990.7" y1="136.0" x2="990.7" y2="3628.0" stroke="#334155" stroke-width="2"/>
+<rect x="902.1" y="96.0" width="177.2" height="40" rx="7" fill="#f59e0b"/>
+<text x="990.7" y="120.0" text-anchor="middle" fill="#fff" font-size="11.5" font-weight="700">Access Control Module</text>
+<rect x="902.1" y="3628.0" width="177.2" height="30" rx="7" fill="#f59e0b" opacity="0.55"/>
+<text x="990.7" y="3647.0" text-anchor="middle" fill="#fff" font-size="10.5" font-weight="700">Access Control Module</text>
+<line x1="1246.9" y1="136.0" x2="1246.9" y2="3628.0" stroke="#334155" stroke-width="2"/>
+<rect x="1175.4" y="96.0" width="143.1" height="40" rx="7" fill="#14b8a6"/>
+<text x="1246.9" y="120.0" text-anchor="middle" fill="#fff" font-size="11.5" font-weight="700">Approvals Module</text>
+<rect x="1175.4" y="3628.0" width="143.1" height="30" rx="7" fill="#14b8a6" opacity="0.55"/>
+<text x="1246.9" y="3647.0" text-anchor="middle" fill="#fff" font-size="10.5" font-weight="700">Approvals Module</text>
+<line x1="1581.6" y1="136.0" x2="1581.6" y2="3628.0" stroke="#334155" stroke-width="2"/>
+<rect x="1516.6" y="96.0" width="130.0" height="40" rx="7" fill="#f97316"/>
+<text x="1581.6" y="120.0" text-anchor="middle" fill="#fff" font-size="11.5" font-weight="700">Surveys Module</text>
+<rect x="1516.6" y="3628.0" width="130.0" height="30" rx="7" fill="#f97316" opacity="0.55"/>
+<text x="1581.6" y="3647.0" text-anchor="middle" fill="#fff" font-size="10.5" font-weight="700">Surveys Module</text>
+<line x1="1807.6" y1="136.0" x2="1807.6" y2="3628.0" stroke="#334155" stroke-width="2"/>
+<rect x="1742.6" y="96.0" width="130.0" height="40" rx="7" fill="#ec4899"/>
+<text x="1807.6" y="120.0" text-anchor="middle" fill="#fff" font-size="11.5" font-weight="700">Audit Module</text>
+<rect x="1742.6" y="3628.0" width="130.0" height="30" rx="7" fill="#ec4899" opacity="0.55"/>
+<text x="1807.6" y="3647.0" text-anchor="middle" fill="#fff" font-size="10.5" font-weight="700">Audit Module</text>
+<line x1="2033.6" y1="136.0" x2="2033.6" y2="3628.0" stroke="#334155" stroke-width="2"/>
+<rect x="1968.6" y="96.0" width="130.0" height="40" rx="7" fill="#10b981"/>
+<text x="2033.6" y="120.0" text-anchor="middle" fill="#fff" font-size="11.5" font-weight="700">PostgreSQL</text>
+<rect x="1968.6" y="3628.0" width="130.0" height="30" rx="7" fill="#10b981" opacity="0.55"/>
+<text x="2033.6" y="3647.0" text-anchor="middle" fill="#fff" font-size="10.5" font-weight="700">PostgreSQL</text>
+<line x1="70" y1="162.0" x2="2118" y2="162.0" stroke="#334155" stroke-width="1" stroke-dasharray="4,4"/>
+<rect x="938.8" y="149.0" width="310.4" height="22" rx="11" fill="#334155"/>
+<text x="1094.0" y="164.0" text-anchor="middle" fill="#cbd5e1" font-size="10.5" font-weight="700">Submit Survey for Approval (Survey Engineer)</text>
+<line x1="224.3" y1="216.0" x2="678.1" y2="216.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="346.5" y="192.0" width="209.5" height="18" rx="4" fill="#0f172a"/>
+<text x="451.2" y="205.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">POST /surveys/10/submit Bearer {jwt}</text>
+<line x1="804.1" y1="270.0" x2="904.1" y2="270.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="814.1" y="246.0" width="80.0" height="18" rx="4" fill="#0f172a"/>
+<text x="854.1" y="259.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">Forward request + token</text>
+<path d="M990.7,324.0 C1036.7,324.0 1036.7,354.0 990.7,354.0" fill="none" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
+<rect x="1032.7" y="326.0" width="214.8" height="20" rx="5" fill="#1e293b" stroke="#334155"/>
+<text x="1140.2" y="340.0" text-anchor="middle" fill="#94a3b8" font-size="9.5">Validate JWT + check survey ownership</text>
+<line x1="1077.3" y1="392.0" x2="1177.4" y2="392.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="1087.3" y="368.0" width="80.0" height="18" rx="4" fill="#0f172a"/>
+<text x="1127.3" y="381.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">Call Approvals Module</text>
+<line x1="1316.5" y1="446.0" x2="1518.6" y2="446.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="1326.5" y="422.0" width="182.2" height="18" rx="4" fill="#0f172a"/>
+<text x="1417.6" y="435.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">Check readiness (files ready, processing done)</text>
+<line x1="1644.6" y1="500.0" x2="1970.6" y2="500.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="1713.5" y="476.0" width="188.2" height="18" rx="4" fill="#0f172a"/>
+<text x="1807.6" y="489.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">Query survey + file + job status</text>
+<line x1="1970.6" y1="554.0" x2="1644.6" y2="554.0" stroke="#5eead4" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)"/>
+<rect x="1729.5" y="530.0" width="156.3" height="18" rx="4" fill="#0f172a"/>
+<text x="1807.6" y="543.0" text-anchor="middle" fill="#5eead4" font-size="9.5">ready, all files processed</text>
+<line x1="1518.6" y1="608.0" x2="1316.5" y2="608.0" stroke="#5eead4" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)"/>
+<rect x="1347.4" y="584.0" width="140.4" height="18" rx="4" fill="#0f172a"/>
+<text x="1417.6" y="597.0" text-anchor="middle" fill="#5eead4" font-size="9.5">Eligible for submission</text>
+<line x1="1316.5" y1="662.0" x2="1970.6" y2="662.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="1490.9" y="638.0" width="305.3" height="18" rx="4" fill="#0f172a"/>
+<text x="1643.6" y="651.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">UPDATE survey status=pending_approval; INSERT approval</text>
+<line x1="1316.5" y1="716.0" x2="1744.6" y2="716.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="1468.4" y="692.0" width="124.4" height="18" rx="4" fill="#0f172a"/>
+<text x="1530.6" y="705.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">Log SURVEY_SUBMITTED</text>
+<line x1="1870.6" y1="770.0" x2="1970.6" y2="770.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="1880.6" y="746.0" width="80.0" height="18" rx="4" fill="#0f172a"/>
+<text x="1920.6" y="759.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">INSERT audit_log</text>
+<line x1="1970.6" y1="824.0" x2="1870.6" y2="824.0" stroke="#5eead4" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)"/>
+<rect x="1906.3" y="800.0" width="28.6" height="18" rx="4" fill="#0f172a"/>
+<text x="1920.6" y="813.0" text-anchor="middle" fill="#5eead4" font-size="9.5">OK</text>
+<line x1="1177.4" y1="878.0" x2="1077.3" y2="878.0" stroke="#5eead4" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)"/>
+<rect x="1087.3" y="854.0" width="80.0" height="18" rx="4" fill="#0f172a"/>
+<text x="1127.3" y="867.0" text-anchor="middle" fill="#5eead4" font-size="9.5">200 {status: pending_approval}</text>
+<line x1="904.1" y1="932.0" x2="804.1" y2="932.0" stroke="#5eead4" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)"/>
+<rect x="829.2" y="908.0" width="49.9" height="18" rx="4" fill="#0f172a"/>
+<text x="854.1" y="921.0" text-anchor="middle" fill="#5eead4" font-size="9.5">200 OK</text>
+<line x1="678.1" y1="986.0" x2="224.3" y2="986.0" stroke="#5eead4" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)"/>
+<rect x="354.4" y="962.0" width="193.6" height="18" rx="4" fill="#0f172a"/>
+<text x="451.2" y="975.0" text-anchor="middle" fill="#5eead4" font-size="9.5">200 OK {status: pending_approval}</text>
+<line x1="70" y1="1026.0" x2="2118" y2="1026.0" stroke="#334155" stroke-width="1" stroke-dasharray="4,4"/>
+<rect x="971.3" y="1013.0" width="245.3" height="22" rx="11" fill="#334155"/>
+<text x="1094.0" y="1028.0" text-anchor="middle" fill="#cbd5e1" font-size="10.5" font-weight="700">Project Manager Reviews Submission</text>
+<line x1="456.6" y1="1080.0" x2="678.1" y2="1080.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="466.6" y="1056.0" width="201.5" height="18" rx="4" fill="#0f172a"/>
+<text x="567.4" y="1069.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">GET /surveys?status=pending_approval Bearer {jwt}</text>
+<line x1="804.1" y1="1134.0" x2="904.1" y2="1134.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="814.1" y="1110.0" width="80.0" height="18" rx="4" fill="#0f172a"/>
+<text x="854.1" y="1123.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">Forward request + token</text>
+<line x1="1077.3" y1="1188.0" x2="1518.6" y2="1188.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="1172.0" y="1164.0" width="252.1" height="18" rx="4" fill="#0f172a"/>
+<text x="1298.0" y="1177.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">List pending surveys scoped to PM's projects</text>
+<line x1="1644.6" y1="1242.0" x2="1970.6" y2="1242.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="1694.9" y="1218.0" width="225.5" height="18" rx="4" fill="#0f172a"/>
+<text x="1807.6" y="1231.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">Query surveys (status=pending_approval)</text>
+<line x1="1970.6" y1="1296.0" x2="1644.6" y2="1296.0" stroke="#5eead4" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)"/>
+<rect x="1764.1" y="1272.0" width="87.2" height="18" rx="4" fill="#0f172a"/>
+<text x="1807.6" y="1285.0" text-anchor="middle" fill="#5eead4" font-size="9.5">[survey list]</text>
+<line x1="1518.6" y1="1350.0" x2="1077.3" y2="1350.0" stroke="#5eead4" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)"/>
+<rect x="1259.7" y="1326.0" width="76.5" height="18" rx="4" fill="#0f172a"/>
+<text x="1298.0" y="1339.0" text-anchor="middle" fill="#5eead4" font-size="9.5">survey list</text>
+<line x1="904.1" y1="1404.0" x2="804.1" y2="1404.0" stroke="#5eead4" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)"/>
+<rect x="814.1" y="1380.0" width="80.0" height="18" rx="4" fill="#0f172a"/>
+<text x="854.1" y="1393.0" text-anchor="middle" fill="#5eead4" font-size="9.5">200 OK {surveys}</text>
+<line x1="678.1" y1="1458.0" x2="456.6" y2="1458.0" stroke="#5eead4" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)"/>
+<rect x="515.8" y="1434.0" width="103.1" height="18" rx="4" fill="#0f172a"/>
+<text x="567.4" y="1447.0" text-anchor="middle" fill="#5eead4" font-size="9.5">200 OK {surveys}</text>
+<line x1="70" y1="1498.0" x2="2118" y2="1498.0" stroke="#334155" stroke-width="1" stroke-dasharray="4,4"/>
+<rect x="1036.4" y="1485.0" width="115.1" height="22" rx="11" fill="#334155"/>
+<text x="1094.0" y="1500.0" text-anchor="middle" fill="#cbd5e1" font-size="10.5" font-weight="700">Approve Survey</text>
+<line x1="456.6" y1="1552.0" x2="678.1" y2="1552.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="466.6" y="1528.0" width="201.5" height="18" rx="4" fill="#0f172a"/>
+<text x="567.4" y="1541.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">POST /surveys/10/approve Bearer {jwt}</text>
+<line x1="804.1" y1="1606.0" x2="904.1" y2="1606.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="814.1" y="1582.0" width="80.0" height="18" rx="4" fill="#0f172a"/>
+<text x="854.1" y="1595.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">Forward request + token</text>
+<path d="M990.7,1660.0 C1036.7,1660.0 1036.7,1690.0 990.7,1690.0" fill="none" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
+<rect x="1032.7" y="1662.0" width="268.0" height="20" rx="5" fill="#1e293b" stroke="#334155"/>
+<text x="1166.8" y="1676.0" text-anchor="middle" fill="#94a3b8" font-size="9.5">Validate JWT + guard: cannot approve own survey</text>
+<line x1="1077.3" y1="1728.0" x2="1177.4" y2="1728.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="1087.3" y="1704.0" width="80.0" height="18" rx="4" fill="#0f172a"/>
+<text x="1127.3" y="1717.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">Call Approvals Module</text>
+<line x1="1316.5" y1="1782.0" x2="1518.6" y2="1782.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="1326.5" y="1758.0" width="182.2" height="18" rx="4" fill="#0f172a"/>
+<text x="1417.6" y="1771.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">Re-verify eligibility (no failed processing)</text>
+<line x1="1644.6" y1="1836.0" x2="1970.6" y2="1836.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="1729.5" y="1812.0" width="156.3" height="18" rx="4" fill="#0f172a"/>
+<text x="1807.6" y="1825.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">Query current survey state</text>
+<line x1="1970.6" y1="1890.0" x2="1644.6" y2="1890.0" stroke="#5eead4" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)"/>
+<rect x="1777.4" y="1866.0" width="60.6" height="18" rx="4" fill="#0f172a"/>
+<text x="1807.6" y="1879.0" text-anchor="middle" fill="#5eead4" font-size="9.5">eligible</text>
+<line x1="1316.5" y1="1944.0" x2="1970.6" y2="1944.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="1512.2" y="1920.0" width="262.7" height="18" rx="4" fill="#0f172a"/>
+<text x="1643.6" y="1933.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">UPDATE survey status=approved; INSERT approval</text>
+<line x1="1316.5" y1="1998.0" x2="1744.6" y2="1998.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="1465.7" y="1974.0" width="129.7" height="18" rx="4" fill="#0f172a"/>
+<text x="1530.6" y="1987.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">Log APPROVAL_APPROVED</text>
+<line x1="1870.6" y1="2052.0" x2="1970.6" y2="2052.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="1880.6" y="2028.0" width="80.0" height="18" rx="4" fill="#0f172a"/>
+<text x="1920.6" y="2041.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">INSERT audit_log</text>
+<line x1="1970.6" y1="2106.0" x2="1870.6" y2="2106.0" stroke="#5eead4" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)"/>
+<rect x="1906.3" y="2082.0" width="28.6" height="18" rx="4" fill="#0f172a"/>
+<text x="1920.6" y="2095.0" text-anchor="middle" fill="#5eead4" font-size="9.5">OK</text>
+<line x1="1177.4" y1="2160.0" x2="1077.3" y2="2160.0" stroke="#5eead4" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)"/>
+<rect x="1087.3" y="2136.0" width="80.0" height="18" rx="4" fill="#0f172a"/>
+<text x="1127.3" y="2149.0" text-anchor="middle" fill="#5eead4" font-size="9.5">200 {status: approved}</text>
+<line x1="904.1" y1="2214.0" x2="804.1" y2="2214.0" stroke="#5eead4" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)"/>
+<rect x="829.2" y="2190.0" width="49.9" height="18" rx="4" fill="#0f172a"/>
+<text x="854.1" y="2203.0" text-anchor="middle" fill="#5eead4" font-size="9.5">200 OK</text>
+<line x1="678.1" y1="2268.0" x2="456.6" y2="2268.0" stroke="#5eead4" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)"/>
+<rect x="491.9" y="2244.0" width="151.0" height="18" rx="4" fill="#0f172a"/>
+<text x="567.4" y="2257.0" text-anchor="middle" fill="#5eead4" font-size="9.5">200 OK {status: approved}</text>
+<line x1="70" y1="2308.0" x2="2118" y2="2308.0" stroke="#334155" stroke-width="1" stroke-dasharray="4,4"/>
+<rect x="977.8" y="2295.0" width="232.3" height="22" rx="11" fill="#334155"/>
+<text x="1094.0" y="2310.0" text-anchor="middle" fill="#cbd5e1" font-size="10.5" font-weight="700">Reject Survey (mandatory reason)</text>
+<line x1="456.6" y1="2362.0" x2="678.1" y2="2362.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="466.6" y="2338.0" width="201.5" height="18" rx="4" fill="#0f172a"/>
+<text x="567.4" y="2351.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">POST /surveys/11/reject {reason} Bearer {jwt}</text>
+<line x1="804.1" y1="2416.0" x2="904.1" y2="2416.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="814.1" y="2392.0" width="80.0" height="18" rx="4" fill="#0f172a"/>
+<text x="854.1" y="2405.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">Forward request + token</text>
+<line x1="1077.3" y1="2470.0" x2="1177.4" y2="2470.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="1087.3" y="2446.0" width="80.0" height="18" rx="4" fill="#0f172a"/>
+<text x="1127.3" y="2459.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">Call Approvals Module</text>
+<path d="M1246.9,2524.0 C1292.9,2524.0 1292.9,2554.0 1246.9,2554.0" fill="none" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
+<rect x="1288.9" y="2526.0" width="220.2" height="20" rx="5" fill="#1e293b" stroke="#334155"/>
+<text x="1399.0" y="2540.0" text-anchor="middle" fill="#94a3b8" font-size="9.5">Validate rejection reason is non-empty</text>
+<line x1="1316.5" y1="2592.0" x2="1970.6" y2="2592.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="1512.2" y="2568.0" width="262.7" height="18" rx="4" fill="#0f172a"/>
+<text x="1643.6" y="2581.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">UPDATE survey status=rejected; INSERT approval</text>
+<line x1="1316.5" y1="2646.0" x2="1744.6" y2="2646.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="1465.7" y="2622.0" width="129.7" height="18" rx="4" fill="#0f172a"/>
+<text x="1530.6" y="2635.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">Log APPROVAL_REJECTED</text>
+<line x1="1870.6" y1="2700.0" x2="1970.6" y2="2700.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="1880.6" y="2676.0" width="80.0" height="18" rx="4" fill="#0f172a"/>
+<text x="1920.6" y="2689.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">INSERT audit_log</text>
+<line x1="1970.6" y1="2754.0" x2="1870.6" y2="2754.0" stroke="#5eead4" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)"/>
+<rect x="1906.3" y="2730.0" width="28.6" height="18" rx="4" fill="#0f172a"/>
+<text x="1920.6" y="2743.0" text-anchor="middle" fill="#5eead4" font-size="9.5">OK</text>
+<line x1="1177.4" y1="2808.0" x2="1077.3" y2="2808.0" stroke="#5eead4" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)"/>
+<rect x="1087.3" y="2784.0" width="80.0" height="18" rx="4" fill="#0f172a"/>
+<text x="1127.3" y="2797.0" text-anchor="middle" fill="#5eead4" font-size="9.5">200 {status: rejected}</text>
+<line x1="904.1" y1="2862.0" x2="804.1" y2="2862.0" stroke="#5eead4" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)"/>
+<rect x="829.2" y="2838.0" width="49.9" height="18" rx="4" fill="#0f172a"/>
+<text x="854.1" y="2851.0" text-anchor="middle" fill="#5eead4" font-size="9.5">200 OK</text>
+<line x1="678.1" y1="2916.0" x2="456.6" y2="2916.0" stroke="#5eead4" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)"/>
+<rect x="491.9" y="2892.0" width="151.0" height="18" rx="4" fill="#0f172a"/>
+<text x="567.4" y="2905.0" text-anchor="middle" fill="#5eead4" font-size="9.5">200 OK {status: rejected}</text>
+<line x1="70" y1="2956.0" x2="2118" y2="2956.0" stroke="#334155" stroke-width="1" stroke-dasharray="4,4"/>
+<rect x="1036.4" y="2943.0" width="115.1" height="22" rx="11" fill="#334155"/>
+<text x="1094.0" y="2958.0" text-anchor="middle" fill="#cbd5e1" font-size="10.5" font-weight="700">Archive Survey</text>
+<line x1="456.6" y1="3010.0" x2="678.1" y2="3010.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="466.6" y="2986.0" width="201.5" height="18" rx="4" fill="#0f172a"/>
+<text x="567.4" y="2999.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">POST /surveys/10/archive Bearer {jwt}</text>
+<line x1="804.1" y1="3064.0" x2="904.1" y2="3064.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="814.1" y="3040.0" width="80.0" height="18" rx="4" fill="#0f172a"/>
+<text x="854.1" y="3053.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">Forward request + token</text>
+<line x1="1077.3" y1="3118.0" x2="1518.6" y2="3118.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="1238.5" y="3094.0" width="119.1" height="18" rx="4" fill="#0f172a"/>
+<text x="1298.0" y="3107.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">Call Surveys Module</text>
+<path d="M1581.6,3172.0 C1627.6,3172.0 1627.6,3202.0 1581.6,3202.0" fill="none" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
+<rect x="1623.6" y="3174.0" width="241.4" height="20" rx="5" fill="#1e293b" stroke="#334155"/>
+<text x="1744.4" y="3188.0" text-anchor="middle" fill="#94a3b8" font-size="9.5">Guard: status must be approved or rejected</text>
+<line x1="1644.6" y1="3240.0" x2="1970.6" y2="3240.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="1721.5" y="3216.0" width="172.3" height="18" rx="4" fill="#0f172a"/>
+<text x="1807.6" y="3229.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">UPDATE survey status=archived</text>
+<line x1="1644.6" y1="3294.0" x2="1744.6" y2="3294.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="1654.6" y="3270.0" width="80.0" height="18" rx="4" fill="#0f172a"/>
+<text x="1694.6" y="3283.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">Log SURVEY_ARCHIVED</text>
+<line x1="1870.6" y1="3348.0" x2="1970.6" y2="3348.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="1880.6" y="3324.0" width="80.0" height="18" rx="4" fill="#0f172a"/>
+<text x="1920.6" y="3337.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">INSERT audit_log</text>
+<line x1="1970.6" y1="3402.0" x2="1870.6" y2="3402.0" stroke="#5eead4" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)"/>
+<rect x="1906.3" y="3378.0" width="28.6" height="18" rx="4" fill="#0f172a"/>
+<text x="1920.6" y="3391.0" text-anchor="middle" fill="#5eead4" font-size="9.5">OK</text>
+<line x1="1518.6" y1="3456.0" x2="1077.3" y2="3456.0" stroke="#5eead4" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)"/>
+<rect x="1230.5" y="3432.0" width="135.0" height="18" rx="4" fill="#0f172a"/>
+<text x="1298.0" y="3445.0" text-anchor="middle" fill="#5eead4" font-size="9.5">200 {status: archived}</text>
+<line x1="904.1" y1="3510.0" x2="804.1" y2="3510.0" stroke="#5eead4" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)"/>
+<rect x="829.2" y="3486.0" width="49.9" height="18" rx="4" fill="#0f172a"/>
+<text x="854.1" y="3499.0" text-anchor="middle" fill="#5eead4" font-size="9.5">200 OK</text>
+<line x1="678.1" y1="3564.0" x2="456.6" y2="3564.0" stroke="#5eead4" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)"/>
+<rect x="491.9" y="3540.0" width="151.0" height="18" rx="4" fill="#0f172a"/>
+<text x="567.4" y="3553.0" text-anchor="middle" fill="#5eead4" font-size="9.5">200 OK {status: archived}</text>
+<rect x="30.0" y="3684.0" width="693.3" height="156.0" rx="10" fill="#1e293b" stroke="#334155" stroke-width="1.5" stroke-dasharray="6,4"/>
+<text x="44.0" y="3708.0" fill="#e2e8f0" font-size="12" font-weight="700">Error Flows:</text>
+<text x="44.0" y="3730.0" fill="#94a3b8" font-size="9.5">- Survey Engineer approves own submission: 403 Forbidden</text>
+<text x="44.0" y="3748.0" fill="#94a3b8" font-size="9.5">- Approve while processing incomplete or failed:</text>
+<text x="44.0" y="3766.0" fill="#94a3b8" font-size="9.5">  400 SURVEY_NOT_READY</text>
+<text x="44.0" y="3784.0" fill="#94a3b8" font-size="9.5">- Reject without a reason: 400 REASON_REQUIRED</text>
+<text x="44.0" y="3802.0" fill="#94a3b8" font-size="9.5">- Archive a survey still pending_approval: 400 INVALID_STATE</text>
+<text x="44.0" y="3820.0" fill="#94a3b8" font-size="9.5">- Approve/Reject a survey not pending_approval: 409 CONFLICT</text>
+<rect x="747.3" y="3684.0" width="693.3" height="192.0" rx="10" fill="#1e293b" stroke="#334155" stroke-width="1.5" stroke-dasharray="6,4"/>
+<text x="761.3" y="3708.0" fill="#e2e8f0" font-size="12" font-weight="700">Module Interactions (Drone Mapping Service):</text>
+<text x="761.3" y="3730.0" fill="#94a3b8" font-size="9.5">- Approvals Module owns state transitions for review;</text>
+<text x="761.3" y="3748.0" fill="#94a3b8" font-size="9.5">  Surveys Module remains source of truth for readiness</text>
+<text x="761.3" y="3766.0" fill="#94a3b8" font-size="9.5">- Every approval action writes an immutable</text>
+<text x="761.3" y="3784.0" fill="#94a3b8" font-size="9.5">  ApprovalHistory row before returning</text>
+<text x="761.3" y="3802.0" fill="#94a3b8" font-size="9.5">- Audit Module call is synchronous, so no approval</text>
+<text x="761.3" y="3820.0" fill="#94a3b8" font-size="9.5">  action can be left unlogged</text>
+<text x="761.3" y="3838.0" fill="#94a3b8" font-size="9.5">- Access Control Module enforces the 'cannot approve own</text>
+<text x="761.3" y="3856.0" fill="#94a3b8" font-size="9.5">  survey' guard before Approvals Module is even called</text>
+<rect x="1464.7" y="3684.0" width="693.3" height="120.0" rx="10" fill="#1e293b" stroke="#334155" stroke-width="1.5" stroke-dasharray="6,4"/>
+<text x="1478.7" y="3708.0" fill="#e2e8f0" font-size="12" font-weight="700">Legend:</text>
+<text x="1478.7" y="3730.0" fill="#94a3b8" font-size="9.5">- Solid arrow: request / call</text>
+<text x="1478.7" y="3748.0" fill="#94a3b8" font-size="9.5">- Dashed arrow: response</text>
+<text x="1478.7" y="3766.0" fill="#94a3b8" font-size="9.5">- Dashed orange box: Drone Mapping Service boundary</text>
+<text x="1478.7" y="3784.0" fill="#94a3b8" font-size="9.5">- Colored modules inside the box are internal</text>
+</svg>

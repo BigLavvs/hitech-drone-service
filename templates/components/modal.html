@@ -1,0 +1,11 @@
+<section class="modal" id="{{ modal_id }}" aria-hidden="true" aria-labelledby="{{ modal_id }}-title" role="dialog" aria-modal="true" hidden>
+  <div class="modal-backdrop" data-modal-close></div>
+  <div class="modal-dialog" role="document">
+    <header class="modal-header">
+      <h2 id="{{ modal_id }}-title">{{ modal_title }}</h2>
+      <button class="icon-button" type="button" data-modal-close aria-label="Close dialog">×</button>
+    </header>
+    <div class="modal-body">{{ modal_content }}</div>
+    {% if modal_actions %}<footer class="modal-footer">{{ modal_actions }}</footer>{% endif %}
+  </div>
+</section>

@@ -1,0 +1,603 @@
+# ============================================================================
+# apps/access_control/models.py
+# ============================================================================
+
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
+from django.db import models
+
+
+class UserRole(models.TextChoices):
+    ADMINISTRATOR = "ADMINISTRATOR", "Administrator"
+    PROJECT_MANAGER = "PROJECT_MANAGER", "Project Manager"
+    SURVEY_ENGINEER = "SURVEY_ENGINEER", "Survey Engineer"
+    VIEWER = "VIEWER", "Viewer"
+
+
+class UserManager(BaseUserManager):
+    def create_user(self, email, external_id, role, **extra_fields):
+        if not email:
+            raise ValueError("Email is required")
+        if not external_id:
+            raise ValueError("External ID is required")
+        email = self.normalize_email(email)
+        user = self.model(email=email, external_id=external_id, role=role, **extra_fields)
+        user.set_unusable_password()
+        user.save(using=self._db)
+        return user
+
+    def create_superuser(self, email, external_id, **extra_fields):
+        extra_fields.setdefault("is_staff", True)
+        extra_fields.setdefault("is_superuser", True)
+        extra_fields.setdefault("role", UserRole.ADMINISTRATOR)
+        return self.create_user(email, external_id, **extra_fields)
+
+
+class User(AbstractBaseUser):
+    """
+    Local reference only; source of truth is Hitech Auth Service.
+    Full name, avatar, and other profile data are fetched from Auth Service on demand.
+    This model exists solely for foreign key constraints and role caching.
+    Users are never hard-deleted; deactivation sets is_active=False and nulls all FK references.
+    """
+    external_id = models.CharField(max_length=255, unique=True, db_index=True)
+    email = models.EmailField(unique=True)
+    role = models.CharField(max_length=50, choices=UserRole.choices)
+    is_active = models.BooleanField(default=True)
+    is_staff = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    USERNAME_FIELD = "email"
+    REQUIRED_FIELDS = ["external_id"]
+
+    objects = UserManager()
+
+    class Meta:
+        db_table = "user"
+        indexes = [
+            models.Index(fields=["role"]),
+        ]
+
+    def __str__(self):
+        return f"{self.email} ({self.role})"
+
+
+# ============================================================================
+# apps/projects/models.py
+# ============================================================================
+
+class Project(models.Model):
+    name = models.CharField(max_length=255)
+    description = models.TextField(null=True, blank=True)
+    location = models.CharField(max_length=255, null=True, blank=True)
+    status = models.CharField(max_length=50, default="active")
+
+    project_manager = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="projects_owned",
+        db_column="project_manager_id",
+    )
+    created_by = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="projects_created",
+        db_column="created_by_id",
+    )
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = "project"
+        indexes = [
+            models.Index(fields=["project_manager"]),
+            models.Index(fields=["status"]),
+        ]
+
+    def __str__(self):
+        return self.name
+
+
+class ProjectMembership(models.Model):
+    project = models.ForeignKey(
+        Project,
+        on_delete=models.CASCADE,
+        related_name="memberships",
+        db_column="project_id",
+    )
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="projects_assigned",
+        db_column="user_id",
+    )
+    assigned_by = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="memberships_assigned",
+        db_column="assigned_by_id",
+    )
+    assigned_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = "project_membership"
+        unique_together = [["project", "user"]]
+        indexes = [
+            models.Index(fields=["project"]),
+            models.Index(fields=["user"]),
+        ]
+
+    def __str__(self):
+        return f"{self.user.email} -> {self.project.name}"
+
+
+# ============================================================================
+# apps/projects/models.py (Site)
+# ============================================================================
+
+from django.contrib.gis.db import models as gis_models
+
+
+class Site(models.Model):
+    project = models.ForeignKey(
+        Project,
+        on_delete=models.CASCADE,
+        related_name="sites",
+        db_column="project_id",
+    )
+    name = models.CharField(max_length=255)
+    coordinates = gis_models.PointField(srid=4326)
+    coordinate_reference_system = models.CharField(
+        max_length=50, default="EPSG:4326", db_column="coordinate_reference_system"
+    )
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = "site"
+        indexes = [
+            models.Index(fields=["project"]),
+        ]
+
+    def __str__(self):
+        return self.name
+
+
+# ============================================================================
+# apps/surveys/models.py
+# ============================================================================
+
+class SurveyStatus(models.TextChoices):
+    DRAFT = "DRAFT", "Draft"
+    UPLOADING = "UPLOADING", "Uploading"
+    PROCESSING = "PROCESSING", "Processing"
+    READY = "READY", "Ready"
+    FAILED = "FAILED", "Failed"
+    PENDING_APPROVAL = "PENDING_APPROVAL", "Pending Approval"
+    APPROVED = "APPROVED", "Approved"
+    REJECTED = "REJECTED", "Rejected"
+    ARCHIVED = "ARCHIVED", "Archived"
+
+
+class Survey(models.Model):
+    project = models.ForeignKey(
+        Project,
+        on_delete=models.CASCADE,
+        related_name="surveys",
+        db_column="project_id",
+    )
+    site = models.ForeignKey(
+        Site,
+        on_delete=models.CASCADE,
+        related_name="surveys",
+        db_column="site_id",
+    )
+    name = models.CharField(max_length=255)
+    survey_date = models.DateField(db_column="survey_date")
+    drone_model = models.CharField(max_length=255, null=True, blank=True, db_column="drone_model")
+    pilot = models.CharField(max_length=255, null=True, blank=True)
+    coordinate_reference_system = models.CharField(
+        max_length=50, default="EPSG:4326", db_column="coordinate_reference_system"
+    )
+    status = models.CharField(
+        max_length=50, choices=SurveyStatus.choices, default=SurveyStatus.DRAFT
+    )
+    processing_status = models.CharField(
+        max_length=50,
+        default="pending",
+        db_column="processing_status",
+    )
+
+    notes = models.TextField(null=True, blank=True)
+
+    created_by = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="surveys_created",
+        db_column="created_by_id",
+    )
+    approved_by = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="surveys_approved",
+        db_column="approved_by_id",
+    )
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = "survey"
+        indexes = [
+            models.Index(fields=["project"]),
+            models.Index(fields=["site"]),
+            models.Index(fields=["status"]),
+            models.Index(fields=["survey_date"]),
+        ]
+
+    def __str__(self):
+        return self.name
+
+
+# ============================================================================
+# apps/files/models.py
+# ============================================================================
+
+class FileType(models.TextChoices):
+    TWO_D = "TWO_D", "2D"
+    THREE_D = "THREE_D", "3D"
+
+
+class FileFormat(models.TextChoices):
+    GEOTIFF = "GEOTIFF", "GeoTIFF"
+    TIFF = "TIFF", "TIFF"
+    PNG = "PNG", "PNG"
+    JPEG = "JPEG", "JPEG"
+    KML = "KML", "KML"
+    GEOJSON = "GEOJSON", "GeoJSON"
+    OBJ = "OBJ", "OBJ"
+    GLB = "GLB", "GLB"
+    GLTF = "GLTF", "GLTF"
+    LAS = "LAS", "LAS"
+    LAZ = "LAZ", "LAZ"
+    PLY = "PLY", "PLY"
+    STL = "STL", "STL"
+
+
+class SurveyFile(models.Model):
+    survey = models.ForeignKey(
+        Survey,
+        on_delete=models.CASCADE,
+        related_name="files",
+        db_column="survey_id",
+    )
+    original_filename = models.CharField(max_length=255, db_column="original_filename")
+    stored_filename = models.CharField(max_length=255, db_column="stored_filename")
+    file_type = models.CharField(max_length=50, choices=FileType.choices, db_column="file_type")
+    format = models.CharField(max_length=50, choices=FileFormat.choices)
+    mime_type = models.CharField(max_length=100, db_column="mime_type")
+
+    size_bytes = models.BigIntegerField(db_column="size_bytes")
+    sha256_checksum = models.CharField(max_length=64, db_column="sha256_checksum")
+
+    storage_path = models.CharField(max_length=500, db_column="storage_path")
+    preview_path = models.CharField(
+        max_length=500, null=True, blank=True, db_column="preview_path"
+    )
+    converted_path = models.CharField(
+        max_length=500, null=True, blank=True, db_column="converted_path"
+    )
+
+    status = models.CharField(
+        max_length=50, default="uploading"
+    )
+
+    uploaded_by = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="files_uploaded",
+        db_column="uploaded_by_id",
+    )
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = "survey_file"
+        unique_together = [["sha256_checksum", "survey"]]
+        indexes = [
+            models.Index(fields=["survey"]),
+            models.Index(fields=["status"]),
+        ]
+
+    def __str__(self):
+        return self.original_filename
+
+
+class UploadSession(models.Model):
+    id = models.CharField(max_length=255, primary_key=True, db_column="session_id")
+    survey = models.ForeignKey(
+        Survey,
+        on_delete=models.CASCADE,
+        related_name="upload_sessions",
+        db_column="survey_id",
+    )
+    file = models.OneToOneField(
+        SurveyFile,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="upload_session",
+        db_column="file_id",
+    )
+    file_type = models.CharField(max_length=50, choices=FileType.choices, db_column="file_type")
+    total_size_bytes = models.BigIntegerField(db_column="total_size_bytes")
+    uploaded_bytes = models.BigIntegerField(default=0, db_column="uploaded_bytes")
+    progress_percent = models.IntegerField(default=0, db_column="progress_percent")
+    status = models.CharField(
+        max_length=50, default="in_progress"
+    )
+    checksum_expected = models.CharField(
+        max_length=64, null=True, blank=True, db_column="checksum_expected"
+    )
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = "upload_session"
+        indexes = [
+            models.Index(fields=["survey"]),
+            models.Index(fields=["status"]),
+        ]
+
+    def __str__(self):
+        return f"Session {self.id}"
+
+
+# ============================================================================
+# apps/processing/models.py
+# ============================================================================
+
+class ProcessingJob(models.Model):
+    file = models.OneToOneField(
+        SurveyFile,
+        on_delete=models.CASCADE,
+        related_name="processing_job",
+        db_column="file_id",
+    )
+    status = models.CharField(
+        max_length=50, default="queued"
+    )
+    progress_percent = models.IntegerField(default=0, db_column="progress_percent")
+    retry_count = models.IntegerField(default=0, db_column="retry_count")
+
+    started_at = models.DateTimeField(null=True, blank=True, db_column="started_at")
+    completed_at = models.DateTimeField(null=True, blank=True, db_column="completed_at")
+    error_message = models.TextField(null=True, blank=True, db_column="error_message")
+    celery_task_id = models.CharField(
+        max_length=255, null=True, blank=True, db_column="celery_task_id"
+    )
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = "processing_job"
+        indexes = [
+            models.Index(fields=["file"]),
+            models.Index(fields=["status"]),
+            models.Index(fields=["celery_task_id"]),
+        ]
+
+    def __str__(self):
+        return f"Job for {self.file.original_filename}"
+
+
+# ============================================================================
+# apps/approvals/models.py
+# ============================================================================
+
+class Approval(models.Model):
+    survey = models.OneToOneField(
+        Survey,
+        on_delete=models.CASCADE,
+        related_name="approval",
+        db_column="survey_id",
+    )
+    submitted_at = models.DateTimeField(null=True, blank=True, db_column="submitted_at")
+    submitted_by = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="approvals_submitted",
+        db_column="submitted_by_id",
+    )
+    approved_at = models.DateTimeField(null=True, blank=True, db_column="approved_at")
+    approved_by = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="approvals_approved",
+        db_column="approved_by_id",
+    )
+    rejection_reason = models.TextField(null=True, blank=True, db_column="rejection_reason")
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = "approval"
+
+    def __str__(self):
+        return f"Approval for {self.survey.name}"
+
+
+class ApprovalHistory(models.Model):
+    approval = models.ForeignKey(
+        Approval,
+        on_delete=models.CASCADE,
+        related_name="history",
+        db_column="approval_id",
+    )
+    action = models.CharField(max_length=50)
+    actor = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        db_column="actor_id",
+    )
+    reason = models.TextField(null=True, blank=True)
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = "approval_history"
+        indexes = [
+            models.Index(fields=["approval"]),
+            models.Index(fields=["actor"]),
+        ]
+
+    def __str__(self):
+        return f"{self.action} at {self.timestamp}"
+
+
+# ============================================================================
+# apps/maps/models.py
+# ============================================================================
+
+class MeasurementType(models.TextChoices):
+    DISTANCE = "DISTANCE", "Distance"
+    AREA = "AREA", "Area"
+
+
+class Measurement(models.Model):
+    survey = models.ForeignKey(
+        Survey,
+        on_delete=models.CASCADE,
+        related_name="measurements",
+        db_column="survey_id",
+    )
+    type = models.CharField(max_length=50, choices=MeasurementType.choices)
+    name = models.CharField(max_length=255)
+    coordinates = models.JSONField()
+    calculated_value = models.DecimalField(
+        max_digits=20, decimal_places=8, db_column="calculated_value"
+    )
+    unit = models.CharField(max_length=50)
+
+    created_by = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="measurements_created",
+        db_column="created_by_id",
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = "measurement"
+        indexes = [
+            models.Index(fields=["survey"]),
+            models.Index(fields=["type"]),
+        ]
+
+    def __str__(self):
+        return self.name
+
+
+# ============================================================================
+# apps/audit/models.py
+# ============================================================================
+
+class AuditAction(models.TextChoices):
+    PROJECT_CREATED = "PROJECT_CREATED", "Project Created" 
+    PROJECT_UPDATED = "PROJECT_UPDATED", "Project Updated" 
+    PROJECT_ARCHIVED = "PROJECT_ARCHIVED", "Project Archived"
+    SITE_CREATED = "SITE_CREATED", "Site Created"
+    SITE_UPDATED = "SITE_UPDATED", "Site Updated"
+    SITE_DELETED = "SITE_DELETED", "Site Deleted"
+    SURVEY_CREATED = "SURVEY_CREATED", "Survey Created"
+    SURVEY_SUBMITTED = "SURVEY_SUBMITTED", "Survey Submitted"
+    FILE_UPLOADED = "FILE_UPLOADED", "File Uploaded"
+    FILE_UPLOAD_FAILED = "FILE_UPLOAD_FAILED", "File Upload Failed"
+    PROCESSING_STARTED = "PROCESSING_STARTED", "Processing Started"
+    PROCESSING_FAILED = "PROCESSING_FAILED", "Processing Failed"
+    PROCESSING_RETRY = "PROCESSING_RETRY", "Processing Retry"
+    APPROVAL_SUBMITTED = "APPROVAL_SUBMITTED", "Approval Submitted"
+    APPROVAL_APPROVED = "APPROVAL_APPROVED", "Approval Approved"
+    APPROVAL_REJECTED = "APPROVAL_REJECTED", "Approval Rejected"
+    SURVEY_ARCHIVED = "SURVEY_ARCHIVED", "Survey Archived"
+    FILE_DOWNLOADED = "FILE_DOWNLOADED", "File Downloaded"
+    MEASUREMENT_CREATED = "MEASUREMENT_CREATED", "Measurement Created"
+    MEASUREMENT_DELETED = "MEASUREMENT_DELETED", "Measurement Deleted"
+    ADMIN_ACTION = "ADMIN_ACTION", "Admin Action"
+
+
+class AuditLog(models.Model):
+    action = models.CharField(max_length=50, choices=AuditAction.choices)
+    entity_type = models.CharField(
+        max_length=50, db_column="entity_type"
+    )
+    entity_id = models.IntegerField(db_column="entity_id")
+
+    user = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="audit_logs",
+        db_column="user_id",
+    )
+    project = models.ForeignKey(
+        Project,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="audit_logs",
+        db_column="project_id",
+    )
+    survey = models.ForeignKey(
+        Survey,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="audit_logs",
+        db_column="survey_id",
+    )
+
+    details = models.JSONField(null=True, blank=True)
+    ip_address = models.GenericIPAddressField(null=True, blank=True, db_column="ip_address")
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = "audit_log"
+        indexes = [
+            models.Index(fields=["action"]),
+            models.Index(fields=["entity_type", "entity_id"]),
+            models.Index(fields=["user"]),
+            models.Index(fields=["project"]),
+            models.Index(fields=["survey"]),
+            models.Index(fields=["timestamp"]),
+        ]
+
+    def __str__(self):
+        return f"{self.action} on {self.entity_type}:{self.entity_id}"

@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+
+{% block page_header %}
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <a href="/projects">Projects</a>
+    <span aria-hidden="true">/</span>
+    <a href="/projects/{{ project_id }}">Project {{ project_id }}</a>
+    <span aria-hidden="true">/</span>
+    <span aria-current="page">Site {{ site_id }}</span>
+  </nav>
+
+  <header class="page-header">
+    <div>
+      <p class="eyebrow">Site detail</p>
+      <h1>Site {{ site_id }}</h1>
+      <p class="page-description">This shared-shell page is prepared for the documented site detail flow and its child surveys. Site metadata and survey records will populate here when the authenticated site and survey APIs are connected in a later step.</p>
+    </div>
+    <div class="page-actions" data-role-aware-actions>
+      {% if ui_can_create_survey %}
+        <button class="button button--primary" type="button">Create Survey</button>
+      {% endif %}
+    </div>
+  </header>
+{% endblock %}
+
+{% block content %}
+  <div data-site-detail-page data-project-id="{{ project_id }}" data-site-id="{{ site_id }}">
+  <div class="survey-inline-message" data-page-message hidden></div>
+  <section class="card">
+    <header class="card-header">
+      <div>
+        <p class="eyebrow">Metadata</p>
+        <h2>Site overview</h2>
+      </div>
+    </header>
+    <div class="card-body" data-site-overview-region>
+      <dl class="metadata-grid" data-site-overview-list hidden>
+        <div class="metadata-item">
+          <dt>Site name</dt>
+          <dd data-site-field="name">Loading...</dd>
+        </div>
+        <div class="metadata-item">
+          <dt>Coordinates</dt>
+          <dd data-site-field="coordinates">Loading...</dd>
+        </div>
+        <div class="metadata-item">
+          <dt>CRS</dt>
+          <dd data-site-field="coordinate_reference_system">Loading...</dd>
+        </div>
+        <div class="metadata-item">
+          <dt>Project reference</dt>
+          <dd data-site-field="project_id">Project {{ project_id }}</dd>
+        </div>
+      </dl>
+      <div data-site-overview-state>
+        {% include "components/loading_state.html" with loading_title="Loading site" loading_description="Fetching authenticated site metadata." %}
+      </div>
+    </div>
+  </section>
+
+  <section class="card detail-section">
+    <header class="card-header">
+      <div>
+        <p class="eyebrow">Surveys</p>
+        <h2>Site surveys</h2>
+      </div>
+    </header>
+    <div class="card-body card-body--flush">
+      <div data-survey-table-region>
+        {% include "components/loading_state.html" with loading_title="Loading surveys" loading_description="Fetching surveys for this site." %}
+      </div>
+    </div>
+  </section>
+
+  <div class="pagination-bar" data-surveys-pagination hidden></div>
+
+  <section class="card" data-site-edit-card hidden>
+    <header class="card-header">
+      <div>
+        <p class="eyebrow">Edit</p>
+        <h2>Update site</h2>
+      </div>
+    </header>
+    <div class="card-body">
+      <form class="stack-form" data-site-edit-form>
+        <div class="form-field">
+          <label for="site-edit-name">Site name</label>
+          <input id="site-edit-name" name="name" type="text" required>
+        </div>
+        <div class="form-field form-field--inline-grid">
+          <div>
+            <label for="site-edit-latitude">Latitude</label>
+            <input id="site-edit-latitude" name="lat" type="number" step="any" required>
+          </div>
+          <div>
+            <label for="site-edit-longitude">Longitude</label>
+            <input id="site-edit-longitude" name="lng" type="number" step="any" required>
+          </div>
+        </div>
+        <div class="survey-action-row">
+          <button class="button button--primary" type="submit" data-site-edit-submit>Save site</button>
+          <button class="button button--danger" type="button" data-site-delete-button>Delete site</button>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <section class="card" data-survey-create-card hidden>
+    <header class="card-header">
+      <div>
+        <p class="eyebrow">Surveys</p>
+        <h2>Create survey</h2>
+      </div>
+    </header>
+    <div class="card-body">
+      <form class="stack-form" data-survey-create-form>
+        <div class="form-field">
+          <label for="survey-name">Survey name</label>
+          <input id="survey-name" name="name" type="text" required>
+        </div>
+        <div class="form-field">
+          <label for="survey-date">Survey date</label>
+          <input id="survey-date" name="survey_date" type="date" required>
+        </div>
+        <div class="form-field">
+          <label for="survey-drone-model">Drone model</label>
+          <input id="survey-drone-model" name="drone_model" type="text">
+        </div>
+        <div class="form-field">
+          <label for="survey-pilot">Pilot</label>
+          <input id="survey-pilot" name="pilot" type="text">
+        </div>
+        <div class="form-field">
+          <label for="survey-notes">Notes</label>
+          <textarea id="survey-notes" name="notes"></textarea>
+        </div>
+        <div class="survey-action-row">
+          <button class="button button--primary" type="submit" data-survey-create-submit>Create survey</button>
+        </div>
+      </form>
+    </div>
+  </section>
+  </div>
+{% endblock %}

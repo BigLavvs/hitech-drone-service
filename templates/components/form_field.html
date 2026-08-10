@@ -1,0 +1,15 @@
+<div class="form-field{% if field_error %} has-error{% endif %}">
+  <label for="{{ field_id }}">{{ field_label }}</label>
+  {% if input_type == "textarea" %}
+    <textarea id="{{ field_id }}" name="{{ field_name }}" placeholder="{{ field_placeholder }}"{% if field_required %} required{% endif %}></textarea>
+  {% elif input_type == "select" %}
+    <select id="{{ field_id }}" name="{{ field_name }}"{% if field_required %} required{% endif %}>
+      <option value="">{{ field_placeholder|default:"Select an option" }}</option>
+      {% for option in field_options %}<option value="{{ option.value }}">{{ option.label }}</option>{% endfor %}
+    </select>
+  {% else %}
+    <input id="{{ field_id }}" name="{{ field_name }}" type="{{ input_type|default:'text' }}" placeholder="{{ field_placeholder }}"{% if field_required %} required{% endif %}>
+  {% endif %}
+  {% if field_help %}<p class="field-help">{{ field_help }}</p>{% endif %}
+  {% if field_error %}<p class="field-error" role="alert">{{ field_error }}</p>{% endif %}
+</div>

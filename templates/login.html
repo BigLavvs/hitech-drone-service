@@ -1,0 +1,30 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>{{ page_title|default:"Login | Hitech Drone Mapping" }}</title>
+  <link rel="stylesheet" href="{% static 'css/app.css' %}">
+</head>
+<body class="public-page">
+  <main class="public-layout" id="main-content">
+    <section class="public-panel" aria-labelledby="login-title">
+      <div class="public-panel-copy">
+        <p class="eyebrow">Hitech Drone Mapping</p>
+        <h1 id="login-title">Sign in to continue</h1>
+        <p class="public-description">Authentication for this service is handled by Hitech's external Auth Service. Use your approved Hitech account to access projects assigned to your role.</p>
+        {% if hitech_auth_login_url %}
+          <p class="public-description">Selecting the action below will continue to the configured Hitech sign-in flow.</p>
+          <div class="public-actions">
+            <a class="button button--primary" href="{{ hitech_auth_login_url }}">Continue with Hitech</a>
+          </div>
+        {% else %}
+          <p class="public-description">The external Auth Service login URL is not configured in this environment yet, so this screen is presentation-only for the current assessment step.</p>
+        {% endif %}
+      </div>
+    </section>
+  </main>
+</body>
+</html>

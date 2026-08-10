@@ -1,0 +1,43 @@
+from django.db import migrations, models
+
+
+class Migration(migrations.Migration):
+
+    dependencies = [
+        ("audit", "0002_alter_auditlog_action"),
+    ]
+
+    operations = [
+        migrations.AlterField(
+            model_name="auditlog",
+            name="action",
+            field=models.CharField(
+                choices=[
+                    ("PROJECT_CREATED", "Project Created"),
+                    ("PROJECT_UPDATED", "Project Updated"),
+                    ("PROJECT_ARCHIVED", "Project Archived"),
+                    ("SITE_CREATED", "Site Created"),
+                    ("SITE_UPDATED", "Site Updated"),
+                    ("SITE_DELETED", "Site Deleted"),
+                    ("SURVEY_CREATED", "Survey Created"),
+                    ("SURVEY_UPDATED", "Survey Updated"),
+                    ("SURVEY_SUBMITTED", "Survey Submitted"),
+                    ("FILE_UPLOADED", "File Uploaded"),
+                    ("FILE_UPLOAD_FAILED", "File Upload Failed"),
+                    ("PROCESSING_STARTED", "Processing Started"),
+                    ("PROCESSING_FAILED", "Processing Failed"),
+                    ("PROCESSING_RETRY", "Processing Retry"),
+                    ("PROCESSING_COMPLETED", "Processing Completed"),
+                    ("APPROVAL_SUBMITTED", "Approval Submitted"),
+                    ("APPROVAL_APPROVED", "Approval Approved"),
+                    ("APPROVAL_REJECTED", "Approval Rejected"),
+                    ("SURVEY_ARCHIVED", "Survey Archived"),
+                    ("FILE_DOWNLOADED", "File Downloaded"),
+                    ("MEASUREMENT_CREATED", "Measurement Created"),
+                    ("MEASUREMENT_DELETED", "Measurement Deleted"),
+                    ("ADMIN_ACTION", "Admin Action"),
+                ],
+                max_length=50,
+            ),
+        ),
+    ]

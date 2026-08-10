@@ -1,0 +1,25 @@
+<header class="app-header">
+  <a class="brand" href="/projects" aria-label="Hitech Drone Mapping home">
+    <span class="brand-mark" aria-hidden="true">HD</span>
+    <span class="brand-name">Hitech Drone Mapping</span>
+  </a>
+
+  <nav class="header-nav" id="primary-navigation" aria-label="Primary navigation">
+    <a href="/projects"{% if active_nav == "projects" %} aria-current="page"{% endif %}>Projects</a>
+    <a href="/admin" data-admin-nav hidden{% if active_nav == "admin" %} aria-current="page"{% endif %}>Admin</a>
+    <a href="/docs"{% if active_nav == "docs" %} aria-current="page"{% endif %}>API Docs</a>
+  </nav>
+
+  <button class="mobile-menu-toggle" type="button" data-mobile-nav-toggle aria-controls="primary-navigation" aria-expanded="false" aria-label="Open navigation menu" hidden>
+    <span>Menu</span>
+  </button>
+
+  <div class="header-user" aria-label="Signed-in user">
+    <span class="user-avatar" aria-hidden="true" data-shell-user-initials>{{ ui_user_initials|default:"AM" }}</span>
+    <span class="header-user-details">
+      <strong data-shell-user-email>{{ ui_user_name|default:"Alex Morgan" }}</strong>
+      <span data-shell-user-role>{{ ui_user_role|default:"Project Manager" }}</span>
+    </span>
+    <a class="text-action" href="{{ logout_url|default:'#' }}" data-logout>Log out</a>
+  </div>
+</header>
