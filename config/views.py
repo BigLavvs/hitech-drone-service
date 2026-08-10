@@ -28,6 +28,13 @@ def login_view(request):
         {
             "page_title": "Login | Hitech Drone Mapping",
             "hitech_auth_login_url": getattr(settings, "HITECH_AUTH_LOGIN_URL", None),
+            "demo_auth_enabled": settings.ENABLE_DEMO_AUTH,
+            "demo_auth_roles": [
+                {"key": "administrator", "label": "Administrator"},
+                {"key": "project_manager", "label": "Project Manager"},
+                {"key": "survey_engineer", "label": "Survey Engineer"},
+                {"key": "viewer", "label": "Viewer"},
+            ],
         },
     )
 

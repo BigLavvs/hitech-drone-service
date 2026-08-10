@@ -6,6 +6,7 @@ from apps.access_control.models import User, UserRole
 from apps.audit.models import AuditAction
 from apps.audit.services import record_audit_event
 from apps.projects.models import Project
+from apps.access_control.demo_access import DemoUserSpec
 
 _UNSET = object()
 
@@ -40,6 +41,15 @@ def resolve_active_user_from_external_identity(
             user.save(update_fields=[*updated_fields, "updated_at"])
 
         return user
+
+
+def get_seeded_demo_user(*, spec: DemoUserSpec) -> User | None:
+    return User.objects.filter(
+        external_id=spec.external_id,
+        email=spec.email,
+        role=spec.role,
+        is_active=True,
+    ).first()
 
 
 def get_local_users_for_admin(*, actor: User):

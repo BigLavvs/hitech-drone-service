@@ -82,6 +82,7 @@ DATABASES["default"]["ENGINE"] = "django.contrib.gis.db.backends.postgis"
 # Retained for future direct-connection migration and management command use.
 DIRECT_URL = env("DIRECT_URL")
 ENABLE_DEMO_AUTH = env.bool("ENABLE_DEMO_AUTH", default=False)
+DEMO_AUTH_PRIVATE_KEY = env("DEMO_AUTH_PRIVATE_KEY", default="")
 DEMO_AUTH_PRIVATE_KEY_PATH = env(
     "DEMO_AUTH_PRIVATE_KEY_PATH",
     default=str(BASE_DIR / ".demo-auth" / "private_key.pem"),

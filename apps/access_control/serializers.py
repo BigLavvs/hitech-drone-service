@@ -2,6 +2,7 @@ from collections.abc import Mapping
 
 from rest_framework import serializers
 
+from apps.access_control.demo_access import DEMO_USER_SPECS
 from apps.access_control.models import User, UserRole
 
 
@@ -29,6 +30,21 @@ class AuthValidatedUserSerializer(serializers.Serializer):
 class AuthValidateResponseSerializer(serializers.Serializer):
     authenticated = serializers.BooleanField()
     user = AuthValidatedUserSerializer()
+
+
+class DemoSessionCreateSerializer(serializers.Serializer):
+    role = serializers.ChoiceField(choices=sorted(DEMO_USER_SPECS.keys()))
+
+    def to_internal_value(self, data):
+        _reject_unknown_fields(
+            data=data,
+            allowed_fields={"role"},
+        )
+        return super().to_internal_value(data)
+
+
+class DemoSessionCreateResponseSerializer(serializers.Serializer):
+    redirect_to = serializers.CharField()
 
 
 class UserCreateSerializer(serializers.Serializer):

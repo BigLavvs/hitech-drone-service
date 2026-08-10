@@ -1,5 +1,6 @@
 services:
   migrate:
+    exclude_from_hc: true
     build:
       context: .
     command: python manage.py migrate --settings=config.settings_migrations

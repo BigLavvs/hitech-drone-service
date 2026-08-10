@@ -50,10 +50,8 @@ DEMO_USER_SPECS: dict[str, DemoUserSpec] = {
 
 
 def ensure_demo_auth_enabled() -> None:
-    if not settings.DEBUG or not settings.ENABLE_DEMO_AUTH:
-        raise CommandError(
-            "Development demo access is disabled. Enable both DEBUG=True and ENABLE_DEMO_AUTH=True."
-        )
+    if not settings.ENABLE_DEMO_AUTH:
+        raise CommandError("Assessment demo access is disabled. Set ENABLE_DEMO_AUTH=True.")
 
 
 def get_demo_private_key_path() -> Path:
@@ -93,12 +91,6 @@ def ensure_demo_keypair(*, rotate: bool = False) -> tuple[Path, Path]:
 
 def issue_demo_token_for_spec(*, spec: DemoUserSpec, lifetime_seconds: int | None = None) -> str:
     ensure_demo_auth_enabled()
-    private_key_path = get_demo_private_key_path()
-    if not private_key_path.exists():
-        raise CommandError(
-            f"Demo private key not found at {private_key_path}. Run `python manage.py init_demo_auth_keys` first."
-        )
-
     ttl_seconds = max(
         60,
         min(
@@ -114,4 +106,25 @@ def issue_demo_token_for_spec(*, spec: DemoUserSpec, lifetime_seconds: int | Non
         "exp": now + timedelta(seconds=ttl_seconds),
         "iat": now,
     }
-    return jwt.encode(payload, private_key_path.read_text(encoding="utf-8"), algorithm="RS256")
+    return jwt.encode(payload, _load_demo_private_key(), algorithm="RS256")
+
+
+def get_demo_user_spec(role_key: str) -> DemoUserSpec | None:
+    return DEMO_USER_SPECS.get(role_key)
+
+
+def _load_demo_private_key() -> str:
+    private_key_value = _normalize_pem_value(settings.DEMO_AUTH_PRIVATE_KEY)
+    if private_key_value:
+        return private_key_value
+
+    private_key_path = get_demo_private_key_path()
+    if not private_key_path.exists():
+        raise CommandError(
+            f"Demo private key not found at {private_key_path}. Run `python manage.py init_demo_auth_keys` first."
+        )
+    return private_key_path.read_text(encoding="utf-8")
+
+
+def _normalize_pem_value(value: str) -> str:
+    return value.strip().replace("\\n", "\n")

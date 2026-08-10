@@ -44,6 +44,7 @@ Fill in `.env` with the documented values from `docs/Hitech_Drone_Service_System
 - `R2_SECRET_ACCESS_KEY`
 - `R2_BUCKET_NAME`
 - `HITECH_AUTH_JWT_PUBLIC_KEY`
+- `DEMO_AUTH_PRIVATE_KEY` only when running the temporary assessment demo selector outside local development
 
 ### Database Commands
 
@@ -119,41 +120,36 @@ Export a static schema artifact for submission with:
 .\.venv\Scripts\python.exe manage.py spectacular --file docs/openapi.yaml
 ```
 
-## Development-Only Demo Access
+## Assessment Demo Access
 
-This is operational scaffolding for the assessment only. It is not an in-application login flow and it does not issue production credentials.
+This is a temporary isolated assessment-only exception. It does not replace or connect to Hitech's real Auth Service and must be disabled after assessment review.
 
-1. Enable the local demo guards in `.env`:
+1. Enable demo auth in `.env` for the assessment environment:
 
 ```powershell
-DEBUG=True
 ENABLE_DEMO_AUTH=True
 ```
 
-2. Generate local RSA demo keys:
+2. For local development, generate the gitignored fallback demo RSA keypair and seed the four demo users plus assessment data:
 
 ```powershell
 .\.venv\Scripts\python.exe manage.py init_demo_auth_keys
-```
-
-3. Restart the Django server after generating demo keys so the generated public key can be loaded when `HITECH_AUTH_JWT_PUBLIC_KEY` is otherwise unset.
-
-4. Seed the assessment demo data:
-
-```powershell
 .\.venv\Scripts\python.exe manage.py seed_demo_assessment
 ```
 
-5. Issue a short-lived demo token for a role:
+3. If the runtime environment provides `DEMO_AUTH_PRIVATE_KEY`, the demo-session endpoint uses that secret in preference to any local key file. This is the required deployment path for Coolify. Escaped `\n` line breaks are supported.
+
+4. Restart Django if `HITECH_AUTH_JWT_PUBLIC_KEY` is intentionally unset and the app should read the generated demo public key file.
+
+5. Open `/login` and use the clearly labelled `Access assessment demo` option to start a short-lived demo session for one of the four seeded assessment roles.
+
+6. In deployed assessment environments, keep `DEBUG=False`, serve the site over HTTPS, configure `HITECH_AUTH_JWT_PUBLIC_KEY` with the matching public key, and provide `DEMO_AUTH_PRIVATE_KEY` as a runtime secret. The demo token is returned only through the `hitech_access_token` HttpOnly cookie and is marked `Secure` whenever `DEBUG=False`.
+
+7. After assessment review, disable the exception:
 
 ```powershell
-.\.venv\Scripts\python.exe manage.py issue_demo_token --role administrator
-.\.venv\Scripts\python.exe manage.py issue_demo_token --role project_manager
-.\.venv\Scripts\python.exe manage.py issue_demo_token --role survey_engineer
-.\.venv\Scripts\python.exe manage.py issue_demo_token --role viewer
+ENABLE_DEMO_AUTH=False
 ```
-
-6. Add the emitted token value to the browser's `hitech_access_token` cookie for the local app origin, then refresh the page.
 
 ## Implemented Features
 
@@ -169,7 +165,7 @@ ENABLE_DEMO_AUTH=True
 
 ## Known Limitations
 
-- The service does not implement a fake in-application login flow. It validates only externally issued Hitech JWTs, with optional development-only demo tokens generated out of band.
+- The service keeps the external Hitech Auth Service as the normal authentication path. The `/login` assessment demo option exists only while `ENABLE_DEMO_AUTH=True` and must be disabled after review.
 - Docker configuration is included but unverified locally because virtualization is unavailable in this environment.
 - The Docker web container is configured to run `collectstatic` and then start Gunicorn; Django/admin static assets are served from the collected output via WhiteNoise, while survey/map/model file payloads remain on private R2.
 - Docker Compose does not provision PostgreSQL/PostGIS locally. It expects the documented external database configuration through environment variables.

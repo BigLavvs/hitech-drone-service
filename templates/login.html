@@ -25,6 +25,53 @@
         {% endif %}
       </div>
     </section>
+    {% if demo_auth_enabled %}
+      <section class="public-panel public-panel--secondary" aria-labelledby="assessment-demo-title">
+        <div class="public-panel-copy">
+          <p class="eyebrow">Assessment only</p>
+          <h2 id="assessment-demo-title">Assessment demo access</h2>
+          <p class="public-description">This temporary isolated assessment environment can create a short-lived demo session for a selected role.</p>
+          <p class="public-description">It does not use, replace, or connect to Hitech&apos;s real Auth Service. It only exposes seeded assessment data and will be disabled after assessment review.</p>
+          <div class="public-actions">
+            <button class="button" type="button" data-demo-access-open>Access assessment demo</button>
+          </div>
+        </div>
+      </section>
+    {% endif %}
   </main>
+  {% if demo_auth_enabled %}
+    <section class="modal" id="assessment-demo-modal" aria-hidden="true" aria-labelledby="assessment-demo-modal-title" role="dialog" aria-modal="true" hidden>
+      <div class="modal-backdrop" data-modal-close></div>
+      <div class="modal-dialog" role="document">
+        <header class="modal-header">
+          <h2 id="assessment-demo-modal-title">Assessment demo access</h2>
+          <button class="icon-button" type="button" data-modal-close aria-label="Close dialog">&times;</button>
+        </header>
+        <div class="modal-body">
+          <p class="public-description public-description--compact">This assessment-only option creates a short-lived demo session for one seeded role in an isolated environment. It is not Hitech&apos;s production authentication flow.</p>
+          <p class="survey-panel-message is-error" data-demo-access-message hidden></p>
+          <form class="demo-access-form" data-demo-access-form>
+            <fieldset class="demo-access-fieldset">
+              <legend class="demo-access-legend">Select a demo role</legend>
+              <div class="demo-access-role-grid">
+                {% for role in demo_auth_roles %}
+                  <label class="demo-access-role-card" data-demo-role-card>
+                    <input class="sr-only" type="radio" name="role" value="{{ role.key }}">
+                    <span class="demo-access-role-title">{{ role.label }}</span>
+                    <span class="demo-access-role-copy">Short-lived access to seeded assessment data only.</span>
+                  </label>
+                {% endfor %}
+              </div>
+            </fieldset>
+            <div class="modal-footer modal-footer--inline">
+              <button class="button" type="button" data-modal-close>Cancel</button>
+              <button class="button button--primary" type="submit">Start demo session</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </section>
+    <script type="module" src="{% static 'js/login-demo.js' %}"></script>
+  {% endif %}
 </body>
 </html>

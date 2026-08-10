@@ -180,11 +180,11 @@ The assessment documents and approved architecture remain the source of truth. R
 
 **Impact:** 3D viewer flows keep the documented original-versus-converted behaviour while always exposing a lightweight private preview/proxy artefact for supported model formats.
 
-### 2026-08-09 â€” External-auth assessment demo
+### 2026-08-10 - Assessment-only public demo access exception
 
-**Decision:** No fake in-application login, token issuer, or password flow will be added for the assessment. If Hitech Auth is unavailable during the demo, any signed-token workaround must remain clearly labelled, development-only, and out of band from the application itself.
+**Decision:** Keep the external Hitech Auth Service as the normal `/login` path, but allow a second, clearly separated assessment-only demo access flow on `/login` while `ENABLE_DEMO_AUTH=True`. This temporary exception may be exposed publicly in the reviewer deployment because external assessors' IP addresses are unknown.
 
-**Impact:** The Django application continues to validate externally issued Hitech JWTs only. Any temporary demo token setup is operational scaffolding, not application functionality.
+**Impact:** The application still validates JWTs through the normal `HitechJWTAuthentication` path and does not add a production password system. The demo flow may issue only the existing short-lived RS256 demo JWT for one of the four seeded assessment users, set it only in the `hitech_access_token` HttpOnly cookie, require CSRF on the same-origin POST, and never expose the token to JavaScript, URLs, page markup, localStorage, or logs. Set `ENABLE_DEMO_AUTH=False` immediately after assessment review.
 
 ### 2026-08-09 â€” Cookie-JWT CSRF
 
@@ -260,11 +260,11 @@ The assessment documents and approved architecture remain the source of truth. R
 
 **Impact:** Audit responses are ordered newest first with a deterministic `-timestamp, -id` tie-break, and the serializer must hide sensitive storage paths, object keys, checksums, presigned URLs, JWTs, and similar secrets without mutating the immutable stored audit record.
 
-### 2026-08-10 - Development-only demo JWT and assessment seed tooling
+### 2026-08-10 - Assessment demo JWT and seed tooling
 
-**Decision:** Assessment demo access uses out-of-band management commands only. When `DEBUG=True` and `ENABLE_DEMO_AUTH=True`, the local environment may load a gitignored demo RSA public key file for JWT validation if `HITECH_AUTH_JWT_PUBLIC_KEY` is otherwise unset. Private key material remains local-only and is never exposed through HTTP routes, stored in the database, or committed to source control.
+**Decision:** Assessment demo JWTs and seeded demo data remain temporary assessment scaffolding controlled by `ENABLE_DEMO_AUTH`. Deployed assessment environments must provide the demo RSA private key through the runtime `DEMO_AUTH_PRIVATE_KEY` environment variable, while local development may fall back to the existing gitignored private-key file path. The local environment may load a gitignored demo RSA public key file for JWT validation if `HITECH_AUTH_JWT_PUBLIC_KEY` is otherwise unset. Private key material remains secret-only, is never exposed through HTTP routes, stored in the database, logged, or committed to source control.
 
-**Impact:** Demo access stays operational scaffolding rather than application authentication. The Django service still validates RS256 JWTs through the normal `HitechJWTAuthentication` path, while `init_demo_auth_keys`, `seed_demo_assessment`, and `issue_demo_token` remain unavailable unless both development guards are enabled.
+**Impact:** The Django service still validates RS256 JWTs through the normal `HitechJWTAuthentication` path using `HITECH_AUTH_JWT_PUBLIC_KEY`. `DEMO_AUTH_PRIVATE_KEY` supports escaped `\n` PEM line breaks and takes precedence over the local file-path fallback so Coolify can inject the signing secret at runtime without shipping `.demo-auth/`. `init_demo_auth_keys`, `seed_demo_assessment`, and `issue_demo_token` stay assessment-only operational tooling and must not be enabled after review is complete.
 
 ### 2026-08-10 - Readiness probe route
 

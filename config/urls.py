@@ -3,8 +3,13 @@
 from django.urls import path
 from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
 
-from apps.access_control.views import AuthValidateView
-from apps.access_control.views import UserDetailAPIView, UserListCreateAPIView, admin_panel_view
+from apps.access_control.views import (
+    AuthValidateView,
+    DemoSessionCreateView,
+    UserDetailAPIView,
+    UserListCreateAPIView,
+    admin_panel_view,
+)
 from apps.approvals.views import (
     SurveyApprovalDetailAPIView,
     SurveyApproveAPIView,
@@ -48,6 +53,11 @@ urlpatterns = [
     path("docs", SpectacularSwaggerView.as_view(url_name="api-schema"), name="api-docs"),
     path("docs/redoc", SpectacularRedocView.as_view(url_name="api-schema"), name="api-redoc"),
     path("api/v1/auth/validate", AuthValidateView.as_view(), name="api-auth-validate"),
+    path(
+        "api/v1/demo-auth/session",
+        DemoSessionCreateView.as_view(),
+        name="api-demo-auth-session",
+    ),
     path("api/v1/users", UserListCreateAPIView.as_view(), name="api-user-list"),
     path("api/v1/users/<int:user_id>", UserDetailAPIView.as_view(), name="api-user-detail"),
     path("api/v1/audit-logs", AuditLogListAPIView.as_view(), name="api-audit-log-list"),

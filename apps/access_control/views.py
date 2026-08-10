@@ -1,10 +1,13 @@
+from django.conf import settings
+from django.core.management.base import CommandError
 from django.http import Http404
 from django.shortcuts import redirect, render
+from django.urls import reverse
 from django.views.decorators.csrf import ensure_csrf_cookie
-from drf_spectacular.utils import OpenApiResponse, extend_schema
 from django.core.exceptions import ValidationError as DjangoValidationError
+from drf_spectacular.utils import OpenApiResponse, extend_schema
 from rest_framework import generics, permissions, status
-from rest_framework.authentication import BaseAuthentication
+from rest_framework.authentication import BaseAuthentication, CSRFCheck
 from rest_framework.exceptions import AuthenticationFailed, PermissionDenied
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.response import Response
@@ -12,9 +15,12 @@ from rest_framework.serializers import ValidationError as DRFValidationError
 from rest_framework.views import APIView
 
 from apps.access_control.authentication import HitechJWTAuthentication
+from apps.access_control.demo_access import get_demo_user_spec, issue_demo_token_for_spec
 from apps.access_control.models import User, UserRole
 from apps.access_control.serializers import (
     AuthValidateResponseSerializer,
+    DemoSessionCreateResponseSerializer,
+    DemoSessionCreateSerializer,
     UserCreateSerializer,
     UserReadSerializer,
     UserUpdateSerializer,
@@ -24,6 +30,7 @@ from apps.access_control.services import (
     create_local_user,
     get_local_user_for_admin,
     get_local_users_for_admin,
+    get_seeded_demo_user,
     update_local_user,
 )
 
@@ -50,6 +57,56 @@ class AuthValidateView(APIView):
             },
             status=status.HTTP_200_OK,
         )
+
+
+class DemoSessionCreateView(APIView):
+    authentication_classes: list[type[BaseAuthentication]] = []
+    permission_classes = [permissions.AllowAny]
+
+    @extend_schema(
+        summary="Create an assessment-only demo session",
+        request=DemoSessionCreateSerializer,
+        responses={
+            200: DemoSessionCreateResponseSerializer,
+            403: OpenApiResponse(description="CSRF validation failed."),
+            404: OpenApiResponse(description="Assessment demo access is disabled."),
+        },
+    )
+    def post(self, request):
+        if not getattr(request, "_dont_enforce_csrf_checks", False):
+            _enforce_request_csrf(request)
+
+        if not settings.ENABLE_DEMO_AUTH:
+            raise Http404
+
+        serializer = DemoSessionCreateSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        spec = get_demo_user_spec(serializer.validated_data["role"])
+        demo_user = get_seeded_demo_user(spec=spec) if spec is not None else None
+        if demo_user is None or spec is None:
+            raise DRFValidationError({"role": ["The selected demo role is unavailable in this environment."]})
+
+        try:
+            token = issue_demo_token_for_spec(spec=spec)
+        except CommandError as exc:
+            raise DRFValidationError(
+                {"role": ["Assessment demo access is unavailable in this environment."]}
+            ) from exc
+        response = Response(
+            {"redirect_to": reverse("projects")},
+            status=status.HTTP_200_OK,
+        )
+        response.set_cookie(
+            settings.HITECH_AUTH_ACCESS_COOKIE_NAME,
+            token,
+            max_age=settings.DEMO_AUTH_TOKEN_TTL_SECONDS,
+            httponly=True,
+            secure=not settings.DEBUG,
+            samesite="Lax",
+            path="/",
+        )
+        return response
 
 
 class UserLimitOffsetPagination(LimitOffsetPagination):
@@ -175,6 +232,14 @@ def _authenticate_template_request(request):
     user, _auth = auth_result
     request.user = user
     return user
+
+
+def _enforce_request_csrf(request) -> None:
+    check = CSRFCheck(lambda request: None)
+    check.process_request(request)
+    reason = check.process_view(request, None, (), {})
+    if reason:
+        raise PermissionDenied(f"CSRF Failed: {reason}")
 
 
 def _to_drf_validation_error(exc: DjangoValidationError) -> DRFValidationError:
