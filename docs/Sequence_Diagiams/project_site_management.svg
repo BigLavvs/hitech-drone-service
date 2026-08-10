@@ -164,7 +164,7 @@
 <text x="369.2" y="2353.0" text-anchor="middle" fill="#5eead4" font-size="9.5">204 No Content</text>
 <line x1="70" y1="2404.0" x2="1606" y2="2404.0" stroke="#334155" stroke-width="1" stroke-dasharray="4,4"/>
 <rect x="643.7" y="2391.0" width="388.6" height="22" rx="11" fill="#334155"/>
-<text x="838.0" y="2406.0" text-anchor="middle" fill="#cbd5e1" font-size="10.5" font-weight="700">Create / Update / Archive Site (Admin or Owning PM only)</text>
+<text x="838.0" y="2406.0" text-anchor="middle" fill="#cbd5e1" font-size="10.5" font-weight="700">Create / Update / Delete Site (Admin or Owning PM only)</text>
 <line x1="237.9" y1="2458.0" x2="500.5" y2="2458.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
 <rect x="247.9" y="2434.0" width="242.6" height="18" rx="4" fill="#0f172a"/>
 <text x="369.2" y="2447.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">POST /api/v1/projects/1/sites {fields} (cookie)</text>
@@ -251,7 +251,7 @@
 <text x="949.8" y="3947.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">Call Projects Module</text>
 <line x1="1132.1" y1="4012.0" x2="1458.0" y2="4012.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
 <rect x="1166.4" y="3988.0" width="257.4" height="18" rx="4" fill="#0f172a"/>
-<text x="1295.1" y="4001.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">UPDATE site SET status=archived (soft delete)</text>
+<text x="1295.1" y="4001.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">DELETE site WHERE id=2</text>
 <line x1="1458.0" y1="4066.0" x2="1132.1" y2="4066.0" stroke="#5eead4" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)"/>
 <rect x="1280.7" y="4042.0" width="28.6" height="18" rx="4" fill="#0f172a"/>
 <text x="1295.1" y="4055.0" text-anchor="middle" fill="#5eead4" font-size="9.5">OK</text>
@@ -291,8 +291,8 @@
 <text x="590.7" y="4628.0" fill="#94a3b8" font-size="9.5">  manage sites for a project</text>
 <text x="590.7" y="4646.0" fill="#94a3b8" font-size="9.5">- SE / Viewer may hold explicit project membership for</text>
 <text x="590.7" y="4664.0" fill="#94a3b8" font-size="9.5">  read access only; they cannot manage projects or sites</text>
-<text x="590.7" y="4682.0" fill="#94a3b8" font-size="9.5">- DELETE routes archive (soft delete); records are never</text>
-<text x="590.7" y="4700.0" fill="#94a3b8" font-size="9.5">  hard-deleted</text>
+<text x="590.7" y="4682.0" fill="#94a3b8" font-size="9.5">- Project DELETE archives (soft delete); Site DELETE</text>
+<text x="590.7" y="4700.0" fill="#94a3b8" font-size="9.5">  permanently deletes the Site record</text>
 <rect x="1123.3" y="4510.0" width="522.7" height="138.0" rx="10" fill="#1e293b" stroke="#334155" stroke-width="1.5" stroke-dasharray="6,4"/>
 <text x="1137.3" y="4534.0" fill="#e2e8f0" font-size="12" font-weight="700">Module Interactions (Drone Mapping Service):</text>
 <text x="1137.3" y="4556.0" fill="#94a3b8" font-size="9.5">- Project and Site audit events are written synchronously</text>
