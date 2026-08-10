@@ -273,3 +273,9 @@ The assessment documents and approved architecture remain the source of truth. R
 **Reason:** The source architecture document describes the readiness behavior but the final assessment-completion scope explicitly approves `GET /ready` and requires that path to be recorded here. This keeps the split intact without introducing a second readiness URL.
 
 **Impact:** `GET /health` remains the lightweight process liveness probe. `GET /ready` is the only implemented readiness endpoint and returns `200` only when PostgreSQL/PostGIS, Redis, private R2 connectivity, and a reachable Celery worker are all ready.
+
+### 2026-08-10 - Project membership candidate list endpoint
+
+**Decision:** `GET /api/v1/projects/{project_id}/available-members` exists only to support the authorised project-detail membership picker. It is available only to an active Administrator or the owning active Project Manager, only while the parent project is active, and it returns only active `SURVEY_ENGINEER` and `VIEWER` users who are not already assigned to that project.
+
+**Impact:** The candidate list must not expose Administrators, Project Managers, inactive users, existing members, or data for archived projects. The current-members list and add/remove membership routes follow the same manage-project authorization boundary and active-project guard.

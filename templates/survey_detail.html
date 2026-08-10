@@ -112,13 +112,18 @@
           <form class="survey-upload-form" data-upload-form hidden>
             <div class="form-field">
               <label for="survey-primary-file">Primary file</label>
-              <input id="survey-primary-file" name="file" type="file" required>
+              <p class="field-help">Supported 2D files: <code>.tif</code>, <code>.tiff</code>, <code>.png</code>, <code>.jpg</code>, <code>.jpeg</code>, <code>.kml</code>, <code>.geojson</code></p>
+              <p class="field-help">Supported 3D files: <code>.obj</code>, <code>.glb</code>, <code>.gltf</code>, <code>.las</code>, <code>.laz</code>, <code>.ply</code>, <code>.stl</code></p>
+              <p class="field-help">Maximum file size: 10 GB</p>
+              <p class="field-help">Maximum combined survey uploads: 50 GB</p>
+              <p class="field-help">Files are validated again by the server; unsupported or mismatched content is rejected.</p>
+              <input id="survey-primary-file" name="file" type="file" accept=".tif,.tiff,.png,.jpg,.jpeg,.kml,.geojson,.obj,.glb,.gltf,.las,.laz,.ply,.stl" required>
               <p class="field-help">Upload one primary survey dataset file.</p>
             </div>
-            <div class="form-field">
-              <label for="survey-asset-files">OBJ related assets</label>
-              <input id="survey-asset-files" name="assets" type="file" multiple>
-              <p class="field-help">Optional. Use only for an OBJ upload's MTL and texture assets.</p>
+            <div class="form-field" data-upload-assets-field hidden>
+              <label for="survey-asset-files">OBJ related assets for an <code>.obj</code> primary file</label>
+              <input id="survey-asset-files" name="assets" type="file" accept=".mtl,.png,.jpg,.jpeg" multiple disabled>
+              <p class="field-help">Accepted companion formats: <code>.mtl</code>, <code>.png</code>, <code>.jpg</code>, <code>.jpeg</code>.</p>
             </div>
             <div class="survey-action-row">
               <button class="button button--primary" type="submit" data-upload-submit>Upload file</button>
@@ -212,6 +217,7 @@
         </header>
         <div class="card-body survey-panel-body">
           <div class="survey-panel-message" data-approval-message hidden></div>
+          <p class="field-help" data-approval-guidance>Loading workflow guidance.</p>
           <div class="survey-action-row" data-approval-actions></div>
           <form class="survey-rejection-form" data-rejection-form hidden>
             <div class="form-field">

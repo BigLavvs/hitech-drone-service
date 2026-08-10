@@ -6,6 +6,13 @@ import { startPolling } from "./modules/polling.js";
 
 const TERMINAL_JOB_STATUSES = new Set(["completed", "failed"]);
 const NON_TERMINAL_JOB_STATUSES = new Set(["queued", "running"]);
+const PRIMARY_UPLOAD_ACCEPT =
+  ".tif,.tiff,.png,.jpg,.jpeg,.kml,.geojson,.obj,.glb,.gltf,.las,.laz,.ply,.stl";
+const OBJ_ASSET_ACCEPT = ".mtl,.png,.jpg,.jpeg";
+const PRIMARY_UPLOAD_EXTENSIONS = new Set(
+  PRIMARY_UPLOAD_ACCEPT.split(",").map((value) => value.toLowerCase()),
+);
+const OBJ_ASSET_EXTENSIONS = new Set(OBJ_ASSET_ACCEPT.split(",").map((value) => value.toLowerCase()));
 const APPROVAL_ACTION_LABELS = {
   submitted: "Submitted",
   approved: "Approved",
@@ -36,7 +43,11 @@ class SurveyWorkspaceController {
     this.mapViewerRoot = root.querySelector("[data-map-viewer]");
     this.modelViewerRoot = root.querySelector("[data-model-viewer]");
     this.uploadForm = root.querySelector("[data-upload-form]");
+    this.primaryFileInput = root.querySelector("#survey-primary-file");
+    this.assetFileInput = root.querySelector("#survey-asset-files");
+    this.assetField = root.querySelector("[data-upload-assets-field]");
     this.uploadSubmit = root.querySelector("[data-upload-submit]");
+    this.approvalGuidance = root.querySelector("[data-approval-guidance]");
     this.approvalActions = root.querySelector("[data-approval-actions]");
     this.rejectionForm = root.querySelector("[data-rejection-form]");
     this.rejectionReasonInput = root.querySelector("#survey-rejection-reason");
@@ -95,6 +106,8 @@ class SurveyWorkspaceController {
 
   bindEvents() {
     this.uploadForm?.addEventListener("submit", (event) => this.handleUpload(event));
+    this.primaryFileInput?.addEventListener("change", () => this.handlePrimaryFileChange());
+    this.assetFileInput?.addEventListener("change", () => this.handleAssetFileChange());
     this.filesContent?.addEventListener("click", (event) => this.handleFilesClick(event));
     this.approvalActions?.addEventListener("click", (event) => this.handleApprovalActionClick(event));
     this.rejectionForm?.addEventListener("submit", (event) => this.handleReject(event));
@@ -188,6 +201,7 @@ class SurveyWorkspaceController {
       "error",
     );
     this.uploadForm.hidden = true;
+    this.syncUploadAssetField();
     this.measurementForm.hidden = true;
     this.rejectionForm.hidden = true;
     this.auditFilterForm.hidden = true;
@@ -519,11 +533,19 @@ class SurveyWorkspaceController {
     const role = this.auth?.user?.role;
     const canUpload = ["ADMINISTRATOR", "PROJECT_MANAGER", "SURVEY_ENGINEER"].includes(role);
     this.uploadForm.hidden = !canUpload;
+    if (this.primaryFileInput) {
+      this.primaryFileInput.setAttribute("accept", PRIMARY_UPLOAD_ACCEPT);
+    }
+    if (this.assetFileInput) {
+      this.assetFileInput.setAttribute("accept", OBJ_ASSET_ACCEPT);
+    }
+    this.syncUploadAssetField();
   }
 
   renderApproval() {
     this.clearMessage(this.approvalMessage);
     this.renderApprovalFields();
+    this.renderApprovalGuidance();
     this.renderApprovalActions();
     this.renderApprovalHistory();
   }
@@ -547,13 +569,21 @@ class SurveyWorkspaceController {
     const role = this.auth?.user?.role;
     const surveyStatus = this.survey?.status;
     const actions = [];
+    const selfReviewBlocked =
+      ["PROJECT_MANAGER", "ADMINISTRATOR"].includes(role) &&
+      surveyStatus === "PENDING_APPROVAL" &&
+      this.survey?.created_by === this.auth?.user?.id;
 
     if (role === "SURVEY_ENGINEER" && surveyStatus === "READY") {
       actions.push(
         '<button class="button button--primary survey-action-button" type="button" data-approval-action="submit">Submit for approval</button>',
       );
     }
-    if (["PROJECT_MANAGER", "ADMINISTRATOR"].includes(role) && surveyStatus === "PENDING_APPROVAL") {
+    if (
+      ["PROJECT_MANAGER", "ADMINISTRATOR"].includes(role) &&
+      surveyStatus === "PENDING_APPROVAL" &&
+      !selfReviewBlocked
+    ) {
       actions.push(
         '<button class="button button--primary survey-action-button" type="button" data-approval-action="approve">Approve survey</button>',
       );
@@ -569,12 +599,42 @@ class SurveyWorkspaceController {
 
     this.approvalActions.innerHTML = actions.join("");
     const canReject =
-      ["PROJECT_MANAGER", "ADMINISTRATOR"].includes(role) && surveyStatus === "PENDING_APPROVAL";
+      ["PROJECT_MANAGER", "ADMINISTRATOR"].includes(role) &&
+      surveyStatus === "PENDING_APPROVAL" &&
+      !selfReviewBlocked;
     this.rejectionForm.hidden = !canReject || !this.rejectFormVisible;
     if (this.rejectionForm.hidden) {
       this.rejectionReasonInput.value = "";
       this.hideRejectionError();
     }
+  }
+
+  renderApprovalGuidance() {
+    if (!this.approvalGuidance) {
+      return;
+    }
+
+    const status = this.survey?.status;
+    const role = this.auth?.user?.role;
+    const isSelfReview =
+      ["PROJECT_MANAGER", "ADMINISTRATOR"].includes(role) &&
+      status === "PENDING_APPROVAL" &&
+      this.survey?.created_by === this.auth?.user?.id;
+
+    const guidance = {
+      DRAFT: "DRAFT: upload supported files first.",
+      UPLOADING: "UPLOADING: wait for processing.",
+      PROCESSING: "PROCESSING: wait for processing.",
+      READY: "READY: the assigned Survey Engineer can submit for approval.",
+      PENDING_APPROVAL: isSelfReview
+        ? "PENDING_APPROVAL: self-review is not permitted for the survey creator."
+        : "PENDING_APPROVAL: the owning Project Manager or an Administrator can approve or reject, unless they created the survey.",
+      APPROVED: "APPROVED: an eligible reviewer can archive this survey.",
+      REJECTED: "REJECTED: an eligible reviewer can archive this survey.",
+    };
+
+    this.approvalGuidance.textContent =
+      guidance[status] || "Survey status changes are driven by upload, processing, submission, review, and archive actions.";
   }
 
   renderApprovalHistory() {
@@ -856,17 +916,97 @@ class SurveyWorkspaceController {
     }
   }
 
+  handlePrimaryFileChange() {
+    const file = this.primaryFileInput?.files?.[0];
+    if (file && !PRIMARY_UPLOAD_EXTENSIONS.has(this.fileExtension(file.name))) {
+      this.primaryFileInput.value = "";
+      this.showMessage(this.filesMessage, "Unsupported primary file type selected.", "error");
+    } else {
+      this.clearMessage(this.filesMessage);
+    }
+    this.syncUploadAssetField();
+  }
+
+  handleAssetFileChange() {
+    if (!this.assetFileInput?.files?.length) {
+      return;
+    }
+
+    if (!this.primarySelectionIsObj()) {
+      this.assetFileInput.value = "";
+      this.showMessage(this.filesMessage, "OBJ assets are allowed only when the primary file is .obj.", "error");
+      this.syncUploadAssetField();
+      return;
+    }
+
+    const invalidAsset = [...this.assetFileInput.files].find(
+      (file) => !OBJ_ASSET_EXTENSIONS.has(this.fileExtension(file.name)),
+    );
+    if (invalidAsset) {
+      this.assetFileInput.value = "";
+      this.showMessage(this.filesMessage, "Unsupported OBJ asset type selected.", "error");
+      return;
+    }
+
+    this.clearMessage(this.filesMessage);
+  }
+
+  syncUploadAssetField() {
+    if (!this.assetField || !this.assetFileInput) {
+      return;
+    }
+
+    const showAssets = this.primarySelectionIsObj();
+    this.assetField.hidden = !showAssets;
+    this.assetFileInput.disabled = !showAssets;
+    if (!showAssets) {
+      this.assetFileInput.value = "";
+    }
+  }
+
+  primarySelectionIsObj() {
+    const file = this.primaryFileInput?.files?.[0];
+    return this.fileExtension(file?.name) === ".obj";
+  }
+
+  fileExtension(filename) {
+    if (!filename || !String(filename).includes(".")) {
+      return "";
+    }
+    return `.${String(filename).split(".").pop().toLowerCase()}`;
+  }
+
   async handleUpload(event) {
     event.preventDefault();
     if (this.sessionBlocked) {
       return;
     }
 
-    const primaryInput = this.uploadForm.querySelector('input[name="file"]');
-    const assetInput = this.uploadForm.querySelector('input[name="assets"]');
+    const primaryInput = this.primaryFileInput;
+    const assetInput = this.assetFileInput;
     const primaryFile = primaryInput.files[0];
     if (!primaryFile) {
       this.showMessage(this.filesMessage, "Choose a primary file before uploading.", "error");
+      return;
+    }
+    if (!PRIMARY_UPLOAD_EXTENSIONS.has(this.fileExtension(primaryFile.name))) {
+      primaryInput.value = "";
+      this.showMessage(this.filesMessage, "Unsupported primary file type selected.", "error");
+      this.syncUploadAssetField();
+      return;
+    }
+    if (!this.primarySelectionIsObj() && assetInput.files.length > 0) {
+      assetInput.value = "";
+      this.showMessage(this.filesMessage, "OBJ assets are allowed only when the primary file is .obj.", "error");
+      this.syncUploadAssetField();
+      return;
+    }
+    const invalidAsset = [...assetInput.files].find(
+      (file) => !OBJ_ASSET_EXTENSIONS.has(this.fileExtension(file.name)),
+    );
+    if (invalidAsset) {
+      assetInput.value = "";
+      this.showMessage(this.filesMessage, "Unsupported OBJ asset type selected.", "error");
       return;
     }
 
@@ -882,6 +1022,7 @@ class SurveyWorkspaceController {
     try {
       await api.post(`/api/v1/surveys/${this.surveyId}/files`, formData);
       this.uploadForm.reset();
+      this.syncUploadAssetField();
       this.showMessage(this.filesMessage, "Upload accepted. Processing status will update automatically.");
       await this.refreshAll();
     } catch (error) {
@@ -1148,6 +1289,7 @@ class SurveyWorkspaceController {
     this.mapViewer?.showUnavailableState("Survey unavailable", message, "error");
     this.modelViewer?.showUnavailableState("Survey unavailable", message, "error");
     this.uploadForm.hidden = true;
+    this.syncUploadAssetField();
     this.measurementForm.hidden = true;
     this.auditFilterForm.hidden = true;
     this.rejectionForm.hidden = true;

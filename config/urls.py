@@ -28,8 +28,11 @@ from apps.maps.views import (
 from apps.models3d.views import SurveyModelListAPIView
 from apps.processing.views import ProcessingJobDetailAPIView, ProcessingJobRetryAPIView
 from apps.projects.views import (
+    ProjectAvailableMemberListAPIView,
     ProjectDetailAPIView,
     ProjectListCreateAPIView,
+    ProjectMemberDetailAPIView,
+    ProjectMemberListCreateAPIView,
     SiteDetailAPIView,
     SiteListCreateAPIView,
 )
@@ -71,6 +74,21 @@ urlpatterns = [
         "api/v1/projects/<int:project_id>",
         ProjectDetailAPIView.as_view(),
         name="api-project-detail",
+    ),
+    path(
+        "api/v1/projects/<int:project_id>/members",
+        ProjectMemberListCreateAPIView.as_view(),
+        name="api-project-members",
+    ),
+    path(
+        "api/v1/projects/<int:project_id>/available-members",
+        ProjectAvailableMemberListAPIView.as_view(),
+        name="api-project-available-members",
+    ),
+    path(
+        "api/v1/projects/<int:project_id>/members/<int:user_id>",
+        ProjectMemberDetailAPIView.as_view(),
+        name="api-project-member-detail",
     ),
     path(
         "api/v1/projects/<int:project_id>/sites",

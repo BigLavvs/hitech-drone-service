@@ -1,0 +1,362 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2920 5608" font-family="Inter,system-ui,sans-serif">
+<defs>
+<marker id="arrow" markerWidth="10" markerHeight="8" refX="8" refY="4" orient="auto"><path d="M0,0 L10,4 L0,8 L2,4 Z" fill="#94a3b8"/></marker>
+<marker id="arrow-dashed" markerWidth="10" markerHeight="8" refX="8" refY="4" orient="auto"><path d="M0,0 L10,4 L0,8 L2,4 Z" fill="#5eead4"/></marker>
+</defs>
+<rect x="0" y="0" width="2920" height="5608" fill="#0f172a"/>
+<rect x="20" y="14" width="2880" height="36" rx="8" fill="#1e293b"/>
+<text x="36" y="37" fill="#e2e8f0" font-size="15" font-weight="700">Diagram D: File Upload and Async Processing Pipeline</text>
+<rect x="736.3" y="92.0" width="2117.9" height="5130.0" rx="12" fill="#f59e0b" opacity="0.06" stroke="#f59e0b" stroke-width="2" stroke-dasharray="10,5"/>
+<rect x="1702.1" y="58.0" width="186.2" height="26" rx="6" fill="#1e293b" stroke="#f59e0b" stroke-width="1.5"/>
+<text x="1795.2" y="76.0" text-anchor="middle" fill="#f59e0b" font-size="12" font-weight="700">Drone Mapping Service</text>
+<line x1="158.2" y1="136.0" x2="158.2" y2="5226.0" stroke="#334155" stroke-width="2"/>
+<rect x="90.0" y="96.0" width="136.3" height="40" rx="7" fill="#3b82f6"/>
+<text x="158.2" y="120.0" text-anchor="middle" fill="#fff" font-size="11.5" font-weight="700">Survey Engineer</text>
+<rect x="90.0" y="5226.0" width="136.3" height="30" rx="7" fill="#3b82f6" opacity="0.55"/>
+<text x="158.2" y="5245.0" text-anchor="middle" fill="#fff" font-size="10.5" font-weight="700">Survey Engineer</text>
+<line x1="599.3" y1="136.0" x2="599.3" y2="5226.0" stroke="#334155" stroke-width="2"/>
+<rect x="534.3" y="96.0" width="130.0" height="40" rx="7" fill="#8b5cf6"/>
+<text x="599.3" y="120.0" text-anchor="middle" fill="#fff" font-size="11.5" font-weight="700">API Gateway</text>
+<rect x="534.3" y="5226.0" width="130.0" height="30" rx="7" fill="#8b5cf6" opacity="0.55"/>
+<text x="599.3" y="5245.0" text-anchor="middle" fill="#fff" font-size="10.5" font-weight="700">API Gateway</text>
+<line x1="848.9" y1="136.0" x2="848.9" y2="5226.0" stroke="#334155" stroke-width="2"/>
+<rect x="760.3" y="96.0" width="177.2" height="40" rx="7" fill="#f59e0b"/>
+<text x="848.9" y="120.0" text-anchor="middle" fill="#fff" font-size="11.5" font-weight="700">Access Control Module</text>
+<rect x="760.3" y="5226.0" width="177.2" height="30" rx="7" fill="#f59e0b" opacity="0.55"/>
+<text x="848.9" y="5245.0" text-anchor="middle" fill="#fff" font-size="10.5" font-weight="700">Access Control Module</text>
+<line x1="1210.2" y1="136.0" x2="1210.2" y2="5226.0" stroke="#334155" stroke-width="2"/>
+<rect x="1145.2" y="96.0" width="130.0" height="40" rx="7" fill="#eab308"/>
+<text x="1210.2" y="120.0" text-anchor="middle" fill="#1e293b" font-size="11.5" font-weight="700">Files Module</text>
+<rect x="1145.2" y="5226.0" width="130.0" height="30" rx="7" fill="#eab308" opacity="0.55"/>
+<text x="1210.2" y="5245.0" text-anchor="middle" fill="#1e293b" font-size="10.5" font-weight="700">Files Module</text>
+<line x1="1587.5" y1="136.0" x2="1587.5" y2="5226.0" stroke="#334155" stroke-width="2"/>
+<rect x="1522.5" y="96.0" width="130.0" height="40" rx="7" fill="#10b981"/>
+<text x="1587.5" y="120.0" text-anchor="middle" fill="#fff" font-size="11.5" font-weight="700">PostgreSQL</text>
+<rect x="1522.5" y="5226.0" width="130.0" height="30" rx="7" fill="#10b981" opacity="0.55"/>
+<text x="1587.5" y="5245.0" text-anchor="middle" fill="#fff" font-size="10.5" font-weight="700">PostgreSQL</text>
+<line x1="1847.3" y1="136.0" x2="1847.3" y2="5226.0" stroke="#334155" stroke-width="2"/>
+<rect x="1748.5" y="96.0" width="197.7" height="40" rx="7" fill="#0ea5e9"/>
+<text x="1847.3" y="120.0" text-anchor="middle" fill="#fff" font-size="11.5" font-weight="700">Object Storage (private)</text>
+<rect x="1748.5" y="5226.0" width="197.7" height="30" rx="7" fill="#0ea5e9" opacity="0.55"/>
+<text x="1847.3" y="5245.0" text-anchor="middle" fill="#fff" font-size="10.5" font-weight="700">Object Storage (private)</text>
+<line x1="2147.8" y1="136.0" x2="2147.8" y2="5226.0" stroke="#334155" stroke-width="2"/>
+<rect x="2042.2" y="96.0" width="211.3" height="40" rx="7" fill="#ef4444"/>
+<text x="2147.8" y="120.0" text-anchor="middle" fill="#fff" font-size="11.5" font-weight="700">Redis (Celery broker only)</text>
+<rect x="2042.2" y="5226.0" width="211.3" height="30" rx="7" fill="#ef4444" opacity="0.55"/>
+<text x="2147.8" y="5245.0" text-anchor="middle" fill="#fff" font-size="10.5" font-weight="700">Redis (Celery broker only)</text>
+<line x1="2498.5" y1="136.0" x2="2498.5" y2="5226.0" stroke="#334155" stroke-width="2"/>
+<rect x="2392.8" y="96.0" width="211.3" height="40" rx="7" fill="#c026d3"/>
+<text x="2498.5" y="120.0" text-anchor="middle" fill="#fff" font-size="11.5" font-weight="700">Processing Module (Celery)</text>
+<rect x="2392.8" y="5226.0" width="211.3" height="30" rx="7" fill="#c026d3" opacity="0.55"/>
+<text x="2498.5" y="5245.0" text-anchor="middle" fill="#fff" font-size="10.5" font-weight="700">Processing Module (Celery)</text>
+<line x1="2765.2" y1="136.0" x2="2765.2" y2="5226.0" stroke="#334155" stroke-width="2"/>
+<rect x="2700.2" y="96.0" width="130.0" height="40" rx="7" fill="#ec4899"/>
+<text x="2765.2" y="120.0" text-anchor="middle" fill="#fff" font-size="11.5" font-weight="700">Audit Module</text>
+<rect x="2700.2" y="5226.0" width="130.0" height="30" rx="7" fill="#ec4899" opacity="0.55"/>
+<text x="2765.2" y="5245.0" text-anchor="middle" fill="#fff" font-size="10.5" font-weight="700">Audit Module</text>
+<line x1="70" y1="162.0" x2="2850" y2="162.0" stroke="#334155" stroke-width="1" stroke-dasharray="4,4"/>
+<rect x="1259.2" y="149.0" width="401.6" height="22" rx="11" fill="#334155"/>
+<text x="1460.0" y="164.0" text-anchor="middle" fill="#cbd5e1" font-size="10.5" font-weight="700">Upload Files (Primary + Optional OBJ Assets), No Duplicate</text>
+<line x1="224.3" y1="216.0" x2="536.3" y2="216.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="234.3" y="192.0" width="292.0" height="18" rx="4" fill="#0f172a"/>
+<text x="380.3" y="205.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">POST /api/v1/surveys/10/files (multipart: file, assets[]) (cookie)</text>
+<line x1="662.3" y1="270.0" x2="762.3" y2="270.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="672.3" y="246.0" width="80.0" height="18" rx="4" fill="#0f172a"/>
+<text x="712.3" y="259.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">Forward request + cookie</text>
+<path d="M848.9,324.0 C894.9,324.0 894.9,354.0 848.9,354.0" fill="none" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
+<rect x="890.9" y="326.0" width="252.1" height="20" rx="5" fill="#1e293b" stroke="#334155"/>
+<text x="1016.9" y="340.0" text-anchor="middle" fill="#94a3b8" font-size="9.5">Validate cookie + CSRF + check survey access</text>
+<line x1="935.5" y1="392.0" x2="1147.2" y2="392.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="987.1" y="368.0" width="108.4" height="18" rx="4" fill="#0f172a"/>
+<text x="1041.3" y="381.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">Call Files Module</text>
+<line x1="1273.2" y1="446.0" x2="1524.5" y2="446.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="1283.2" y="422.0" width="231.3" height="18" rx="4" fill="#0f172a"/>
+<text x="1398.8" y="435.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">Verify survey exists + project assignment</text>
+<line x1="1524.5" y1="500.0" x2="1273.2" y2="500.0" stroke="#5eead4" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)"/>
+<rect x="1365.9" y="476.0" width="65.9" height="18" rx="4" fill="#0f172a"/>
+<text x="1398.8" y="489.0" text-anchor="middle" fill="#5eead4" font-size="9.5">survey OK</text>
+<path d="M1210.2,554.0 C1256.2,554.0 1256.2,584.0 1210.2,584.0" fill="none" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
+<rect x="1252.2" y="556.0" width="289.3" height="20" rx="5" fill="#1e293b" stroke="#334155"/>
+<text x="1396.9" y="570.0" text-anchor="middle" fill="#94a3b8" font-size="9.5">Validate primary file + confirm assets are OBJ-only</text>
+<line x1="1273.2" y1="622.0" x2="1750.5" y2="622.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="1377.8" y="598.0" width="268.0" height="18" rx="4" fill="#0f172a"/>
+<text x="1511.8" y="611.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">Stream-upload primary file to staging (private)</text>
+<line x1="1750.5" y1="676.0" x2="1273.2" y2="676.0" stroke="#5eead4" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)"/>
+<rect x="1457.6" y="652.0" width="108.4" height="18" rx="4" fill="#0f172a"/>
+<text x="1511.8" y="665.0" text-anchor="middle" fill="#5eead4" font-size="9.5">staging_key, etag</text>
+<path d="M1210.2,730.0 C1256.2,730.0 1256.2,760.0 1210.2,760.0" fill="none" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
+<rect x="1252.2" y="732.0" width="230.8" height="20" rx="5" fill="#1e293b" stroke="#334155"/>
+<text x="1367.6" y="746.0" text-anchor="middle" fill="#94a3b8" font-size="9.5">Compute SHA-256 checksum of primary file</text>
+<line x1="1273.2" y1="798.0" x2="1524.5" y2="798.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="1283.2" y="774.0" width="231.3" height="18" rx="4" fill="#0f172a"/>
+<text x="1398.8" y="787.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">Check checksum for existing SurveyFile on survey</text>
+<line x1="1524.5" y1="852.0" x2="1273.2" y2="852.0" stroke="#5eead4" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)"/>
+<rect x="1342.0" y="828.0" width="113.8" height="18" rx="4" fill="#0f172a"/>
+<text x="1398.8" y="841.0" text-anchor="middle" fill="#5eead4" font-size="9.5">no duplicate found</text>
+<line x1="1273.2" y1="906.0" x2="1750.5" y2="906.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="1375.2" y="882.0" width="273.4" height="18" rx="4" fill="#0f172a"/>
+<text x="1511.8" y="895.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">Promote staged primary file to canonical storage</text>
+<line x1="1750.5" y1="960.0" x2="1273.2" y2="960.0" stroke="#5eead4" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)"/>
+<rect x="1447.0" y="936.0" width="129.7" height="18" rx="4" fill="#0f172a"/>
+<text x="1511.8" y="949.0" text-anchor="middle" fill="#5eead4" font-size="9.5">canonical storage_key</text>
+<line x1="1273.2" y1="1014.0" x2="1750.5" y2="1014.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="1380.5" y="990.0" width="262.7" height="18" rx="4" fill="#0f172a"/>
+<text x="1511.8" y="1003.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">Stream-upload + promote OBJ companion asset(s)</text>
+<line x1="1750.5" y1="1068.0" x2="1273.2" y2="1068.0" stroke="#5eead4" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)"/>
+<rect x="1449.6" y="1044.0" width="124.4" height="18" rx="4" fill="#0f172a"/>
+<text x="1511.8" y="1057.0" text-anchor="middle" fill="#5eead4" font-size="9.5">asset storage_key(s)</text>
+<line x1="1273.2" y1="1122.0" x2="1524.5" y2="1122.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="1283.2" y="1098.0" width="231.3" height="18" rx="4" fill="#0f172a"/>
+<text x="1398.8" y="1111.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">INSERT SurveyFile + SurveyFileAsset(s) + ProcessingJob</text>
+<line x1="1273.2" y1="1176.0" x2="2702.2" y2="1176.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="1933.5" y="1152.0" width="108.4" height="18" rx="4" fill="#0f172a"/>
+<text x="1987.7" y="1165.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">Log FILE_UPLOADED</text>
+<line x1="2702.2" y1="1230.0" x2="1650.5" y2="1230.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="2124.8" y="1206.0" width="103.1" height="18" rx="4" fill="#0f172a"/>
+<text x="2176.3" y="1219.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">INSERT audit_log</text>
+<line x1="1650.5" y1="1284.0" x2="2702.2" y2="1284.0" stroke="#5eead4" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)"/>
+<rect x="2162.0" y="1260.0" width="28.6" height="18" rx="4" fill="#0f172a"/>
+<text x="2176.3" y="1273.0" text-anchor="middle" fill="#5eead4" font-size="9.5">OK</text>
+<line x1="1524.5" y1="1338.0" x2="1273.2" y2="1338.0" stroke="#5eead4" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)"/>
+<rect x="1307.4" y="1314.0" width="182.9" height="18" rx="4" fill="#0f172a"/>
+<text x="1398.8" y="1327.0" text-anchor="middle" fill="#5eead4" font-size="9.5">COMMIT: file_id=456, job_id=789</text>
+<path d="M1210.2,1392.0 C1256.2,1392.0 1256.2,1422.0 1210.2,1422.0" fill="none" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
+<rect x="1252.2" y="1394.0" width="294.6" height="20" rx="5" fill="#1e293b" stroke="#334155"/>
+<text x="1399.5" y="1408.0" text-anchor="middle" fill="#94a3b8" font-size="9.5">Register Celery dispatch via transaction.on_commit()</text>
+<line x1="1273.2" y1="1460.0" x2="2044.2" y2="1460.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="1500.7" y="1436.0" width="315.9" height="18" rx="4" fill="#0f172a"/>
+<text x="1658.7" y="1449.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">SEND TASK process_file(file_id=456, job_id=789, kind=2D)</text>
+<line x1="1147.2" y1="1514.0" x2="935.5" y2="1514.0" stroke="#5eead4" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)"/>
+<rect x="945.5" y="1490.0" width="191.7" height="18" rx="4" fill="#0f172a"/>
+<text x="1041.3" y="1503.0" text-anchor="middle" fill="#5eead4" font-size="9.5">202 Accepted {file_id=456, job_id=789}</text>
+<line x1="762.3" y1="1568.0" x2="662.3" y2="1568.0" stroke="#5eead4" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)"/>
+<rect x="672.3" y="1544.0" width="80.0" height="18" rx="4" fill="#0f172a"/>
+<text x="712.3" y="1557.0" text-anchor="middle" fill="#5eead4" font-size="9.5">202 Accepted</text>
+<line x1="536.3" y1="1622.0" x2="224.3" y2="1622.0" stroke="#5eead4" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)"/>
+<rect x="291.5" y="1598.0" width="177.6" height="18" rx="4" fill="#0f172a"/>
+<text x="380.3" y="1611.0" text-anchor="middle" fill="#5eead4" font-size="9.5">202 Accepted {file_id, job_id}</text>
+<line x1="70" y1="1662.0" x2="2850" y2="1662.0" stroke="#334155" stroke-width="1" stroke-dasharray="4,4"/>
+<rect x="1265.7" y="1649.0" width="388.6" height="22" rx="11" fill="#334155"/>
+<text x="1460.0" y="1664.0" text-anchor="middle" fill="#cbd5e1" font-size="10.5" font-weight="700">Upload Files, Duplicate Primary Checksum (short-circuit)</text>
+<line x1="224.3" y1="1716.0" x2="536.3" y2="1716.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="234.3" y="1692.0" width="292.0" height="18" rx="4" fill="#0f172a"/>
+<text x="380.3" y="1705.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">POST /api/v1/surveys/10/files (multipart: file) (cookie)</text>
+<line x1="662.3" y1="1770.0" x2="762.3" y2="1770.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="672.3" y="1746.0" width="80.0" height="18" rx="4" fill="#0f172a"/>
+<text x="712.3" y="1759.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">Forward request + cookie</text>
+<line x1="935.5" y1="1824.0" x2="1147.2" y2="1824.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="987.1" y="1800.0" width="108.4" height="18" rx="4" fill="#0f172a"/>
+<text x="1041.3" y="1813.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">Call Files Module</text>
+<line x1="1273.2" y1="1878.0" x2="1750.5" y2="1878.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="1377.8" y="1854.0" width="268.0" height="18" rx="4" fill="#0f172a"/>
+<text x="1511.8" y="1867.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">Stream-upload primary file to staging (private)</text>
+<path d="M1210.2,1932.0 C1256.2,1932.0 1256.2,1962.0 1210.2,1962.0" fill="none" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
+<rect x="1252.2" y="1934.0" width="230.8" height="20" rx="5" fill="#1e293b" stroke="#334155"/>
+<text x="1367.6" y="1948.0" text-anchor="middle" fill="#94a3b8" font-size="9.5">Compute SHA-256 checksum of primary file</text>
+<line x1="1273.2" y1="2000.0" x2="1524.5" y2="2000.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="1283.2" y="1976.0" width="231.3" height="18" rx="4" fill="#0f172a"/>
+<text x="1398.8" y="1989.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">Check checksum for existing SurveyFile on survey</text>
+<line x1="1524.5" y1="2054.0" x2="1273.2" y2="2054.0" stroke="#5eead4" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)"/>
+<rect x="1283.2" y="2030.0" width="231.3" height="18" rx="4" fill="#0f172a"/>
+<text x="1398.8" y="2043.0" text-anchor="middle" fill="#5eead4" font-size="9.5">duplicate found: existing file_id, job_id</text>
+<path d="M1210.2,2108.0 C1256.2,2108.0 1256.2,2138.0 1210.2,2138.0" fill="none" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
+<rect x="1252.2" y="2110.0" width="257.4" height="20" rx="5" fill="#1e293b" stroke="#334155"/>
+<text x="1380.9" y="2124.0" text-anchor="middle" fill="#94a3b8" font-size="9.5">Discard staged upload; no new records created</text>
+<line x1="1147.2" y1="2176.0" x2="935.5" y2="2176.0" stroke="#5eead4" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)"/>
+<rect x="945.5" y="2152.0" width="191.7" height="18" rx="4" fill="#0f172a"/>
+<text x="1041.3" y="2165.0" text-anchor="middle" fill="#5eead4" font-size="9.5">200 {file_id, job_id} (existing, no job dispatched)</text>
+<line x1="762.3" y1="2230.0" x2="662.3" y2="2230.0" stroke="#5eead4" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)"/>
+<rect x="687.3" y="2206.0" width="49.9" height="18" rx="4" fill="#0f172a"/>
+<text x="712.3" y="2219.0" text-anchor="middle" fill="#5eead4" font-size="9.5">200 OK</text>
+<line x1="536.3" y1="2284.0" x2="224.3" y2="2284.0" stroke="#5eead4" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)"/>
+<rect x="283.5" y="2260.0" width="193.6" height="18" rx="4" fill="#0f172a"/>
+<text x="380.3" y="2273.0" text-anchor="middle" fill="#5eead4" font-size="9.5">200 {file_id, job_id} (duplicate)</text>
+<line x1="70" y1="2324.0" x2="2850" y2="2324.0" stroke="#334155" stroke-width="1" stroke-dasharray="4,4"/>
+<rect x="1314.5" y="2311.0" width="290.9" height="22" rx="11" fill="#334155"/>
+<text x="1460.0" y="2326.0" text-anchor="middle" fill="#cbd5e1" font-size="10.5" font-weight="700">Async Processing Pipeline (Celery Worker)</text>
+<line x1="2251.5" y1="2378.0" x2="2394.8" y2="2378.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="2261.5" y="2354.0" width="123.4" height="18" rx="4" fill="#0f172a"/>
+<text x="2323.2" y="2367.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">RECEIVE task process_file</text>
+<path d="M2498.5,2432.0 C2544.5,2432.0 2544.5,2462.0 2498.5,2462.0" fill="none" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
+<rect x="2540.5" y="2434.0" width="326.6" height="20" rx="5" fill="#1e293b" stroke="#334155"/>
+<text x="2703.8" y="2448.0" text-anchor="middle" fill="#94a3b8" font-size="9.5">Check existing ProcessingJob:789 state (idempotency guard)</text>
+<line x1="2602.2" y1="2500.0" x2="2702.2" y2="2500.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="2612.2" y="2476.0" width="80.0" height="18" rx="4" fill="#0f172a"/>
+<text x="2652.2" y="2489.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">Log PROCESSING_STARTED</text>
+<line x1="2702.2" y1="2554.0" x2="1650.5" y2="2554.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="2124.8" y="2530.0" width="103.1" height="18" rx="4" fill="#0f172a"/>
+<text x="2176.3" y="2543.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">INSERT audit_log</text>
+<line x1="1650.5" y1="2608.0" x2="2702.2" y2="2608.0" stroke="#5eead4" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)"/>
+<rect x="2162.0" y="2584.0" width="28.6" height="18" rx="4" fill="#0f172a"/>
+<text x="2176.3" y="2597.0" text-anchor="middle" fill="#5eead4" font-size="9.5">OK</text>
+<line x1="2394.8" y1="2662.0" x2="1650.5" y2="2662.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="1864.7" y="2638.0" width="315.9" height="18" rx="4" fill="#0f172a"/>
+<text x="2022.7" y="2651.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">UPDATE file status=processing; UPDATE job status=running</text>
+<line x1="2394.8" y1="2716.0" x2="1944.2" y2="2716.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="2016.9" y="2692.0" width="305.3" height="18" rx="4" fill="#0f172a"/>
+<text x="2169.5" y="2705.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">Fetch primary (+ asset) file(s) from canonical storage</text>
+<path d="M2498.5,2770.0 C2544.5,2770.0 2544.5,2800.0 2498.5,2800.0" fill="none" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
+<rect x="2540.5" y="2772.0" width="262.7" height="20" rx="5" fill="#1e293b" stroke="#334155"/>
+<text x="2671.9" y="2786.0" text-anchor="middle" fill="#94a3b8" font-size="9.5">Validate file (magic bytes) + confirm checksum</text>
+<path d="M2498.5,2838.0 C2544.5,2838.0 2544.5,2868.0 2498.5,2868.0" fill="none" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
+<rect x="2540.5" y="2840.0" width="284.0" height="20" rx="5" fill="#1e293b" stroke="#334155"/>
+<text x="2682.5" y="2854.0" text-anchor="middle" fill="#94a3b8" font-size="9.5">Extract metadata (CRS/bounds or vertex count/bbox)</text>
+<line x1="2394.8" y1="2906.0" x2="1944.2" y2="2906.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="2003.6" y="2882.0" width="331.9" height="18" rx="4" fill="#0f172a"/>
+<text x="2169.5" y="2895.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">Generate preview / convert (COG+tiles or GLB), store output</text>
+<line x1="2394.8" y1="2960.0" x2="1650.5" y2="2960.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="1891.3" y="2936.0" width="262.7" height="18" rx="4" fill="#0f172a"/>
+<text x="2022.7" y="2949.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">UPDATE file status=ready; job status=completed</text>
+<line x1="2602.2" y1="3014.0" x2="2702.2" y2="3014.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="2612.2" y="2990.0" width="80.0" height="18" rx="4" fill="#0f172a"/>
+<text x="2652.2" y="3003.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">Log PROCESSING_COMPLETED</text>
+<line x1="2702.2" y1="3068.0" x2="1650.5" y2="3068.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="2124.8" y="3044.0" width="103.1" height="18" rx="4" fill="#0f172a"/>
+<text x="2176.3" y="3057.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">INSERT audit_log</text>
+<line x1="1650.5" y1="3122.0" x2="2702.2" y2="3122.0" stroke="#5eead4" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)"/>
+<rect x="2162.0" y="3098.0" width="28.6" height="18" rx="4" fill="#0f172a"/>
+<text x="2176.3" y="3111.0" text-anchor="middle" fill="#5eead4" font-size="9.5">OK</text>
+<line x1="70" y1="3162.0" x2="2850" y2="3162.0" stroke="#334155" stroke-width="1" stroke-dasharray="4,4"/>
+<rect x="1246.2" y="3149.0" width="427.6" height="22" rx="11" fill="#334155"/>
+<text x="1460.0" y="3164.0" text-anchor="middle" fill="#cbd5e1" font-size="10.5" font-weight="700">Client Polls Processing Status (PostgreSQL is source of truth)</text>
+<line x1="224.3" y1="3216.0" x2="536.3" y2="3216.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="264.9" y="3192.0" width="230.8" height="18" rx="4" fill="#0f172a"/>
+<text x="380.3" y="3205.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">GET /api/v1/processing-jobs/789 (cookie)</text>
+<line x1="662.3" y1="3270.0" x2="762.3" y2="3270.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="672.3" y="3246.0" width="80.0" height="18" rx="4" fill="#0f172a"/>
+<text x="712.3" y="3259.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">Forward request + cookie</text>
+<line x1="935.5" y1="3324.0" x2="1524.5" y2="3324.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="1159.8" y="3300.0" width="140.4" height="18" rx="4" fill="#0f172a"/>
+<text x="1230.0" y="3313.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">Query ProcessingJob 789</text>
+<line x1="1524.5" y1="3378.0" x2="935.5" y2="3378.0" stroke="#5eead4" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)"/>
+<rect x="1109.3" y="3354.0" width="241.4" height="18" rx="4" fill="#0f172a"/>
+<text x="1230.0" y="3367.0" text-anchor="middle" fill="#5eead4" font-size="9.5">{status: completed, progress, retry_count}</text>
+<line x1="762.3" y1="3432.0" x2="662.3" y2="3432.0" stroke="#5eead4" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)"/>
+<rect x="672.3" y="3408.0" width="80.0" height="18" rx="4" fill="#0f172a"/>
+<text x="712.3" y="3421.0" text-anchor="middle" fill="#5eead4" font-size="9.5">200 OK {job, file}</text>
+<line x1="536.3" y1="3486.0" x2="224.3" y2="3486.0" stroke="#5eead4" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)"/>
+<rect x="323.4" y="3462.0" width="113.8" height="18" rx="4" fill="#0f172a"/>
+<text x="380.3" y="3475.0" text-anchor="middle" fill="#5eead4" font-size="9.5">200 OK {job, file}</text>
+<line x1="70" y1="3526.0" x2="2850" y2="3526.0" stroke="#334155" stroke-width="1" stroke-dasharray="4,4"/>
+<rect x="1298.3" y="3513.0" width="323.5" height="22" rx="11" fill="#334155"/>
+<text x="1460.0" y="3528.0" text-anchor="middle" fill="#cbd5e1" font-size="10.5" font-weight="700">Automatic Retry (Celery backoff: 5m, 15m, 45m)</text>
+<path d="M2498.5,3580.0 C2544.5,3580.0 2544.5,3610.0 2498.5,3610.0" fill="none" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
+<rect x="2540.5" y="3582.0" width="220.2" height="20" rx="5" fill="#1e293b" stroke="#334155"/>
+<text x="2650.6" y="3596.0" text-anchor="middle" fill="#94a3b8" font-size="9.5">Processing task raises transient error</text>
+<line x1="2394.8" y1="3648.0" x2="1650.5" y2="3648.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="1880.7" y="3624.0" width="284.0" height="18" rx="4" fill="#0f172a"/>
+<text x="2022.7" y="3637.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">UPDATE job: status=retry_scheduled, retry_count+=1</text>
+<line x1="2602.2" y1="3702.0" x2="2702.2" y2="3702.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="2612.2" y="3678.0" width="80.0" height="18" rx="4" fill="#0f172a"/>
+<text x="2652.2" y="3691.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">Log PROCESSING_RETRY</text>
+<line x1="2702.2" y1="3756.0" x2="1650.5" y2="3756.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="2124.8" y="3732.0" width="103.1" height="18" rx="4" fill="#0f172a"/>
+<text x="2176.3" y="3745.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">INSERT audit_log</text>
+<line x1="1650.5" y1="3810.0" x2="2702.2" y2="3810.0" stroke="#5eead4" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)"/>
+<rect x="2162.0" y="3786.0" width="28.6" height="18" rx="4" fill="#0f172a"/>
+<text x="2176.3" y="3799.0" text-anchor="middle" fill="#5eead4" font-size="9.5">OK</text>
+<path d="M2498.5,3864.0 C2544.5,3864.0 2544.5,3894.0 2498.5,3894.0" fill="none" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
+<rect x="2540.5" y="3866.0" width="300.0" height="20" rx="5" fill="#1e293b" stroke="#334155"/>
+<text x="2690.5" y="3880.0" text-anchor="middle" fill="#94a3b8" font-size="9.5">Celery schedules retry after backoff (5m / 15m / 45m)</text>
+<line x1="2251.5" y1="3932.0" x2="2394.8" y2="3932.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="2261.5" y="3908.0" width="123.4" height="18" rx="4" fill="#0f172a"/>
+<text x="2323.2" y="3921.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">RECEIVE retried task (after backoff delay)</text>
+<path d="M2498.5,3986.0 C2544.5,3986.0 2544.5,4016.0 2498.5,4016.0" fill="none" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
+<rect x="2540.5" y="3988.0" width="268.0" height="20" rx="5" fill="#1e293b" stroke="#334155"/>
+<text x="2674.5" y="4002.0" text-anchor="middle" fill="#94a3b8" font-size="9.5">Re-attempt processing on existing ProcessingJob</text>
+<line x1="2394.8" y1="4054.0" x2="1650.5" y2="4054.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="1870.0" y="4030.0" width="305.3" height="18" rx="4" fill="#0f172a"/>
+<text x="2022.7" y="4043.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">UPDATE job: status=FAILED_PERMANENT (after 3 attempts)</text>
+<line x1="2602.2" y1="4108.0" x2="2702.2" y2="4108.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="2612.2" y="4084.0" width="80.0" height="18" rx="4" fill="#0f172a"/>
+<text x="2652.2" y="4097.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">Log PROCESSING_FAILED</text>
+<line x1="2702.2" y1="4162.0" x2="1650.5" y2="4162.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="2124.8" y="4138.0" width="103.1" height="18" rx="4" fill="#0f172a"/>
+<text x="2176.3" y="4151.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">INSERT audit_log</text>
+<line x1="1650.5" y1="4216.0" x2="2702.2" y2="4216.0" stroke="#5eead4" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)"/>
+<rect x="2162.0" y="4192.0" width="28.6" height="18" rx="4" fill="#0f172a"/>
+<text x="2176.3" y="4205.0" text-anchor="middle" fill="#5eead4" font-size="9.5">OK</text>
+<line x1="70" y1="4256.0" x2="2850" y2="4256.0" stroke="#334155" stroke-width="1" stroke-dasharray="4,4"/>
+<rect x="1282.0" y="4243.0" width="356.0" height="22" rx="11" fill="#334155"/>
+<text x="1460.0" y="4258.0" text-anchor="middle" fill="#cbd5e1" font-size="10.5" font-weight="700">Manual Retry (SE or Admin, after permanent failure)</text>
+<line x1="224.3" y1="4310.0" x2="536.3" y2="4310.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="246.3" y="4286.0" width="268.0" height="18" rx="4" fill="#0f172a"/>
+<text x="380.3" y="4299.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">POST /api/v1/processing-jobs/789/retry (cookie)</text>
+<line x1="662.3" y1="4364.0" x2="762.3" y2="4364.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="672.3" y="4340.0" width="80.0" height="18" rx="4" fill="#0f172a"/>
+<text x="712.3" y="4353.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">Forward request + cookie</text>
+<path d="M848.9,4418.0 C894.9,4418.0 894.9,4448.0 848.9,4448.0" fill="none" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
+<rect x="890.9" y="4420.0" width="278.7" height="20" rx="5" fill="#1e293b" stroke="#334155"/>
+<text x="1030.2" y="4434.0" text-anchor="middle" fill="#94a3b8" font-size="9.5">Validate cookie + CSRF + check role (SE or Admin)</text>
+<line x1="935.5" y1="4486.0" x2="2394.8" y2="4486.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="1557.7" y="4462.0" width="214.8" height="18" rx="4" fill="#0f172a"/>
+<text x="1665.2" y="4475.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">Call Processing Module (manual retry)</text>
+<path d="M2498.5,4540.0 C2544.5,4540.0 2544.5,4570.0 2498.5,4570.0" fill="none" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
+<rect x="2540.5" y="4542.0" width="315.9" height="20" rx="5" fill="#1e293b" stroke="#334155"/>
+<text x="2698.5" y="4556.0" text-anchor="middle" fill="#94a3b8" font-size="9.5">Check job status=FAILED_PERMANENT + retry_count &lt; max</text>
+<line x1="2394.8" y1="4608.0" x2="1650.5" y2="4608.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="1851.4" y="4584.0" width="342.5" height="18" rx="4" fill="#0f172a"/>
+<text x="2022.7" y="4597.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">UPDATE job: status=queued, retry_count+=1, error_message=NULL</text>
+<line x1="2602.2" y1="4662.0" x2="2702.2" y2="4662.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="2612.2" y="4638.0" width="80.0" height="18" rx="4" fill="#0f172a"/>
+<text x="2652.2" y="4651.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">Log PROCESSING_RETRY</text>
+<line x1="2702.2" y1="4716.0" x2="1650.5" y2="4716.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="2124.8" y="4692.0" width="103.1" height="18" rx="4" fill="#0f172a"/>
+<text x="2176.3" y="4705.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">INSERT audit_log</text>
+<line x1="1650.5" y1="4770.0" x2="2702.2" y2="4770.0" stroke="#5eead4" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)"/>
+<rect x="2162.0" y="4746.0" width="28.6" height="18" rx="4" fill="#0f172a"/>
+<text x="2176.3" y="4759.0" text-anchor="middle" fill="#5eead4" font-size="9.5">OK</text>
+<line x1="1650.5" y1="4824.0" x2="2394.8" y2="4824.0" stroke="#5eead4" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)"/>
+<rect x="1952.5" y="4800.0" width="140.4" height="18" rx="4" fill="#0f172a"/>
+<text x="2022.7" y="4813.0" text-anchor="middle" fill="#5eead4" font-size="9.5">COMMIT: job:789 updated</text>
+<path d="M2498.5,4878.0 C2544.5,4878.0 2544.5,4908.0 2498.5,4908.0" fill="none" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
+<rect x="2540.5" y="4880.0" width="294.6" height="20" rx="5" fill="#1e293b" stroke="#334155"/>
+<text x="2687.8" y="4894.0" text-anchor="middle" fill="#94a3b8" font-size="9.5">Register Celery dispatch via transaction.on_commit()</text>
+<line x1="2394.8" y1="4946.0" x2="2251.5" y2="4946.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="2261.5" y="4922.0" width="123.4" height="18" rx="4" fill="#0f172a"/>
+<text x="2323.2" y="4935.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">SEND TASK process_file(job_id=789) (manual retry)</text>
+<line x1="2251.5" y1="5000.0" x2="2394.8" y2="5000.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="2261.5" y="4976.0" width="123.4" height="18" rx="4" fill="#0f172a"/>
+<text x="2323.2" y="4989.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">RECEIVE task process_file (manual retry)</text>
+<line x1="2394.8" y1="5054.0" x2="935.5" y2="5054.0" stroke="#5eead4" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)"/>
+<rect x="1624.2" y="5030.0" width="81.8" height="18" rx="4" fill="#0f172a"/>
+<text x="1665.2" y="5043.0" text-anchor="middle" fill="#5eead4" font-size="9.5">202 Accepted</text>
+<line x1="762.3" y1="5108.0" x2="662.3" y2="5108.0" stroke="#5eead4" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)"/>
+<rect x="672.3" y="5084.0" width="80.0" height="18" rx="4" fill="#0f172a"/>
+<text x="712.3" y="5097.0" text-anchor="middle" fill="#5eead4" font-size="9.5">202 Accepted</text>
+<line x1="536.3" y1="5162.0" x2="224.3" y2="5162.0" stroke="#5eead4" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)"/>
+<rect x="299.5" y="5138.0" width="161.6" height="18" rx="4" fill="#0f172a"/>
+<text x="380.3" y="5151.0" text-anchor="middle" fill="#5eead4" font-size="9.5">202 Accepted {retry queued}</text>
+<rect x="30.0" y="5282.0" width="937.3" height="228.0" rx="10" fill="#1e293b" stroke="#334155" stroke-width="1.5" stroke-dasharray="6,4"/>
+<text x="44.0" y="5306.0" fill="#e2e8f0" font-size="12" font-weight="700">Error Flows:</text>
+<text x="44.0" y="5328.0" fill="#94a3b8" font-size="9.5">- More than one primary 'file' part, or zero: 400</text>
+<text x="44.0" y="5346.0" fill="#94a3b8" font-size="9.5">  INVALID_UPLOAD_SHAPE</text>
+<text x="44.0" y="5364.0" fill="#94a3b8" font-size="9.5">- Non-OBJ file in 'assets': 400 UNSUPPORTED_ASSET_TYPE</text>
+<text x="44.0" y="5382.0" fill="#94a3b8" font-size="9.5">- Unsupported file type / bad MIME: 400 INVALID_FILE_TYPE</text>
+<text x="44.0" y="5400.0" fill="#94a3b8" font-size="9.5">- File exceeds max size: 400 FILE_TOO_LARGE</text>
+<text x="44.0" y="5418.0" fill="#94a3b8" font-size="9.5">- Manual retry while job is not FAILED_PERMANENT: 409</text>
+<text x="44.0" y="5436.0" fill="#94a3b8" font-size="9.5">  INVALID_STATE</text>
+<text x="44.0" y="5454.0" fill="#94a3b8" font-size="9.5">- Manual retry beyond configured max: 429 RETRY_LIMIT_EXCEEDED</text>
+<text x="44.0" y="5472.0" fill="#94a3b8" font-size="9.5">- Upload to unassigned project: 403 Forbidden</text>
+<text x="44.0" y="5490.0" fill="#94a3b8" font-size="9.5">- Unsafe request without valid CSRF token: 403 CSRF_FAILURE</text>
+<rect x="991.3" y="5282.0" width="937.3" height="246.0" rx="10" fill="#1e293b" stroke="#334155" stroke-width="1.5" stroke-dasharray="6,4"/>
+<text x="1005.3" y="5306.0" fill="#e2e8f0" font-size="12" font-weight="700">Module Interactions (Drone Mapping Service):</text>
+<text x="1005.3" y="5328.0" fill="#94a3b8" font-size="9.5">- Files Module streams to a private staging area first,</text>
+<text x="1005.3" y="5346.0" fill="#94a3b8" font-size="9.5">  then promotes to canonical private storage only after</text>
+<text x="1005.3" y="5364.0" fill="#94a3b8" font-size="9.5">  checksum confirms no duplicate exists</text>
+<text x="1005.3" y="5382.0" fill="#94a3b8" font-size="9.5">- Duplicate checksum short-circuits before any SurveyFile,</text>
+<text x="1005.3" y="5400.0" fill="#94a3b8" font-size="9.5">  SurveyFileAsset, or ProcessingJob is created</text>
+<text x="1005.3" y="5418.0" fill="#94a3b8" font-size="9.5">- One SurveyFile maps to exactly one ProcessingJob; retries</text>
+<text x="1005.3" y="5436.0" fill="#94a3b8" font-size="9.5">  (automatic or manual) always update that same job</text>
+<text x="1005.3" y="5454.0" fill="#94a3b8" font-size="9.5">- Redis is used only as the Celery broker; ProcessingJob in</text>
+<text x="1005.3" y="5472.0" fill="#94a3b8" font-size="9.5">  PostgreSQL is the sole source of truth for status/progress</text>
+<text x="1005.3" y="5490.0" fill="#94a3b8" font-size="9.5">- No external message-broker event is published on</text>
+<text x="1005.3" y="5508.0" fill="#94a3b8" font-size="9.5">  completion; nothing outside this service is notified</text>
+<rect x="1952.7" y="5282.0" width="937.3" height="138.0" rx="10" fill="#1e293b" stroke="#334155" stroke-width="1.5" stroke-dasharray="6,4"/>
+<text x="1966.7" y="5306.0" fill="#e2e8f0" font-size="12" font-weight="700">Legend:</text>
+<text x="1966.7" y="5328.0" fill="#94a3b8" font-size="9.5">- Solid arrow: request / call</text>
+<text x="1966.7" y="5346.0" fill="#94a3b8" font-size="9.5">- Dashed arrow: response</text>
+<text x="1966.7" y="5364.0" fill="#94a3b8" font-size="9.5">- Dashed orange box: Drone Mapping Service boundary</text>
+<text x="1966.7" y="5382.0" fill="#94a3b8" font-size="9.5">- Colored modules inside the box are internal</text>
+<text x="1966.7" y="5400.0" fill="#94a3b8" font-size="9.5">- Auth is via HttpOnly cookie, not an Authorization header</text>
+</svg>

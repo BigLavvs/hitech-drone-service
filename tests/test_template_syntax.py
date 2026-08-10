@@ -1,7 +1,13 @@
 from django.template.loader import get_template
-from django.test import RequestFactory, SimpleTestCase
+from django.test import RequestFactory, SimpleTestCase, override_settings
 
 
+@override_settings(
+    STORAGES={
+        "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
+        "staticfiles": {"BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage"},
+    }
+)
 class TemplateSyntaxTests(SimpleTestCase):
     """Ensure shared templates remain parseable as the feature pages are added."""
 

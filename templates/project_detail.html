@@ -79,6 +79,33 @@
 
   <div class="pagination-bar" data-sites-pagination hidden></div>
 
+  <section class="card detail-section" data-project-members-card hidden>
+    <header class="card-header">
+      <div>
+        <p class="eyebrow">Members</p>
+        <h2>Project members</h2>
+      </div>
+    </header>
+    <div class="card-body survey-panel-body">
+      <div class="survey-panel-message" data-project-members-message hidden></div>
+      <div data-project-members-content>
+        {% include "components/loading_state.html" with loading_title="Loading members" loading_description="Fetching project membership details." %}
+      </div>
+      <form class="stack-form" data-project-member-form>
+        <div class="form-field">
+          <label for="project-member-user-id">Available Survey Engineers and Viewers</label>
+          <select id="project-member-user-id" name="user_id" required>
+            <option value="">Select a member</option>
+          </select>
+          <p class="field-help">Only active Survey Engineers and Viewers who are not already assigned appear here.</p>
+        </div>
+        <div class="survey-action-row">
+          <button class="button button--primary" type="submit" data-project-member-submit>Add member</button>
+        </div>
+      </form>
+    </div>
+  </section>
+
   <section class="card" data-project-edit-card hidden>
     <header class="card-header">
       <div>

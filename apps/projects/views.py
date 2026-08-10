@@ -7,9 +7,12 @@ from rest_framework.response import Response
 from rest_framework.serializers import ValidationError as DRFValidationError
 
 from apps.access_control.authentication import HitechJWTAuthentication
-from apps.access_control.models import UserRole
+from apps.access_control.models import User, UserRole
 from apps.projects.models import Project, Site
 from apps.projects.serializers import (
+    ProjectMemberCandidateSerializer,
+    ProjectMemberCreateSerializer,
+    ProjectMemberReadSerializer,
     ProjectReadSerializer,
     ProjectWriteSerializer,
     SiteReadSerializer,
@@ -21,10 +24,14 @@ from apps.projects.services import (
     create_project,
     create_site,
     delete_site,
+    get_available_project_members,
+    get_project_members,
     get_project_manageable_by_user,
     get_projects_visible_to_user,
     get_project_visible_to_user,
     get_site_with_project,
+    remove_project_member,
+    add_project_member,
     update_project,
     update_site,
 )
@@ -128,6 +135,73 @@ class ProjectDetailAPIView(generics.GenericAPIView):
             raise _to_drf_validation_error(exc) from exc
 
         return Response(ProjectReadSerializer(project).data)
+
+
+class ProjectMemberListCreateAPIView(generics.GenericAPIView):
+    authentication_classes = [HitechJWTAuthentication]
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = ProjectMemberReadSerializer
+
+    def get_serializer_class(self):
+        if self.request.method == "POST":
+            return ProjectMemberCreateSerializer
+        return ProjectMemberReadSerializer
+
+    def get(self, request, project_id, *args, **kwargs):
+        project = _get_manageable_project_or_404(user=request.user, project_id=project_id)
+        try:
+            memberships = get_project_members(actor=request.user, project=project)
+        except DjangoValidationError as exc:
+            raise _to_drf_validation_error(exc) from exc
+        return Response(ProjectMemberReadSerializer(memberships, many=True).data)
+
+    def post(self, request, project_id, *args, **kwargs):
+        project = _get_manageable_project_or_404(user=request.user, project_id=project_id)
+        serializer = ProjectMemberCreateSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        try:
+            membership = add_project_member(
+                actor=request.user,
+                project=project,
+                member=serializer.validated_data["user"],
+            )
+        except DjangoValidationError as exc:
+            raise _to_drf_validation_error(exc) from exc
+
+        membership = get_project_members(actor=request.user, project=project).get(pk=membership.pk)
+        return Response(ProjectMemberReadSerializer(membership).data, status=status.HTTP_201_CREATED)
+
+
+class ProjectAvailableMemberListAPIView(generics.GenericAPIView):
+    authentication_classes = [HitechJWTAuthentication]
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = ProjectMemberCandidateSerializer
+
+    def get(self, request, project_id, *args, **kwargs):
+        project = _get_manageable_project_or_404(user=request.user, project_id=project_id)
+        try:
+            candidates = get_available_project_members(actor=request.user, project=project)
+        except DjangoValidationError as exc:
+            raise _to_drf_validation_error(exc) from exc
+        return Response(ProjectMemberCandidateSerializer(candidates, many=True).data)
+
+
+class ProjectMemberDetailAPIView(generics.GenericAPIView):
+    authentication_classes = [HitechJWTAuthentication]
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = ProjectMemberReadSerializer
+
+    def delete(self, request, project_id, user_id, *args, **kwargs):
+        project = _get_manageable_project_or_404(user=request.user, project_id=project_id)
+
+        try:
+            member = _get_user_or_404(user_id=user_id)
+            remove_project_member(actor=request.user, project=project, member=member)
+        except DjangoValidationError as exc:
+            raise _to_drf_validation_error(exc) from exc
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class SiteListCreateAPIView(generics.GenericAPIView):
@@ -250,6 +324,13 @@ def _get_site_or_404(*, site_id: int) -> Site:
     try:
         return get_site_with_project(site_id=site_id)
     except Site.DoesNotExist as exc:
+        raise Http404 from exc
+
+
+def _get_user_or_404(*, user_id: int):
+    try:
+        return User.objects.get(pk=user_id)
+    except User.DoesNotExist as exc:
         raise Http404 from exc
 
 

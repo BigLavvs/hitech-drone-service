@@ -14,6 +14,8 @@ from apps.projects.services import (
     create_site,
     create_project,
     delete_site,
+    get_available_project_members,
+    get_project_members,
     remove_project_member,
     update_site,
     update_project,
@@ -776,6 +778,31 @@ class ProjectMembershipServiceTests(TestCase):
 
         self.assertFalse(ProjectMembership.objects.filter(project=self.project, user=self.viewer).exists())
 
+    def test_authorized_users_can_list_current_members_and_available_candidates(self):
+        ProjectMembership.objects.create(
+            project=self.project,
+            user=self.survey_engineer,
+            assigned_by=self.owner_manager,
+        )
+        extra_engineer = self.create_user(
+            "extra-engineer@example.com",
+            "engineer-2",
+            UserRole.SURVEY_ENGINEER,
+        )
+
+        for actor in (self.admin, self.owner_manager):
+            with self.subTest(actor=actor.role):
+                members = list(get_project_members(actor=actor, project=self.project))
+                candidates = list(get_available_project_members(actor=actor, project=self.project))
+                self.assertEqual([membership.user_id for membership in members], [self.survey_engineer.pk])
+                self.assertEqual(
+                    [(candidate.email, candidate.role) for candidate in candidates],
+                    [
+                        (extra_engineer.email, UserRole.SURVEY_ENGINEER),
+                        (self.viewer.email, UserRole.VIEWER),
+                    ],
+                )
+
     def test_non_owning_project_manager_survey_engineer_viewer_and_inactive_user_are_denied(self):
         blocked_users = (
             self.other_manager,
@@ -799,6 +826,16 @@ class ProjectMembershipServiceTests(TestCase):
                     project=self.project,
                     member=self.viewer,
                 )
+            with self.assertRaisesMessage(
+                PermissionDenied,
+                "Only active administrators and the owning project manager can manage project membership.",
+            ):
+                list(get_project_members(actor=blocked_user, project=self.project))
+            with self.assertRaisesMessage(
+                PermissionDenied,
+                "Only active administrators and the owning project manager can manage project membership.",
+            ):
+                list(get_available_project_members(actor=blocked_user, project=self.project))
 
         self.assertEqual(ProjectMembership.objects.count(), 0)
         self.assertEqual(AuditLog.objects.count(), 0)
@@ -877,6 +914,16 @@ class ProjectMembershipServiceTests(TestCase):
                 project=self.archived_project,
                 member=self.survey_engineer,
             )
+        with self.assertRaisesMessage(
+            ValidationError,
+            "Only active projects can have membership changes.",
+        ):
+            list(get_project_members(actor=self.admin, project=self.archived_project))
+        with self.assertRaisesMessage(
+            ValidationError,
+            "Only active projects can have membership changes.",
+        ):
+            list(get_available_project_members(actor=self.admin, project=self.archived_project))
 
         self.assertTrue(
             ProjectMembership.objects.filter(project=self.archived_project, user=self.survey_engineer).exists()

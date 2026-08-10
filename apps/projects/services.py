@@ -251,6 +251,27 @@ def remove_project_member(*, actor: User, project: Project, member: User) -> Non
         )
 
 
+def get_project_members(*, actor: User, project: Project):
+    _validate_project_membership_actor(actor=actor, project=project)
+    return (
+        ProjectMembership.objects.select_related("user")
+        .filter(project=project)
+        .order_by("user__email", "id")
+    )
+
+
+def get_available_project_members(*, actor: User, project: Project):
+    _validate_project_membership_actor(actor=actor, project=project)
+    return (
+        User.objects.filter(
+            is_active=True,
+            role__in={UserRole.SURVEY_ENGINEER, UserRole.VIEWER},
+        )
+        .exclude(projects_assigned__project=project)
+        .order_by("email", "id")
+    )
+
+
 def create_site(
     *,
     actor: User,

@@ -1,0 +1,208 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1786 2998" font-family="Inter,system-ui,sans-serif">
+<defs>
+<marker id="arrow" markerWidth="10" markerHeight="8" refX="8" refY="4" orient="auto"><path d="M0,0 L10,4 L0,8 L2,4 Z" fill="#94a3b8"/></marker>
+<marker id="arrow-dashed" markerWidth="10" markerHeight="8" refX="8" refY="4" orient="auto"><path d="M0,0 L10,4 L0,8 L2,4 Z" fill="#5eead4"/></marker>
+</defs>
+<rect x="0" y="0" width="1786" height="2998" fill="#0f172a"/>
+<rect x="20" y="14" width="1746" height="36" rx="8" fill="#1e293b"/>
+<text x="36" y="37" fill="#e2e8f0" font-size="15" font-weight="700">Diagram G: Measurement Creation</text>
+<rect x="817.4" y="92.0" width="903.2" height="2574.0" rx="12" fill="#f59e0b" opacity="0.06" stroke="#f59e0b" stroke-width="2" stroke-dasharray="10,5"/>
+<rect x="1175.9" y="58.0" width="186.2" height="26" rx="6" fill="#1e293b" stroke="#f59e0b" stroke-width="1.5"/>
+<text x="1269.0" y="76.0" text-anchor="middle" fill="#f59e0b" font-size="12" font-weight="700">Drone Mapping Service</text>
+<line x1="212.7" y1="136.0" x2="212.7" y2="2670.0" stroke="#334155" stroke-width="2"/>
+<rect x="90.0" y="96.0" width="245.4" height="40" rx="7" fill="#3b82f6"/>
+<text x="212.7" y="120.0" text-anchor="middle" fill="#fff" font-size="11.5" font-weight="700">User (Admin / PM / SE / Viewer)</text>
+<rect x="90.0" y="2670.0" width="245.4" height="30" rx="7" fill="#3b82f6" opacity="0.55"/>
+<text x="212.7" y="2689.0" text-anchor="middle" fill="#fff" font-size="10.5" font-weight="700">User (Admin / PM / SE / Viewer)</text>
+<line x1="680.4" y1="136.0" x2="680.4" y2="2670.0" stroke="#334155" stroke-width="2"/>
+<rect x="615.4" y="96.0" width="130.0" height="40" rx="7" fill="#8b5cf6"/>
+<text x="680.4" y="120.0" text-anchor="middle" fill="#fff" font-size="11.5" font-weight="700">API Gateway</text>
+<rect x="615.4" y="2670.0" width="130.0" height="30" rx="7" fill="#8b5cf6" opacity="0.55"/>
+<text x="680.4" y="2689.0" text-anchor="middle" fill="#fff" font-size="10.5" font-weight="700">API Gateway</text>
+<line x1="930.0" y1="136.0" x2="930.0" y2="2670.0" stroke="#334155" stroke-width="2"/>
+<rect x="841.4" y="96.0" width="177.2" height="40" rx="7" fill="#f59e0b"/>
+<text x="930.0" y="120.0" text-anchor="middle" fill="#fff" font-size="11.5" font-weight="700">Access Control Module</text>
+<rect x="841.4" y="2670.0" width="177.2" height="30" rx="7" fill="#f59e0b" opacity="0.55"/>
+<text x="930.0" y="2689.0" text-anchor="middle" fill="#fff" font-size="10.5" font-weight="700">Access Control Module</text>
+<line x1="1179.7" y1="136.0" x2="1179.7" y2="2670.0" stroke="#334155" stroke-width="2"/>
+<rect x="1114.7" y="96.0" width="130.0" height="40" rx="7" fill="#84cc16"/>
+<text x="1179.7" y="120.0" text-anchor="middle" fill="#1e293b" font-size="11.5" font-weight="700">Maps Module</text>
+<rect x="1114.7" y="2670.0" width="130.0" height="30" rx="7" fill="#84cc16" opacity="0.55"/>
+<text x="1179.7" y="2689.0" text-anchor="middle" fill="#1e293b" font-size="10.5" font-weight="700">Maps Module</text>
+<line x1="1405.6" y1="136.0" x2="1405.6" y2="2670.0" stroke="#334155" stroke-width="2"/>
+<rect x="1340.6" y="96.0" width="130.0" height="40" rx="7" fill="#ec4899"/>
+<text x="1405.6" y="120.0" text-anchor="middle" fill="#fff" font-size="11.5" font-weight="700">Audit Module</text>
+<rect x="1340.6" y="2670.0" width="130.0" height="30" rx="7" fill="#ec4899" opacity="0.55"/>
+<text x="1405.6" y="2689.0" text-anchor="middle" fill="#fff" font-size="10.5" font-weight="700">Audit Module</text>
+<line x1="1631.6" y1="136.0" x2="1631.6" y2="2670.0" stroke="#334155" stroke-width="2"/>
+<rect x="1566.6" y="96.0" width="130.0" height="40" rx="7" fill="#10b981"/>
+<text x="1631.6" y="120.0" text-anchor="middle" fill="#fff" font-size="11.5" font-weight="700">PostgreSQL</text>
+<rect x="1566.6" y="2670.0" width="130.0" height="30" rx="7" fill="#10b981" opacity="0.55"/>
+<text x="1631.6" y="2689.0" text-anchor="middle" fill="#fff" font-size="10.5" font-weight="700">PostgreSQL</text>
+<line x1="70" y1="162.0" x2="1716" y2="162.0" stroke="#334155" stroke-width="1" stroke-dasharray="4,4"/>
+<rect x="763.8" y="149.0" width="258.4" height="22" rx="11" fill="#334155"/>
+<text x="893.0" y="164.0" text-anchor="middle" fill="#cbd5e1" font-size="10.5" font-weight="700">Create Measurement (Distance / Area)</text>
+<line x1="333.4" y1="216.0" x2="617.4" y2="216.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="343.4" y="192.0" width="264.0" height="18" rx="4" fill="#0f172a"/>
+<text x="475.4" y="205.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">POST /api/v1/surveys/10/measurements {type, name, coordinates} (cookie)</text>
+<line x1="743.4" y1="270.0" x2="843.4" y2="270.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="753.4" y="246.0" width="80.0" height="18" rx="4" fill="#0f172a"/>
+<text x="793.4" y="259.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">Forward request + cookie</text>
+<path d="M930.0,324.0 C976.0,324.0 976.0,354.0 930.0,354.0" fill="none" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
+<rect x="972.0" y="326.0" width="278.7" height="20" rx="5" fill="#1e293b" stroke="#334155"/>
+<text x="1111.4" y="340.0" text-anchor="middle" fill="#94a3b8" font-size="9.5">Validate cookie + CSRF + check project assignment</text>
+<line x1="1016.6" y1="392.0" x2="1116.7" y2="392.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="1026.7" y="368.0" width="80.0" height="18" rx="4" fill="#0f172a"/>
+<text x="1066.7" y="381.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">Call Maps Module</text>
+<path d="M1179.7,446.0 C1225.7,446.0 1225.7,476.0 1179.7,476.0" fill="none" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
+<rect x="1221.7" y="448.0" width="294.6" height="20" rx="5" fill="#1e293b" stroke="#334155"/>
+<text x="1369.0" y="462.0" text-anchor="middle" fill="#94a3b8" font-size="9.5">Validate coords: [lon, lat] array, structure + range</text>
+<path d="M1179.7,514.0 C1225.7,514.0 1225.7,544.0 1179.7,544.0" fill="none" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
+<rect x="1221.7" y="516.0" width="284.0" height="20" rx="5" fill="#1e293b" stroke="#334155"/>
+<text x="1363.7" y="530.0" text-anchor="middle" fill="#94a3b8" font-size="9.5">Calculate distance (m) or area (sq m), server-side</text>
+<line x1="1242.7" y1="582.0" x2="1568.6" y2="582.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="1258.3" y="558.0" width="294.6" height="18" rx="4" fill="#0f172a"/>
+<text x="1405.7" y="571.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">INSERT measurement (type, name, coords, value, unit)</text>
+<line x1="1568.6" y1="636.0" x2="1242.7" y2="636.0" stroke="#5eead4" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)"/>
+<rect x="1346.1" y="612.0" width="119.1" height="18" rx="4" fill="#0f172a"/>
+<text x="1405.7" y="625.0" text-anchor="middle" fill="#5eead4" font-size="9.5">measurement_id = 12</text>
+<line x1="1242.7" y1="690.0" x2="1342.6" y2="690.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="1252.7" y="666.0" width="80.0" height="18" rx="4" fill="#0f172a"/>
+<text x="1292.7" y="679.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">Log MEASUREMENT_CREATED</text>
+<line x1="1468.6" y1="744.0" x2="1568.6" y2="744.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="1478.6" y="720.0" width="80.0" height="18" rx="4" fill="#0f172a"/>
+<text x="1518.6" y="733.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">INSERT audit_log</text>
+<line x1="1568.6" y1="798.0" x2="1468.6" y2="798.0" stroke="#5eead4" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)"/>
+<rect x="1504.3" y="774.0" width="28.6" height="18" rx="4" fill="#0f172a"/>
+<text x="1518.6" y="787.0" text-anchor="middle" fill="#5eead4" font-size="9.5">OK</text>
+<line x1="1116.7" y1="852.0" x2="1016.6" y2="852.0" stroke="#5eead4" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)"/>
+<rect x="1026.7" y="828.0" width="80.0" height="18" rx="4" fill="#0f172a"/>
+<text x="1066.7" y="841.0" text-anchor="middle" fill="#5eead4" font-size="9.5">201 {measurement}</text>
+<line x1="843.4" y1="906.0" x2="743.4" y2="906.0" stroke="#5eead4" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)"/>
+<rect x="768.5" y="882.0" width="49.9" height="18" rx="4" fill="#0f172a"/>
+<text x="793.4" y="895.0" text-anchor="middle" fill="#5eead4" font-size="9.5">201 OK</text>
+<line x1="617.4" y1="960.0" x2="333.4" y2="960.0" stroke="#5eead4" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)"/>
+<rect x="421.2" y="936.0" width="108.4" height="18" rx="4" fill="#0f172a"/>
+<text x="475.4" y="949.0" text-anchor="middle" fill="#5eead4" font-size="9.5">201 {measurement}</text>
+<line x1="70" y1="1000.0" x2="1716" y2="1000.0" stroke="#334155" stroke-width="1" stroke-dasharray="4,4"/>
+<rect x="825.7" y="987.0" width="134.7" height="22" rx="11" fill="#334155"/>
+<text x="893.0" y="1002.0" text-anchor="middle" fill="#cbd5e1" font-size="10.5" font-weight="700">List Measurements</text>
+<line x1="333.4" y1="1054.0" x2="617.4" y2="1054.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="349.4" y="1030.0" width="252.1" height="18" rx="4" fill="#0f172a"/>
+<text x="475.4" y="1043.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">GET /api/v1/surveys/10/measurements (cookie)</text>
+<line x1="743.4" y1="1108.0" x2="843.4" y2="1108.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="753.4" y="1084.0" width="80.0" height="18" rx="4" fill="#0f172a"/>
+<text x="793.4" y="1097.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">Forward request + cookie</text>
+<line x1="1016.6" y1="1162.0" x2="1116.7" y2="1162.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="1026.7" y="1138.0" width="80.0" height="18" rx="4" fill="#0f172a"/>
+<text x="1066.7" y="1151.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">Call Maps Module</text>
+<line x1="1242.7" y1="1216.0" x2="1568.6" y2="1216.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="1266.3" y="1192.0" width="278.7" height="18" rx="4" fill="#0f172a"/>
+<text x="1405.7" y="1205.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">Query measurements (scoped to project assignment)</text>
+<line x1="1568.6" y1="1270.0" x2="1242.7" y2="1270.0" stroke="#5eead4" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)"/>
+<rect x="1348.8" y="1246.0" width="113.8" height="18" rx="4" fill="#0f172a"/>
+<text x="1405.7" y="1259.0" text-anchor="middle" fill="#5eead4" font-size="9.5">[measurement list]</text>
+<line x1="1116.7" y1="1324.0" x2="1016.6" y2="1324.0" stroke="#5eead4" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)"/>
+<rect x="1026.7" y="1300.0" width="80.0" height="18" rx="4" fill="#0f172a"/>
+<text x="1066.7" y="1313.0" text-anchor="middle" fill="#5eead4" font-size="9.5">measurement list</text>
+<line x1="843.4" y1="1378.0" x2="743.4" y2="1378.0" stroke="#5eead4" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)"/>
+<rect x="753.4" y="1354.0" width="80.0" height="18" rx="4" fill="#0f172a"/>
+<text x="793.4" y="1367.0" text-anchor="middle" fill="#5eead4" font-size="9.5">200 OK {measurements}</text>
+<line x1="617.4" y1="1432.0" x2="333.4" y2="1432.0" stroke="#5eead4" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)"/>
+<rect x="410.6" y="1408.0" width="129.7" height="18" rx="4" fill="#0f172a"/>
+<text x="475.4" y="1421.0" text-anchor="middle" fill="#5eead4" font-size="9.5">200 OK {measurements}</text>
+<line x1="70" y1="1472.0" x2="1716" y2="1472.0" stroke="#334155" stroke-width="1" stroke-dasharray="4,4"/>
+<rect x="809.4" y="1459.0" width="167.2" height="22" rx="11" fill="#334155"/>
+<text x="893.0" y="1474.0" text-anchor="middle" fill="#cbd5e1" font-size="10.5" font-weight="700">Get Single Measurement</text>
+<line x1="333.4" y1="1526.0" x2="617.4" y2="1526.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="343.4" y="1502.0" width="264.0" height="18" rx="4" fill="#0f172a"/>
+<text x="475.4" y="1515.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">GET /api/v1/surveys/10/measurements/12 (cookie)</text>
+<line x1="743.4" y1="1580.0" x2="843.4" y2="1580.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="753.4" y="1556.0" width="80.0" height="18" rx="4" fill="#0f172a"/>
+<text x="793.4" y="1569.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">Forward request + cookie</text>
+<line x1="1016.6" y1="1634.0" x2="1116.7" y2="1634.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="1026.7" y="1610.0" width="80.0" height="18" rx="4" fill="#0f172a"/>
+<text x="1066.7" y="1623.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">Call Maps Module</text>
+<line x1="1242.7" y1="1688.0" x2="1568.6" y2="1688.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="1261.0" y="1664.0" width="289.3" height="18" rx="4" fill="#0f172a"/>
+<text x="1405.7" y="1677.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">Query measurement 12 (scoped to project assignment)</text>
+<line x1="1568.6" y1="1742.0" x2="1242.7" y2="1742.0" stroke="#5eead4" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)"/>
+<rect x="1367.4" y="1718.0" width="76.5" height="18" rx="4" fill="#0f172a"/>
+<text x="1405.7" y="1731.0" text-anchor="middle" fill="#5eead4" font-size="9.5">measurement</text>
+<line x1="1116.7" y1="1796.0" x2="1016.6" y2="1796.0" stroke="#5eead4" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)"/>
+<rect x="1028.4" y="1772.0" width="76.5" height="18" rx="4" fill="#0f172a"/>
+<text x="1066.7" y="1785.0" text-anchor="middle" fill="#5eead4" font-size="9.5">measurement</text>
+<line x1="843.4" y1="1850.0" x2="743.4" y2="1850.0" stroke="#5eead4" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)"/>
+<rect x="753.4" y="1826.0" width="80.0" height="18" rx="4" fill="#0f172a"/>
+<text x="793.4" y="1839.0" text-anchor="middle" fill="#5eead4" font-size="9.5">200 OK {measurement}</text>
+<line x1="617.4" y1="1904.0" x2="333.4" y2="1904.0" stroke="#5eead4" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)"/>
+<rect x="413.2" y="1880.0" width="124.4" height="18" rx="4" fill="#0f172a"/>
+<text x="475.4" y="1893.0" text-anchor="middle" fill="#5eead4" font-size="9.5">200 OK {measurement}</text>
+<line x1="70" y1="1944.0" x2="1716" y2="1944.0" stroke="#334155" stroke-width="1" stroke-dasharray="4,4"/>
+<rect x="741.0" y="1931.0" width="303.9" height="22" rx="11" fill="#334155"/>
+<text x="893.0" y="1946.0" text-anchor="middle" fill="#cbd5e1" font-size="10.5" font-weight="700">Delete Measurement (Admin / owning PM only)</text>
+<line x1="333.4" y1="1998.0" x2="617.4" y2="1998.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="343.4" y="1974.0" width="264.0" height="18" rx="4" fill="#0f172a"/>
+<text x="475.4" y="1987.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">DELETE /api/v1/surveys/10/measurements/12 (cookie)</text>
+<line x1="743.4" y1="2052.0" x2="843.4" y2="2052.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="753.4" y="2028.0" width="80.0" height="18" rx="4" fill="#0f172a"/>
+<text x="793.4" y="2041.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">Forward request + cookie</text>
+<path d="M930.0,2106.0 C976.0,2106.0 976.0,2136.0 930.0,2136.0" fill="none" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
+<rect x="972.0" y="2108.0" width="315.9" height="20" rx="5" fill="#1e293b" stroke="#334155"/>
+<text x="1130.0" y="2122.0" text-anchor="middle" fill="#94a3b8" font-size="9.5">Validate cookie + CSRF + check role (Admin or owning PM)</text>
+<line x1="1016.6" y1="2174.0" x2="1116.7" y2="2174.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="1026.7" y="2150.0" width="80.0" height="18" rx="4" fill="#0f172a"/>
+<text x="1066.7" y="2163.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">Call Maps Module</text>
+<line x1="1242.7" y1="2228.0" x2="1568.6" y2="2228.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="1316.9" y="2204.0" width="177.6" height="18" rx="4" fill="#0f172a"/>
+<text x="1405.7" y="2217.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">DELETE measurement WHERE id=12</text>
+<line x1="1568.6" y1="2282.0" x2="1242.7" y2="2282.0" stroke="#5eead4" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)"/>
+<rect x="1391.3" y="2258.0" width="28.6" height="18" rx="4" fill="#0f172a"/>
+<text x="1405.7" y="2271.0" text-anchor="middle" fill="#5eead4" font-size="9.5">OK</text>
+<line x1="1242.7" y1="2336.0" x2="1342.6" y2="2336.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="1252.7" y="2312.0" width="80.0" height="18" rx="4" fill="#0f172a"/>
+<text x="1292.7" y="2325.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">Log MEASUREMENT_DELETED</text>
+<line x1="1468.6" y1="2390.0" x2="1568.6" y2="2390.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
+<rect x="1478.6" y="2366.0" width="80.0" height="18" rx="4" fill="#0f172a"/>
+<text x="1518.6" y="2379.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">INSERT audit_log</text>
+<line x1="1568.6" y1="2444.0" x2="1468.6" y2="2444.0" stroke="#5eead4" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)"/>
+<rect x="1504.3" y="2420.0" width="28.6" height="18" rx="4" fill="#0f172a"/>
+<text x="1518.6" y="2433.0" text-anchor="middle" fill="#5eead4" font-size="9.5">OK</text>
+<line x1="1116.7" y1="2498.0" x2="1016.6" y2="2498.0" stroke="#5eead4" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)"/>
+<rect x="1026.7" y="2474.0" width="80.0" height="18" rx="4" fill="#0f172a"/>
+<text x="1066.7" y="2487.0" text-anchor="middle" fill="#5eead4" font-size="9.5">204 No Content</text>
+<line x1="843.4" y1="2552.0" x2="743.4" y2="2552.0" stroke="#5eead4" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)"/>
+<rect x="753.4" y="2528.0" width="80.0" height="18" rx="4" fill="#0f172a"/>
+<text x="793.4" y="2541.0" text-anchor="middle" fill="#5eead4" font-size="9.5">204 No Content</text>
+<line x1="617.4" y1="2606.0" x2="333.4" y2="2606.0" stroke="#5eead4" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)"/>
+<rect x="429.2" y="2582.0" width="92.5" height="18" rx="4" fill="#0f172a"/>
+<text x="475.4" y="2595.0" text-anchor="middle" fill="#5eead4" font-size="9.5">204 No Content</text>
+<rect x="30.0" y="2726.0" width="559.3" height="192.0" rx="10" fill="#1e293b" stroke="#334155" stroke-width="1.5" stroke-dasharray="6,4"/>
+<text x="44.0" y="2750.0" fill="#e2e8f0" font-size="12" font-weight="700">Error Flows:</text>
+<text x="44.0" y="2772.0" fill="#94a3b8" font-size="9.5">- Invalid coordinates (bad structure or out-of-range</text>
+<text x="44.0" y="2790.0" fill="#94a3b8" font-size="9.5">  longitude/latitude): 400 INVALID_COORDINATES</text>
+<text x="44.0" y="2808.0" fill="#94a3b8" font-size="9.5">- Missing type, name, or coordinates: 400 VALIDATION_ERROR</text>
+<text x="44.0" y="2826.0" fill="#94a3b8" font-size="9.5">- User not assigned to survey's project: 403 Forbidden</text>
+<text x="44.0" y="2844.0" fill="#94a3b8" font-size="9.5">- SE, Viewer, or non-owning PM attempts delete: 403</text>
+<text x="44.0" y="2862.0" fill="#94a3b8" font-size="9.5">  Forbidden</text>
+<text x="44.0" y="2880.0" fill="#94a3b8" font-size="9.5">- Delete on non-existent measurement_id: 404 Not Found</text>
+<text x="44.0" y="2898.0" fill="#94a3b8" font-size="9.5">- Unsafe request without valid CSRF token: 403 CSRF_FAILURE</text>
+<rect x="613.3" y="2726.0" width="559.3" height="174.0" rx="10" fill="#1e293b" stroke="#334155" stroke-width="1.5" stroke-dasharray="6,4"/>
+<text x="627.3" y="2750.0" fill="#e2e8f0" font-size="12" font-weight="700">Authorization Model (Measurements):</text>
+<text x="627.3" y="2772.0" fill="#94a3b8" font-size="9.5">- Create / Read: active assigned Administrator, Project</text>
+<text x="627.3" y="2790.0" fill="#94a3b8" font-size="9.5">  Manager, Survey Engineer, and Viewer may all create and</text>
+<text x="627.3" y="2808.0" fill="#94a3b8" font-size="9.5">  read measurements</text>
+<text x="627.3" y="2826.0" fill="#94a3b8" font-size="9.5">- Delete: Administrator or the owning Project Manager only</text>
+<text x="627.3" y="2844.0" fill="#94a3b8" font-size="9.5">- Coordinates are plain [longitude, latitude] position</text>
+<text x="627.3" y="2862.0" fill="#94a3b8" font-size="9.5">  arrays, not GeoJSON; validated for structure and</text>
+<text x="627.3" y="2880.0" fill="#94a3b8" font-size="9.5">  longitude/latitude range</text>
+<rect x="1196.7" y="2726.0" width="559.3" height="174.0" rx="10" fill="#1e293b" stroke="#334155" stroke-width="1.5" stroke-dasharray="6,4"/>
+<text x="1210.7" y="2750.0" fill="#e2e8f0" font-size="12" font-weight="700">Module Interactions (Drone Mapping Service):</text>
+<text x="1210.7" y="2772.0" fill="#94a3b8" font-size="9.5">- The client submits raw coordinates only; Maps Module</text>
+<text x="1210.7" y="2790.0" fill="#94a3b8" font-size="9.5">  computes the distance/area value, client never sends it</text>
+<text x="1210.7" y="2808.0" fill="#94a3b8" font-size="9.5">- Calculated value and unit are persisted alongside the</text>
+<text x="1210.7" y="2826.0" fill="#94a3b8" font-size="9.5">  raw coordinates for replayability</text>
+<text x="1210.7" y="2844.0" fill="#94a3b8" font-size="9.5">- Audit Module is called synchronously on create and</text>
+<text x="1210.7" y="2862.0" fill="#94a3b8" font-size="9.5">  delete so no measurement action is left unlogged</text>
+<text x="1210.7" y="2880.0" fill="#94a3b8" font-size="9.5">- Auth is via HttpOnly cookie, not an Authorization header</text>
+</svg>

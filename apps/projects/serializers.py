@@ -6,7 +6,7 @@ from django.contrib.gis.geos import Point
 from rest_framework import serializers
 
 from apps.access_control.models import User
-from apps.projects.models import Project, Site
+from apps.projects.models import Project, ProjectMembership, Site
 
 
 class ProjectReadSerializer(serializers.ModelSerializer):
@@ -54,6 +54,34 @@ class ProjectWriteSerializer(serializers.Serializer):
             serializer=self,
             data=data,
             allowed_fields={"name", "description", "location", "project_manager_id"},
+        )
+        return super().to_internal_value(data)
+
+
+class ProjectMemberReadSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(source="user_id")
+    email = serializers.EmailField(source="user.email")
+    role = serializers.CharField(source="user.role")
+
+    class Meta:
+        model = ProjectMembership
+        fields = ("id", "email", "role")
+
+
+class ProjectMemberCandidateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ("id", "email", "role")
+
+
+class ProjectMemberCreateSerializer(serializers.Serializer):
+    user_id = serializers.PrimaryKeyRelatedField(source="user", queryset=User.objects.all())
+
+    def to_internal_value(self, data):
+        _reject_unknown_fields(
+            serializer=self,
+            data=data,
+            allowed_fields={"user_id"},
         )
         return super().to_internal_value(data)
 
