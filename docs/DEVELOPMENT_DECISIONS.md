@@ -279,3 +279,11 @@ The assessment documents and approved architecture remain the source of truth. R
 **Decision:** `GET /api/v1/projects/{project_id}/available-members` exists only to support the authorised project-detail membership picker. It is available only to an active Administrator or the owning active Project Manager, only while the parent project is active, and it returns only active `SURVEY_ENGINEER` and `VIEWER` users who are not already assigned to that project.
 
 **Impact:** The candidate list must not expose Administrators, Project Managers, inactive users, existing members, or data for archived projects. The current-members list and add/remove membership routes follow the same manage-project authorization boundary and active-project guard.
+
+### 2026-08-11 - Browser-generic MIME compatibility for approved 3D primary uploads
+
+**Decision:** A primary upload with the browser-generic `application/octet-stream` MIME label may be admitted only when its extension is an approved 3D dataset extension and the existing format-specific content/signature validation succeeds. The generic label remains rejected for every 2D dataset and for OBJ-related asset uploads.
+
+**Reason:** The assessment requires extension, MIME, and file-signature validation, while the deployed Android browser labels valid 3D uploads generically. Retaining the extension whitelist and mandatory content validation supports that browser behaviour without accepting arbitrary generic binary uploads.
+
+**Impact:** OBJ, GLB, GLTF, LAS, LAZ, PLY, and ASCII STL primary uploads may use the generic browser label only if their existing validators confirm the declared format. Exact supported MIME labels remain accepted as before; mismatches, malformed content, unapproved extensions, all 2D files, and dependent OBJ assets remain rejected.

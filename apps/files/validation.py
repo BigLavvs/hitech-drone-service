@@ -186,7 +186,11 @@ def validate_upload(uploaded_file, declared_mime_type=None):
     mime_type = (declared_mime_type or getattr(uploaded_file, "content_type", "") or "").strip().lower()
     if not mime_type:
         raise FileValidationError("MIME type is required.")
-    if mime_type == "application/octet-stream" or mime_type not in format_rule["mime_types"]:
+    generic_3d_mime = (
+        mime_type == "application/octet-stream"
+        and format_rule["file_type"] == FileType.THREE_D
+    )
+    if not generic_3d_mime and mime_type not in format_rule["mime_types"]:
         raise FileValidationError("Unsupported or mismatched MIME type.")
 
     size_bytes = _get_upload_size(uploaded_file)

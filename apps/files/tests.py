@@ -372,12 +372,31 @@ class FileValidationTests(TestCase):
         with self.assertRaises(FileValidationError):
             validate_upload(upload)
 
-    def test_mime_mismatch_and_octet_stream_are_rejected(self):
+    def test_mime_mismatch_is_rejected(self):
         with self.assertRaises(FileValidationError):
             validate_upload(self.make_upload("photo.jpg", b"\xff\xd8\xff\xe0rest", "image/png"))
 
+    def test_generic_mime_is_accepted_only_for_valid_3d_files(self):
+        cases = [
+            ("mesh.obj", b"# test\nv 0.0 0.0 0.0\nf 1 1 1\n", FileFormat.OBJ),
+            ("scene.glb", b"glTF\x02\x00\x00\x00rest", FileFormat.GLB),
+            ("scene.gltf", b'{"asset":{"version":"2.0"},"scenes":[{"nodes":[]}]}', FileFormat.GLTF),
+            ("cloud.las", b"LASF\x00\x00\x00\x00", FileFormat.LAS),
+            ("cloud.laz", b"LASF\x00\x00\x00\x00", FileFormat.LAZ),
+            ("mesh.ply", b"ply\nformat ascii 1.0\nelement vertex 1\nproperty float x\nend_header\n0\n", FileFormat.PLY),
+            ("shape.stl", b"solid cube\nfacet normal 0 0 0\nouter loop\nendloop\nendfacet\nendsolid cube\n", FileFormat.STL),
+        ]
+        for name, content, expected_format in cases:
+            with self.subTest(name=name):
+                result = validate_upload(self.make_upload(name, content, "application/octet-stream"))
+                self.assertEqual(result.file_type, FileType.THREE_D)
+                self.assertEqual(result.file_format, expected_format)
+
         with self.assertRaises(FileValidationError):
-            validate_upload(self.make_upload("scene.glb", b"glTF\x02\x00\x00\x00rest", "application/octet-stream"))
+            validate_upload(self.make_upload("photo.jpg", b"\xff\xd8\xff\xe0rest", "application/octet-stream"))
+
+        with self.assertRaises(FileValidationError):
+            validate_upload(self.make_upload("scene.glb", b"not-a-glb", "application/octet-stream"))
 
     def test_malformed_textual_formats_are_rejected(self):
         cases = [
