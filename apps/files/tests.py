@@ -1,4 +1,5 @@
 import hashlib
+import struct
 from datetime import datetime, timedelta, timezone
 from datetime import date
 from io import BytesIO
@@ -25,6 +26,7 @@ from apps.files.validation import (
     MAX_VALIDATION_BYTES,
     FileValidationError,
     sanitize_storage_filename,
+    validate_obj_asset_upload,
     validate_upload,
 )
 from apps.processing.models import ProcessingJob
@@ -50,8 +52,10 @@ class TrackingUpload(BytesIO):
         self.size = len(content)
         self.fail_above = fail_above
         self.max_requested_read = 0
+        self.read_calls = []
 
     def read(self, size=-1):
+        self.read_calls.append((self.tell(), size))
         if size > self.max_requested_read:
             self.max_requested_read = size
         if self.fail_above is not None and size > self.fail_above:
@@ -342,6 +346,23 @@ class FileValidationTests(TestCase):
     def make_upload(self, name, content, content_type):
         return TrackingUpload(name=name, content=content, content_type=content_type)
 
+    def make_classic_tiff(self, *, endian, first_ifd_offset, entry_tags):
+        tag_pack = ">" if endian == "MM" else "<"
+        header = (b"MM\x00*" if endian == "MM" else b"II*\x00") + struct.pack(
+            f"{tag_pack}I",
+            first_ifd_offset,
+        )
+        entries = b"".join(
+            struct.pack(f"{tag_pack}HHII", tag, 3, 1, 1)
+            for tag in entry_tags
+        )
+        ifd = (
+            struct.pack(f"{tag_pack}H", len(entry_tags))
+            + entries
+            + struct.pack(f"{tag_pack}I", 0)
+        )
+        return header + (b"\x00" * (first_ifd_offset - len(header))) + ifd
+
     def test_every_allowed_format_family_is_accepted(self):
         cases = [
             ("ortho-geotiff.tif", b"II*\x00\x08\x00\x00\x00\x01\x00\xAF\x87\x03\x00\x01\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00", "image/tiff", FileType.TWO_D, FileFormat.GEOTIFF),
@@ -350,6 +371,8 @@ class FileValidationTests(TestCase):
             ("photo.jpg", b"\xff\xd8\xff\xe0rest", "image/jpeg", FileType.TWO_D, FileFormat.JPEG),
             ("area.kml", b'<?xml version="1.0" encoding="UTF-8"?><kml xmlns="http://www.opengis.net/kml/2.2"><Document/></kml>', "application/vnd.google-earth.kml+xml", FileType.TWO_D, FileFormat.KML),
             ("outline.geojson", b'{"type":"FeatureCollection","features":[]}', "application/geo+json", FileType.TWO_D, FileFormat.GEOJSON),
+            ("outline.json", b'{"type":"FeatureCollection","features":[]}', "application/json", FileType.TWO_D, FileFormat.GEOJSON),
+            ("outline.geo.json", b'{"type":"FeatureCollection","features":[]}', "application/json", FileType.TWO_D, FileFormat.GEOJSON),
             ("mesh.obj", b"# test\nv 0.0 0.0 0.0\nf 1 1 1\n", "model/obj", FileType.THREE_D, FileFormat.OBJ),
             ("scene.glb", b"glTF\x02\x00\x00\x00rest", "model/gltf-binary", FileType.THREE_D, FileFormat.GLB),
             ("scene.gltf", b'{"asset":{"version":"2.0"},"scenes":[{"nodes":[]}]}', "model/gltf+json", FileType.THREE_D, FileFormat.GLTF),
@@ -376,8 +399,12 @@ class FileValidationTests(TestCase):
         with self.assertRaises(FileValidationError):
             validate_upload(self.make_upload("photo.jpg", b"\xff\xd8\xff\xe0rest", "image/png"))
 
-    def test_generic_mime_is_accepted_only_for_valid_3d_files(self):
+    def test_browser_fallback_mime_is_accepted_only_after_strict_content_validation(self):
         cases = [
+            ("map.png", b"\x89PNG\r\n\x1a\nrest", "application/octet-stream", FileType.TWO_D, FileFormat.PNG),
+            ("area.kml", b'<?xml version="1.0" encoding="UTF-8"?><kml xmlns="http://www.opengis.net/kml/2.2"><Document/></kml>', "application/octet-stream", FileType.TWO_D, FileFormat.KML),
+            ("outline.geojson", b'{"type":"FeatureCollection","features":[]}', "application/octet-stream", FileType.TWO_D, FileFormat.GEOJSON),
+            ("outline.json", b'{"type":"FeatureCollection","features":[]}', "text/plain", FileType.TWO_D, FileFormat.GEOJSON),
             ("mesh.obj", b"# test\nv 0.0 0.0 0.0\nf 1 1 1\n", FileFormat.OBJ),
             ("scene.glb", b"glTF\x02\x00\x00\x00rest", FileFormat.GLB),
             ("scene.gltf", b'{"asset":{"version":"2.0"},"scenes":[{"nodes":[]}]}', FileFormat.GLTF),
@@ -386,17 +413,53 @@ class FileValidationTests(TestCase):
             ("mesh.ply", b"ply\nformat ascii 1.0\nelement vertex 1\nproperty float x\nend_header\n0\n", FileFormat.PLY),
             ("shape.stl", b"solid cube\nfacet normal 0 0 0\nouter loop\nendloop\nendfacet\nendsolid cube\n", FileFormat.STL),
         ]
-        for name, content, expected_format in cases:
+        for case in cases:
+            if len(case) == 5:
+                name, content, content_type, expected_type, expected_format = case
+            else:
+                name, content, expected_format = case
+                content_type = "application/octet-stream"
+                expected_type = FileType.THREE_D
             with self.subTest(name=name):
-                result = validate_upload(self.make_upload(name, content, "application/octet-stream"))
-                self.assertEqual(result.file_type, FileType.THREE_D)
+                result = validate_upload(self.make_upload(name, content, content_type))
+                self.assertEqual(result.file_type, expected_type)
                 self.assertEqual(result.file_format, expected_format)
 
         with self.assertRaises(FileValidationError):
-            validate_upload(self.make_upload("photo.jpg", b"\xff\xd8\xff\xe0rest", "application/octet-stream"))
+            validate_upload(self.make_upload("photo.jpg", b"\xff\xd8\xff\xe0rest", "text/plain"))
 
         with self.assertRaises(FileValidationError):
             validate_upload(self.make_upload("scene.glb", b"not-a-glb", "application/octet-stream"))
+
+        with self.assertRaises(FileValidationError):
+            validate_upload(self.make_upload("outline.json", b'{"hello":"world"}', "application/octet-stream"))
+
+    def test_conflicting_specific_mime_type_remains_rejected(self):
+        with self.assertRaises(FileValidationError):
+            validate_upload(self.make_upload("map.png", b"\x89PNG\r\n\x1a\nrest", "image/jpeg"))
+
+    def test_obj_mtl_asset_accepts_browser_generic_mime_only_for_valid_mtl_content(self):
+        valid_asset = self.make_upload(
+            "materials.mtl",
+            b"newmtl roof\nmap_Kd 2222.jpg\n",
+            "application/octet-stream",
+        )
+
+        result = validate_obj_asset_upload(valid_asset)
+
+        self.assertEqual(result.original_filename, "materials.mtl")
+        self.assertEqual(result.sanitized_filename, "materials.mtl")
+        self.assertEqual(result.mime_type, "application/octet-stream")
+
+    def test_obj_mtl_asset_with_browser_generic_mime_still_rejects_malformed_content(self):
+        invalid_asset = self.make_upload(
+            "materials.mtl",
+            b"not valid mtl content",
+            "application/octet-stream",
+        )
+
+        with self.assertRaises(FileValidationError):
+            validate_obj_asset_upload(invalid_asset)
 
     def test_malformed_textual_formats_are_rejected(self):
         cases = [
@@ -442,6 +505,68 @@ class FileValidationTests(TestCase):
 
         self.assertEqual(result.file_format, FileFormat.PNG)
         self.assertLessEqual(large_png.max_requested_read, MAX_VALIDATION_BYTES)
+
+    def test_tiff_with_distant_first_ifd_is_accepted_with_bounded_offset_reads(self):
+        first_ifd_offset = MAX_VALIDATION_BYTES + 8192
+        entry_tags = [256, 257, 258, 259, 262, 273, 277, 278, 279, 282, 283, 296, 305, 306, 320, 338, 339, 34735, 42112]
+        upload = TrackingUpload(
+            name="o41078a5.tif",
+            content=self.make_classic_tiff(
+                endian="MM",
+                first_ifd_offset=first_ifd_offset,
+                entry_tags=entry_tags,
+            ),
+            content_type="image/tiff",
+            fail_above=MAX_VALIDATION_BYTES,
+        )
+        upload.seek(123)
+
+        result = validate_upload(upload)
+
+        self.assertEqual(result.file_format, FileFormat.GEOTIFF)
+        self.assertEqual(result.file_type, FileType.TWO_D)
+        self.assertEqual(upload.tell(), 123)
+        self.assertEqual(
+            upload.read_calls,
+            [
+                (0, MAX_VALIDATION_BYTES),
+                (first_ifd_offset, 2),
+                (first_ifd_offset + 2, len(entry_tags) * 12),
+            ],
+        )
+        self.assertLessEqual(upload.max_requested_read, MAX_VALIDATION_BYTES)
+
+    def test_tiff_rejects_oversized_declared_ifd_directory_before_oversized_read(self):
+        first_ifd_offset = MAX_VALIDATION_BYTES + 4096
+        oversized_entry_count = (MAX_VALIDATION_BYTES // 12) + 1
+        upload = TrackingUpload(
+            name="oversized-ifd.tif",
+            content=(
+                b"MM\x00*"
+                + struct.pack(">I", first_ifd_offset)
+                + (b"\x00" * (first_ifd_offset - 8))
+                + struct.pack(">H", oversized_entry_count)
+            ),
+            content_type="image/tiff",
+            fail_above=MAX_VALIDATION_BYTES,
+        )
+        upload.seek(77)
+
+        with self.assertRaisesMessage(
+            FileValidationError,
+            "TIFF IFD directory exceeds validation read limit.",
+        ):
+            validate_upload(upload)
+
+        self.assertEqual(upload.tell(), 77)
+        self.assertEqual(
+            upload.read_calls,
+            [
+                (0, MAX_VALIDATION_BYTES),
+                (first_ifd_offset, 2),
+            ],
+        )
+        self.assertLessEqual(upload.max_requested_read, MAX_VALIDATION_BYTES)
 
     def test_storage_filename_sanitization_is_explicit_and_small(self):
         self.assertEqual(
@@ -1171,6 +1296,82 @@ class UploadAdmissionServiceTests(TestCase):
         self.assertEqual(asset.storage_path, f"surveys/{self.survey.pk}/files/{result.survey_file.pk}/assets/materials.mtl")
         self.assertIn(asset.storage_path, storage.objects)
 
+    def test_gltf_external_assets_must_match_manifest_and_are_persisted(self):
+        storage = FakePrivateStorageAdapter()
+        gltf_upload = self.make_upload(
+            name="scene.gltf",
+            content=(
+                b'{"asset":{"version":"2.0"},"buffers":[{"uri":"scene.bin"}],'
+                b'"images":[{"uri":"textures/albedo.jpeg"}]}'
+            ),
+            content_type="model/gltf+json",
+        )
+        binary_asset = TrackingUpload(
+            name="scene.bin",
+            content=b"binary-buffer",
+            content_type="application/octet-stream",
+        )
+        texture_asset = TrackingUpload(
+            name="albedo.jpeg",
+            content=b"\xff\xd8\xfftexture",
+            content_type="image/jpeg",
+        )
+
+        result = admit_uploaded_file(
+            actor=self.admin,
+            survey=self.survey,
+            uploaded_file=gltf_upload,
+            asset_files=[binary_asset, texture_asset],
+            storage=storage,
+        )
+
+        self.assertEqual(
+            set(
+                SurveyFileAsset.objects.filter(survey_file=result.survey_file).values_list(
+                    "stored_filename", flat=True
+                )
+            ),
+            {"scene.bin", "albedo.jpeg"},
+        )
+
+    def test_gltf_rejects_missing_or_unreferenced_assets_before_storage(self):
+        storage = FakePrivateStorageAdapter()
+        for asset_files in (
+            [],
+            [
+                TrackingUpload(
+                    name="scene.bin",
+                    content=b"binary-buffer",
+                    content_type="application/octet-stream",
+                ),
+                TrackingUpload(
+                    name="unreferenced.png",
+                    content=b"\x89PNG\r\n\x1a\ntexture",
+                    content_type="image/png",
+                ),
+            ],
+        ):
+            with self.subTest(asset_count=len(asset_files)):
+                gltf_upload = self.make_upload(
+                    name="scene.gltf",
+                    content=b'{"asset":{"version":"2.0"},"buffers":[{"uri":"scene.bin"}]}',
+                    content_type="model/gltf+json",
+                )
+                with self.assertRaisesMessage(
+                    ValidationError,
+                    "GLTF related assets must exactly match the external buffers and images referenced by the GLTF manifest.",
+                ):
+                    admit_uploaded_file(
+                        actor=self.admin,
+                        survey=self.survey,
+                        uploaded_file=gltf_upload,
+                        asset_files=asset_files,
+                        storage=storage,
+                    )
+
+        self.assertEqual(storage.uploaded, [])
+        self.assertEqual(SurveyFile.objects.count(), 0)
+
     def test_invalid_obj_asset_is_rejected_before_storage(self):
         storage = FakePrivateStorageAdapter()
         obj_upload = self.make_upload(
@@ -1185,6 +1386,31 @@ class UploadAdmissionServiceTests(TestCase):
         )
 
         with self.assertRaisesMessage(ValidationError, "Unsupported OBJ asset extension."):
+            admit_uploaded_file(
+                actor=self.admin,
+                survey=self.survey,
+                uploaded_file=obj_upload,
+                asset_files=[invalid_asset],
+                storage=storage,
+            )
+
+        self.assertEqual(storage.uploaded, [])
+        self.assertEqual(SurveyFileAsset.objects.count(), 0)
+
+    def test_malformed_obj_mtl_asset_is_rejected_before_storage_even_with_browser_generic_mime(self):
+        storage = FakePrivateStorageAdapter()
+        obj_upload = self.make_upload(
+            name="mesh.obj",
+            content=b"# mesh\nv 0.0 0.0 0.0\nf 1 1 1\n",
+            content_type="model/obj",
+        )
+        invalid_asset = TrackingUpload(
+            name="materials.mtl",
+            content=b"not valid mtl content",
+            content_type="application/octet-stream",
+        )
+
+        with self.assertRaisesMessage(ValidationError, "MTL content is malformed."):
             admit_uploaded_file(
                 actor=self.admin,
                 survey=self.survey,

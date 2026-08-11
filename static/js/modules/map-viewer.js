@@ -389,7 +389,8 @@ class MapViewer {
       return;
     }
 
-    const combined = visibleBounds[0].clone();
+    const firstBounds = visibleBounds[0];
+    const combined = window.L.latLngBounds(firstBounds.getSouthWest(), firstBounds.getNorthEast());
     visibleBounds.slice(1).forEach((bounds) => combined.extend(bounds));
     this.map.fitBounds(combined, { padding: [24, 24] });
     this.map.invalidateSize(false);

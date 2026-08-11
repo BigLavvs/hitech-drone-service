@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from pathlib import Path
 from tempfile import TemporaryDirectory
+from datetime import datetime, timezone
 
 import jwt
 from django.contrib.auth import get_user_model
@@ -75,7 +76,7 @@ class DemoAssessmentCommandsTests(TestCase):
     @override_settings(
         DEBUG=True,
         ENABLE_DEMO_AUTH=True,
-        DEMO_AUTH_TOKEN_TTL_SECONDS=900,
+        DEMO_AUTH_TOKEN_TTL_SECONDS=1800,
     )
     def test_issue_demo_token_signs_expected_claims(self):
         with override_settings(
@@ -97,11 +98,13 @@ class DemoAssessmentCommandsTests(TestCase):
             self.assertEqual(claims["sub"], spec.external_id)
             self.assertEqual(claims["email"], spec.email)
             self.assertEqual(claims["role"], spec.role)
+            self.assertGreaterEqual(claims["exp"] - claims["iat"], 1795)
+            self.assertLessEqual(claims["exp"] - claims["iat"], 1800)
 
     @override_settings(
         DEBUG=True,
         ENABLE_DEMO_AUTH=True,
-        DEMO_AUTH_TOKEN_TTL_SECONDS=900,
+        DEMO_AUTH_TOKEN_TTL_SECONDS=1800,
     )
     def test_issue_demo_token_uses_env_private_key_with_escaped_newlines(self):
         with override_settings(
@@ -132,7 +135,7 @@ class DemoAssessmentCommandsTests(TestCase):
     @override_settings(
         DEBUG=True,
         ENABLE_DEMO_AUTH=True,
-        DEMO_AUTH_TOKEN_TTL_SECONDS=900,
+        DEMO_AUTH_TOKEN_TTL_SECONDS=1800,
     )
     def test_env_private_key_takes_precedence_over_local_key_path(self):
         with override_settings(
@@ -195,7 +198,7 @@ class DemoSessionApiTests(TestCase):
     @override_settings(
         ENABLE_DEMO_AUTH=True,
         DEBUG=False,
-        DEMO_AUTH_TOKEN_TTL_SECONDS=900,
+        DEMO_AUTH_TOKEN_TTL_SECONDS=1800,
         HITECH_AUTH_ACCESS_COOKIE_NAME="hitech_access_token",
     )
     def test_valid_role_sets_secure_cookie_in_deployed_mode_and_returns_redirect_target(self):
@@ -222,12 +225,13 @@ class DemoSessionApiTests(TestCase):
         self.assertTrue(cookie["secure"])
         self.assertEqual(cookie["samesite"], "Lax")
         self.assertEqual(cookie["path"], "/")
+        self.assertEqual(int(cookie["max-age"]), 1800)
         self.assertNotIn("token", response.content.decode("utf-8"))
 
     @override_settings(
         ENABLE_DEMO_AUTH=True,
         DEBUG=True,
-        DEMO_AUTH_TOKEN_TTL_SECONDS=900,
+        DEMO_AUTH_TOKEN_TTL_SECONDS=1800,
         HITECH_AUTH_ACCESS_COOKIE_NAME="hitech_access_token",
     )
     def test_valid_role_keeps_cookie_usable_without_secure_flag_in_local_debug_mode(self):

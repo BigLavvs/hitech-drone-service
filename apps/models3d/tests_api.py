@@ -117,6 +117,20 @@ class ModelDeliveryApiTests(APITestCase):
             status="ready",
             uploaded_by=self.owner_manager,
         )
+        self.converted_gltf_file = SurveyFile.objects.create(
+            survey=self.survey,
+            original_filename="external-scene.gltf",
+            stored_filename="external-scene.gltf",
+            file_type=FileType.THREE_D,
+            format=FileFormat.GLTF,
+            mime_type="model/gltf+json",
+            size_bytes=3072,
+            sha256_checksum="d" * 64,
+            storage_path=f"surveys/{self.survey.pk}/files/24/raw.gltf",
+            converted_path=f"surveys/{self.survey.pk}/files/24/model.glb",
+            status="ready",
+            uploaded_by=self.owner_manager,
+        )
         self.failed_file = SurveyFile.objects.create(
             survey=self.survey,
             original_filename="failed.glb",
@@ -132,6 +146,9 @@ class ModelDeliveryApiTests(APITestCase):
         )
         self.mesh_metadata_key = f"surveys/{self.survey.pk}/files/{self.mesh_file.pk}/model-metadata.json"
         self.point_metadata_key = f"surveys/{self.survey.pk}/files/{self.point_cloud_file.pk}/model-metadata.json"
+        self.converted_gltf_metadata_key = (
+            f"surveys/{self.survey.pk}/files/{self.converted_gltf_file.pk}/model-metadata.json"
+        )
 
     def auth_settings(self):
         return override_settings(
@@ -175,6 +192,14 @@ class ModelDeliveryApiTests(APITestCase):
                         "crs": "EPSG:32631",
                     }
                 ).encode("utf-8"),
+                self.converted_gltf_metadata_key: json.dumps(
+                    {
+                        "display_format": "GLB",
+                        "vertex_count": 42,
+                        "bounding_box": {"min": [0, 0, 0], "max": [2, 2, 2]},
+                        "crs": None,
+                    }
+                ).encode("utf-8"),
             }
         )
         storage_factory.return_value = fake_storage
@@ -190,9 +215,13 @@ class ModelDeliveryApiTests(APITestCase):
         self.assertEqual(allowed.status_code, 200)
         self.assertEqual(denied.status_code, 403)
         payload = allowed.json()
-        self.assertEqual([item["id"] for item in payload], [self.mesh_file.pk, self.point_cloud_file.pk])
+        self.assertEqual(
+            [item["id"] for item in payload],
+            [self.mesh_file.pk, self.point_cloud_file.pk, self.converted_gltf_file.pk],
+        )
         self.assertEqual(payload[0]["viewer_source_type"], "glb")
         self.assertEqual(payload[1]["viewer_source_type"], "potree")
+        self.assertEqual(payload[2]["viewer_source_type"], "glb")
         self.assertEqual(payload[0]["display_format"], "GLB")
         self.assertEqual(payload[1]["display_format"], "POTREE")
         self.assertNotIn("storage_path", json.dumps(payload))
@@ -202,5 +231,6 @@ class ModelDeliveryApiTests(APITestCase):
             [
                 (self.mesh_file.converted_path, 300),
                 (self.point_cloud_file.converted_path, 300),
+                (self.converted_gltf_file.converted_path, 300),
             ],
         )

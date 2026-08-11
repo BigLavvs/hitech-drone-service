@@ -20,9 +20,11 @@ from apps.audit.models import AuditAction, AuditLog
 from apps.files.models import FileFormat, FileType, SurveyFile, SurveyFileAsset
 from apps.processing.models import ProcessingJob
 from apps.processing.services import (
+    ASSESSMENT_MAX_GENERATED_TILE_ZOOM,
     MAX_AUTOMATIC_RETRIES,
     POTREE_METADATA_FILENAME,
     RETRY_DELAYS_MINUTES,
+    _derive_max_zoom,
     _generate_xyz_tile_pyramid,
     ProcessingError,
     create_queued_processing_job,
@@ -648,6 +650,75 @@ class ProcessingServiceTests(TestCase):
                 self.assertIsNone(survey_file.converted_path)
                 self.assertEqual(fake_storage.objects[survey_file.preview_path], b"proxy-glb")
 
+    @patch("apps.processing.services._export_reduced_glb_preview")
+    @patch("trimesh.load")
+    @patch("apps.processing.services.PrivateR2StorageAdapter")
+    def test_external_gltf_assets_are_staged_and_converted_to_glb(
+        self,
+        storage_factory,
+        mocked_trimesh_load,
+        mocked_export_preview,
+    ):
+        gltf_payload = (
+            b'{"asset":{"version":"2.0"},"buffers":[{"uri":"scene.bin"}],'
+            b'"images":[{"uri":"textures/albedo.jpeg"}]}'
+        )
+        survey_file, processing_job, _ = self.create_file_and_job(
+            file_format=FileFormat.GLTF,
+            content=gltf_payload,
+        )
+        binary_payload = b"external-buffer"
+        texture_payload = b"\xff\xd8\xfftexture"
+        binary_key = f"surveys/{self.survey.pk}/files/{survey_file.pk}/assets/scene.bin"
+        texture_key = f"surveys/{self.survey.pk}/files/{survey_file.pk}/assets/albedo.jpeg"
+        SurveyFileAsset.objects.create(
+            survey_file=survey_file,
+            original_filename="scene.bin",
+            stored_filename="scene.bin",
+            mime_type="application/octet-stream",
+            size_bytes=len(binary_payload),
+            sha256_checksum=__import__("hashlib").sha256(binary_payload).hexdigest(),
+            storage_path=binary_key,
+        )
+        SurveyFileAsset.objects.create(
+            survey_file=survey_file,
+            original_filename="albedo.jpeg",
+            stored_filename="albedo.jpeg",
+            mime_type="image/jpeg",
+            size_bytes=len(texture_payload),
+            sha256_checksum=__import__("hashlib").sha256(texture_payload).hexdigest(),
+            storage_path=texture_key,
+        )
+        fake_storage = FakePrivateStorageAdapter(
+            objects={
+                survey_file.storage_path: gltf_payload,
+                binary_key: binary_payload,
+                texture_key: texture_payload,
+            }
+        )
+        storage_factory.return_value = fake_storage
+
+        class FakeMesh:
+            faces = [(0, 1, 2), (0, 2, 3), (0, 3, 4), (0, 4, 5)]
+
+            def export(self, output_path, file_type):
+                Path(output_path).write_bytes(f"{file_type}-full".encode("utf-8"))
+
+        mocked_trimesh_load.return_value = FakeMesh()
+        mocked_export_preview.side_effect = lambda *, mesh, destination_path: destination_path.write_bytes(
+            b"preview-glb"
+        )
+
+        execute_processing_task(processing_job_id=processing_job.pk)
+
+        survey_file.refresh_from_db()
+        self.assertEqual(
+            survey_file.converted_path,
+            f"surveys/{self.survey.pk}/files/{survey_file.pk}/model.glb",
+        )
+        self.assertEqual(fake_storage.objects[survey_file.converted_path], b"glb-full")
+        self.assertEqual(fake_storage.download_calls[:3], [survey_file.storage_path, binary_key, texture_key])
+
     @patch("apps.processing.services.subprocess.run")
     @patch("apps.processing.services.PrivateR2StorageAdapter")
     def test_missing_potree_converter_fails_safely_without_invocation(self, storage_factory, mocked_run):
@@ -775,8 +846,8 @@ class ProcessingServiceTests(TestCase):
         fake_task.retry.assert_called_once()
 
     @patch("apps.processing.tasks.execute_processing_task", side_effect=ProcessingError("File processing failed."))
-    def test_automatic_retry_schedule_uses_documented_backoff(self, _mocked_execute):
-        for starting_retry_count, expected_countdown in enumerate((300, 900, 2700)):
+    def test_automatic_retry_schedule_uses_assessment_backoff(self, _mocked_execute):
+        for starting_retry_count, expected_countdown in enumerate((120, 300, 600)):
             with self.subTest(starting_retry_count=starting_retry_count):
                 survey = Survey.objects.create(
                     project=self.project,
@@ -1020,7 +1091,16 @@ class ProcessingServiceTests(TestCase):
 class ProcessingRoutingTests(TestCase):
     def test_retry_constants_match_documented_policy(self):
         self.assertEqual(MAX_AUTOMATIC_RETRIES, 3)
-        self.assertEqual(RETRY_DELAYS_MINUTES, (5, 15, 45))
+        self.assertEqual(RETRY_DELAYS_MINUTES, (2, 5, 10))
+
+    def test_derived_raster_tile_zoom_is_capped_for_assessment_processing(self):
+        derived_zoom = _derive_max_zoom(
+            mercator_bounds=(0.0, 0.0, 256.0, 256.0),
+            width=65536,
+            height=65536,
+        )
+
+        self.assertEqual(derived_zoom, ASSESSMENT_MAX_GENERATED_TILE_ZOOM)
 
 
 class ProcessingJobApiTests(APITestCase):

@@ -7,7 +7,7 @@ import subprocess
 import tempfile
 from dataclasses import dataclass
 from io import BytesIO
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 
 from django.conf import settings
 from django.core.exceptions import PermissionDenied, ValidationError
@@ -26,7 +26,11 @@ from apps.files.object_keys import (
 )
 from apps.files.models import FileFormat, FileType, SurveyFile
 from apps.files.storage import PrivateR2StorageAdapter
-from apps.files.validation import validate_upload
+from apps.files.validation import (
+    get_gltf_external_resource_references,
+    sanitize_storage_filename,
+    validate_upload,
+)
 from apps.processing.models import ProcessingJob
 from apps.projects.models import ProjectMembership
 from apps.projects.services import user_can_view_project
@@ -35,13 +39,14 @@ from apps.surveys.models import Survey, SurveyStatus
 logger = logging.getLogger(__name__)
 
 MAX_AUTOMATIC_RETRIES = 3
-RETRY_DELAYS_MINUTES = (5, 15, 45)
+RETRY_DELAYS_MINUTES = (2, 5, 10)
 POTREE_METADATA_FILENAME = "metadata.json"
 MESH_PREVIEW_TARGET_MAX_FACES = 5000
 TILE_SIZE_PX = 256
 WEB_MERCATOR_CRS = "EPSG:3857"
 WEB_MERCATOR_MAX_LAT = 85.0511287798066
 WEB_MERCATOR_INITIAL_RESOLUTION = 156543.03392804097
+ASSESSMENT_MAX_GENERATED_TILE_ZOOM = 12
 
 
 class ProcessingError(Exception):
@@ -121,6 +126,15 @@ def execute_processing_task(*, processing_job_id: int):
     try:
         artefacts = _process_file(processing_job=processing_job, storage=storage)
     except Exception as exc:
+        logger.exception(
+            "Processing job failed before exception normalisation.",
+            extra={
+                "processing_job_id": processing_job.pk,
+                "survey_file_id": processing_job.file_id,
+                "file_format": processing_job.file.format,
+                "file_type": processing_job.file.file_type,
+            },
+        )
         raise _normalize_processing_exception(exc) from exc
 
     _mark_job_completed(
@@ -492,19 +506,37 @@ def _process_mesh_file(*, processing_job, survey_file, local_raw_path, temp_dir_
 def _process_browser_ready_model_file(*, processing_job, survey_file, local_raw_path, temp_dir_path, storage):
     import trimesh
 
+    uses_external_gltf_assets = survey_file.format == FileFormat.GLTF and survey_file.assets.exists()
+    if survey_file.format == FileFormat.GLTF:
+        _stage_gltf_external_assets(
+            survey_file=survey_file,
+            local_raw_path=local_raw_path,
+            temp_dir_path=temp_dir_path,
+            storage=storage,
+        )
+
     preview_local_path = temp_dir_path / "preview.glb"
     mesh = trimesh.load(str(local_raw_path), force="mesh")
     _export_reduced_glb_preview(mesh=mesh, destination_path=preview_local_path)
     _set_job_progress(processing_job_id=processing_job.pk, progress_percent=70)
 
     preview_key = _build_generated_key(survey_file=survey_file, filename="preview.glb")
+    converted_key = None
+    if uses_external_gltf_assets:
+        converted_local_path = temp_dir_path / "model.glb"
+        mesh.export(str(converted_local_path), file_type="glb")
+        converted_key = _build_generated_key(survey_file=survey_file, filename="model.glb")
+
     _upload_json_sidecar(
         storage=storage,
         destination_key=build_model_metadata_key(
             survey_id=survey_file.survey_id,
             file_id=survey_file.pk,
         ),
-        payload=_build_mesh_metadata_payload(mesh=mesh, display_format=survey_file.format),
+        payload=_build_mesh_metadata_payload(
+            mesh=mesh,
+            display_format=FileFormat.GLB if converted_key else survey_file.format,
+        ),
     )
     _upload_generated_file(
         storage=storage,
@@ -512,7 +544,39 @@ def _process_browser_ready_model_file(*, processing_job, survey_file, local_raw_
         destination_key=preview_key,
         content_type="model/gltf-binary",
     )
-    return GeneratedArtefacts(preview_path=preview_key)
+    if converted_key:
+        _upload_generated_file(
+            storage=storage,
+            source_path=converted_local_path,
+            destination_key=converted_key,
+            content_type="model/gltf-binary",
+        )
+    return GeneratedArtefacts(preview_path=preview_key, converted_path=converted_key)
+
+
+def _stage_gltf_external_assets(*, survey_file, local_raw_path, temp_dir_path, storage):
+    with local_raw_path.open("rb") as raw_file:
+        references = get_gltf_external_resource_references(
+            _NamedValidationFile(raw_file, survey_file.stored_filename)
+        )
+
+    assets_by_filename = {
+        asset.stored_filename: asset
+        for asset in survey_file.assets.all()
+    }
+    expected_filenames = {sanitize_storage_filename(reference.name) for reference in references}
+    if set(assets_by_filename) != expected_filenames:
+        raise ProcessingError("GLTF related assets no longer match the GLTF manifest.")
+
+    for reference in references:
+        asset = assets_by_filename[sanitize_storage_filename(reference.name)]
+        destination_path = temp_dir_path.joinpath(*PurePosixPath(reference).parts)
+        _download_private_object(
+            storage=storage,
+            storage_key=asset.storage_path,
+            destination_path=destination_path,
+        )
+        _verify_checksum(path=destination_path, expected_sha256=asset.sha256_checksum)
 
 
 def _process_point_cloud_file(*, processing_job, survey_file, local_raw_path, temp_dir_path, storage):
@@ -757,7 +821,7 @@ def _derive_max_zoom(*, mercator_bounds, width: int, height: int) -> int:
     height_m = max(abs(top - bottom), 1.0)
     pixel_size_m = max(width_m / max(width, 1), height_m / max(height, 1))
     zoom = math.ceil(math.log2(WEB_MERCATOR_INITIAL_RESOLUTION / pixel_size_m))
-    return max(0, min(zoom, 22))
+    return max(0, min(zoom, ASSESSMENT_MAX_GENERATED_TILE_ZOOM))
 
 
 def _tile_range_for_bounds(*, geographic_bounds, z: int):

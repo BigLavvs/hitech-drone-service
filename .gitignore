@@ -12,3 +12,5 @@ db.sqlite3
 .ruff_cache/
 .demo-auth/
 staticfiles/
+AGENTS.md
+CODEX.md

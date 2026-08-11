@@ -287,3 +287,61 @@ The assessment documents and approved architecture remain the source of truth. R
 **Reason:** The assessment requires extension, MIME, and file-signature validation, while the deployed Android browser labels valid 3D uploads generically. Retaining the extension whitelist and mandatory content validation supports that browser behaviour without accepting arbitrary generic binary uploads.
 
 **Impact:** OBJ, GLB, GLTF, LAS, LAZ, PLY, and ASCII STL primary uploads may use the generic browser label only if their existing validators confirm the declared format. Exact supported MIME labels remain accepted as before; mismatches, malformed content, unapproved extensions, all 2D files, and dependent OBJ assets remain rejected.
+
+### 2026-08-11 - Browser fallback MIME compatibility for approved primary uploads
+
+**Decision:** A primary upload may use only the browser fallback MIME labels `application/octet-stream`, or for approved textual formats `text/plain`, when its extension is on the approved primary allow-list and the existing strict content validation confirms the allowed format. Conflicting specific MIME labels remain rejected.
+
+**Impact:** TIFF/GeoTIFF, PNG, JPEG, and the approved 3D primary formats may use `application/octet-stream` only after extension and signature/content validation succeed. KML and GeoJSON primary uploads, including `.geojson`, `.json`, and `.geo.json`, may use `application/octet-stream` or `text/plain` only after strict textual validation confirms valid KML or GeoJSON content. Unsupported extensions, malformed content, non-GeoJSON JSON, binary files labelled `text/plain`, and conflicting specific MIME values remain rejected.
+
+### 2026-08-11 - GLTF related assets and browser delivery
+
+**Decision:** The existing direct multipart `file` plus repeated `assets` contract also supports GLTF bundles. An external GLTF buffer or texture must be an exact, safe relative reference from the GLTF manifest and is accepted only as a `.bin`, `.png`, `.jpg`, or `.jpeg` asset. GLB remains self-contained and must not show or accept related assets.
+
+**Impact:** The browser displays a multiple-file related-assets picker only for OBJ and GLTF primary uploads. OBJ retains its MTL and PNG/JPEG rules. GLTF uploads must provide every externally referenced buffer/image and no unreferenced files. The worker reconstructs the referenced GLTF bundle privately, verifies dependent checksums, converts externally dependent GLTF into a private `model.glb`, and delivers that GLB through the existing authorised model endpoint. This refines the earlier raw-GLTF decision only for GLTF files with external dependencies; self-contained and data-URI GLTF files remain raw viewer sources.
+
+### 2026-08-11 - GLTF bundle-folder selection UX
+
+**Decision:** Keep the existing direct multipart `file` plus repeated `assets` contract unchanged, and add a Chromium-only `webkitdirectory` folder picker only as a browser UX convenience for `.gltf` primary uploads.
+
+**Impact:** The survey upload UI now shows a clearly labelled `Choose GLTF bundle folder` control only when the primary file is `.gltf`, while retaining the existing related-assets multiple-file picker as the fallback. The browser reads the selected primary GLTF locally only to identify referenced external buffers and textures, selects only referenced `.bin`, `.png`, `.jpg`, and `.jpeg` files from the chosen folder tree, ignores unrelated files and the primary `.gltf` itself, keeps the selected related-asset state in the application after either picker is reopened, lets the user remove individual selected assets before submission, and still submits only the remaining chosen files as repeated `assets` multipart fields. Folder-derived and fallback-picker assets may be merged in the client as a UX convenience, but the browser must continue to exclude unrelated files and rely on the existing server-authoritative exact-manifest validation. Server-side filename, path-safety, MIME, signature, checksum, exact-manifest-match, authorization, size-limit, storage, processing, and audit controls remain authoritative.
+
+### 2026-08-11 - Development-only static asset cache busting
+
+**Decision:** When `DEBUG=True`, the standard Django `runserver` static-file handler adds development-only response headers on every `/static/` response: `Cache-Control: no-store, no-cache, must-revalidate, max-age=0`, plus `Pragma: no-cache` and `Expires: 0`. When `DEBUG=False`, the override is not applied.
+
+**Reason:** Local Chrome caching retained stale `/static/css/app.css` and `/static/js/...` responses after source edits. Query-string cache busting on template entry files did not cover imported ES modules fetched from stable `/static/` URLs. Applying a no-store policy on the development server responses fixes CSS, entry JavaScript, and imported modules uniformly without changing the approved production static strategy.
+
+**Impact:** Local development with normal `python manage.py runserver` now serves every `/static/` response with cache-prevention headers, so browser refreshes fetch the current asset body for CSS and all JavaScript modules. Production keeps the existing WhiteNoise `CompressedManifestStaticFilesStorage`, `collectstatic`, Docker, and Coolify behaviour unchanged, including hashed filenames and normal production caching.
+
+### 2026-08-11 - OBJ MTL browser MIME compatibility
+
+**Decision:** For an OBJ related `.mtl` asset only, the validator also accepts the browser-generic `application/octet-stream` MIME label when the existing filename, size, UTF-8, and MTL-content validation all succeed.
+
+**Reason:** Some browsers submit a valid companion `.mtl` file with the generic binary label even though the assessment-required OBJ bundle remains `primary.obj` plus related `.mtl` and texture assets.
+
+**Impact:** This is a narrow compatibility exception for OBJ companion `.mtl` uploads only. It does not change the multipart contract, primary-upload validation, PNG/JPEG asset validation, storage layout, processing flow, authorization, or GLTF behaviour. Malformed MTL content remains rejected.
+
+### 2026-08-11 - Assessment demo session duration
+
+**Decision:** The assessment-only demo JWT default lifetime is 1800 seconds (30 minutes), while retaining the existing 60 to 1800 second bounds.
+
+**Reason:** The project owner approved a 30-minute reviewer session for the assessment deployment.
+
+**Impact:** The existing short-lived RS256 JWT continues to be set only in the `hitech_access_token` HttpOnly, Secure-in-deployed-mode, SameSite=Lax cookie. This does not introduce refresh tokens, Django sessions, password authentication, localStorage, or any different authentication flow. Any deployed Coolify environment must set its own `DEMO_AUTH_TOKEN_TTL_SECONDS=1800` runtime variable to match the new default.
+
+### 2026-08-11 - Assessment-time 2D generated tile zoom cap
+
+**Decision:** Generated 2D tile output is capped at zoom 12 for this assessment deployment.
+
+**Reason:** This prevents hundreds or thousands of sequential tile render and upload operations from blocking the demonstrable workflow during assessment-time processing.
+
+**Impact:** The existing 2D map workflow, PNG XYZ tile output, private R2 storage, tile metadata JSON, and tile API contract remain unchanged. The tradeoff is reduced maximum visual detail in exchange for more reliable assessment-time processing.
+
+### 2026-08-11 - Assessment-time processing retry delay schedule
+
+**Decision:** For this assessment deployment, automatic processing retry delays are reduced to 2, 5, and 10 minutes while preserving the existing three automatic retry attempts and retry-state model.
+
+**Reason:** The project owner approved this temporary assessment-time deviation to provide faster feedback and recovery during a time-constrained assessment demonstration.
+
+**Impact:** Only the automatic retry wait schedule changes. Existing retry counts, permanent-failure threshold, audit events, Celery retry flow, manual retry permissions, UI/API contracts, and processing, storage, and authorization behaviour remain unchanged.

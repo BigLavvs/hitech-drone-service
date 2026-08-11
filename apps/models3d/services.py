@@ -59,7 +59,7 @@ def get_survey_models_for_user(*, actor, survey_id: int, storage=None):
 
 
 def _resolve_model_source(*, survey_file):
-    if survey_file.format in {FileFormat.OBJ, FileFormat.PLY, FileFormat.STL} and survey_file.converted_path:
+    if survey_file.format in {FileFormat.OBJ, FileFormat.PLY, FileFormat.STL, FileFormat.GLTF} and survey_file.converted_path:
         return {"viewer_source_type": "glb", "storage_key": survey_file.converted_path}
     if survey_file.format == FileFormat.GLB:
         return {"viewer_source_type": "glb", "storage_key": survey_file.storage_path}

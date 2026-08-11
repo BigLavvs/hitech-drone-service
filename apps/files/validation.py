@@ -46,71 +46,97 @@ _FORMAT_RULES = {
     ".tif": {
         "file_type": FileType.TWO_D,
         "mime_types": {"image/tiff", "image/geotiff", "image/x-geotiff"},
+        "fallback_mime_types": {"application/octet-stream"},
         "formats": {FileFormat.TIFF, FileFormat.GEOTIFF},
     },
     ".tiff": {
         "file_type": FileType.TWO_D,
         "mime_types": {"image/tiff", "image/geotiff", "image/x-geotiff"},
+        "fallback_mime_types": {"application/octet-stream"},
         "formats": {FileFormat.TIFF, FileFormat.GEOTIFF},
     },
     ".png": {
         "file_type": FileType.TWO_D,
         "mime_types": {"image/png"},
+        "fallback_mime_types": {"application/octet-stream"},
         "formats": {FileFormat.PNG},
     },
     ".jpg": {
         "file_type": FileType.TWO_D,
         "mime_types": {"image/jpeg"},
+        "fallback_mime_types": {"application/octet-stream"},
         "formats": {FileFormat.JPEG},
     },
     ".jpeg": {
         "file_type": FileType.TWO_D,
         "mime_types": {"image/jpeg"},
+        "fallback_mime_types": {"application/octet-stream"},
         "formats": {FileFormat.JPEG},
     },
     ".kml": {
         "file_type": FileType.TWO_D,
         "mime_types": {"application/vnd.google-earth.kml+xml"},
+        "fallback_mime_types": {"application/octet-stream", "text/plain"},
         "formats": {FileFormat.KML},
     },
     ".geojson": {
         "file_type": FileType.TWO_D,
         "mime_types": {"application/geo+json", "application/json"},
+        "fallback_mime_types": {"application/octet-stream", "text/plain"},
+        "formats": {FileFormat.GEOJSON},
+    },
+    ".json": {
+        "file_type": FileType.TWO_D,
+        "mime_types": {"application/geo+json", "application/json"},
+        "fallback_mime_types": {"application/octet-stream", "text/plain"},
+        "formats": {FileFormat.GEOJSON},
+    },
+    ".geo.json": {
+        "file_type": FileType.TWO_D,
+        "mime_types": {"application/geo+json", "application/json"},
+        "fallback_mime_types": {"application/octet-stream", "text/plain"},
         "formats": {FileFormat.GEOJSON},
     },
     ".obj": {
         "file_type": FileType.THREE_D,
         "mime_types": {"model/obj", "text/plain"},
+        "fallback_mime_types": {"application/octet-stream"},
         "formats": {FileFormat.OBJ},
     },
     ".glb": {
         "file_type": FileType.THREE_D,
         "mime_types": {"model/gltf-binary", "application/octet-stream+gltf"},
+        "fallback_mime_types": {"application/octet-stream"},
         "formats": {FileFormat.GLB},
     },
     ".gltf": {
         "file_type": FileType.THREE_D,
         "mime_types": {"model/gltf+json", "application/gltf+json"},
+        "fallback_mime_types": {"application/octet-stream"},
         "formats": {FileFormat.GLTF},
     },
     ".las": {
         "file_type": FileType.THREE_D,
         "mime_types": {"application/vnd.las", "application/x-las"},
+        "fallback_mime_types": {"application/octet-stream"},
         "formats": {FileFormat.LAS},
     },
     ".laz": {
         "file_type": FileType.THREE_D,
         "mime_types": {"application/vnd.laszip", "application/x-laz"},
+        "fallback_mime_types": {"application/octet-stream"},
         "formats": {FileFormat.LAZ},
     },
     ".ply": {
         "file_type": FileType.THREE_D,
         "mime_types": {"application/ply", "model/ply"},
+        "fallback_mime_types": {"application/octet-stream"},
         "formats": {FileFormat.PLY},
     },
     ".stl": {
         "file_type": FileType.THREE_D,
         "mime_types": {"model/stl", "application/sla"},
+        "fallback_mime_types": {"application/octet-stream"},
         "formats": {FileFormat.STL},
     },
 }
@@ -178,7 +204,7 @@ def validate_upload(uploaded_file, declared_mime_type=None):
         raise FileValidationError("Filename is required.")
 
     normalized_name = _validate_filename(original_filename)
-    extension = PurePosixPath(normalized_name).suffix.lower()
+    extension = _get_primary_extension(normalized_name)
     format_rule = _FORMAT_RULES.get(extension)
     if format_rule is None:
         raise FileValidationError("Unsupported file extension.")
@@ -186,21 +212,25 @@ def validate_upload(uploaded_file, declared_mime_type=None):
     mime_type = (declared_mime_type or getattr(uploaded_file, "content_type", "") or "").strip().lower()
     if not mime_type:
         raise FileValidationError("MIME type is required.")
-    generic_3d_mime = (
-        mime_type == "application/octet-stream"
-        and format_rule["file_type"] == FileType.THREE_D
-    )
-    if not generic_3d_mime and mime_type not in format_rule["mime_types"]:
-        raise FileValidationError("Unsupported or mismatched MIME type.")
 
     size_bytes = _get_upload_size(uploaded_file)
     if size_bytes > settings.MAX_FILE_SIZE_BYTES:
         raise FileValidationError("File exceeds the configured size limit.")
 
     header = _read_prefix(uploaded_file, MAX_VALIDATION_BYTES)
-    detected_format = _detect_format(extension, header)
+    detected_format = _detect_format(
+        extension,
+        header,
+        uploaded_file=uploaded_file,
+        size_bytes=size_bytes,
+    )
     if detected_format not in format_rule["formats"]:
         raise FileValidationError("Filename extension does not match file content.")
+    if (
+        mime_type not in format_rule["mime_types"]
+        and mime_type not in format_rule["fallback_mime_types"]
+    ):
+        raise FileValidationError("Unsupported or mismatched MIME type.")
 
     sanitized_filename = sanitize_storage_filename(PurePosixPath(normalized_name).name)
     return ValidatedUpload(
@@ -222,6 +252,18 @@ def sanitize_storage_filename(filename):
     return f"{cleaned_stem}{suffix}"
 
 
+def _get_primary_extension(filename):
+    path = PurePosixPath(filename)
+    suffixes = [suffix.lower() for suffix in path.suffixes]
+    if len(suffixes) >= 2:
+        combined_suffix = "".join(suffixes[-2:])
+        if combined_suffix in _FORMAT_RULES:
+            return combined_suffix
+    if suffixes:
+        return suffixes[-1]
+    return ""
+
+
 def validate_obj_asset_upload(uploaded_file, declared_mime_type=None):
     original_filename = getattr(uploaded_file, "name", "")
     if not original_filename:
@@ -239,7 +281,7 @@ def validate_obj_asset_upload(uploaded_file, declared_mime_type=None):
 
     header = _read_prefix(uploaded_file, MAX_VALIDATION_BYTES)
     if extension == ".mtl":
-        if mime_type not in {"text/plain", "model/mtl", "text/mtl"}:
+        if mime_type not in {"text/plain", "model/mtl", "text/mtl", "application/octet-stream"}:
             raise FileValidationError("Unsupported or mismatched asset MIME type.")
         _validate_mtl(header)
     elif extension == ".png":
@@ -260,6 +302,77 @@ def validate_obj_asset_upload(uploaded_file, declared_mime_type=None):
         mime_type=mime_type,
         size_bytes=size_bytes,
     )
+
+
+def validate_gltf_asset_upload(uploaded_file, declared_mime_type=None):
+    """Validate a binary buffer or texture explicitly referenced by a GLTF manifest."""
+    original_filename = getattr(uploaded_file, "name", "")
+    if not original_filename:
+        raise FileValidationError("Asset filename is required.")
+
+    normalized_name = _validate_filename(original_filename)
+    extension = PurePosixPath(normalized_name).suffix.lower()
+    mime_type = (declared_mime_type or getattr(uploaded_file, "content_type", "") or "").strip().lower()
+    if not mime_type:
+        raise FileValidationError("Asset MIME type is required.")
+
+    size_bytes = _get_upload_size(uploaded_file)
+    if size_bytes > settings.MAX_FILE_SIZE_BYTES:
+        raise FileValidationError("Asset exceeds the configured size limit.")
+
+    header = _read_prefix(uploaded_file, MAX_VALIDATION_BYTES)
+    if extension == ".bin":
+        if mime_type != "application/octet-stream":
+            raise FileValidationError("Unsupported or mismatched asset MIME type.")
+    elif extension == ".png":
+        if mime_type != "image/png":
+            raise FileValidationError("Unsupported or mismatched asset MIME type.")
+        _ensure(header.startswith(_PNG_SIGNATURE), "Invalid PNG signature.")
+    elif extension in {".jpg", ".jpeg"}:
+        if mime_type != "image/jpeg":
+            raise FileValidationError("Unsupported or mismatched asset MIME type.")
+        _ensure(header.startswith(_JPEG_SIGNATURE), "Invalid JPEG signature.")
+    else:
+        raise FileValidationError("Unsupported GLTF asset extension.")
+
+    sanitized_filename = sanitize_storage_filename(PurePosixPath(normalized_name).name)
+    return ValidatedAssetUpload(
+        original_filename=PurePosixPath(normalized_name).name,
+        sanitized_filename=sanitized_filename,
+        mime_type=mime_type,
+        size_bytes=size_bytes,
+    )
+
+
+def get_gltf_external_resource_references(uploaded_file) -> list[PurePosixPath]:
+    """Return safe, non-data URIs from GLTF buffers and images.
+
+    Browser file inputs expose companion files by basename only. Duplicate referenced
+    basenames are therefore rejected so they cannot be confused during worker staging.
+    """
+    payload = _load_gltf_payload(_read_prefix(uploaded_file, MAX_VALIDATION_BYTES))
+    references = []
+    seen_filenames = set()
+    for collection_name in ("buffers", "images"):
+        collection = payload.get(collection_name, [])
+        _ensure(isinstance(collection, list), f"GLTF {collection_name} must be an array.")
+        for resource in collection:
+            _ensure(isinstance(resource, dict), f"GLTF {collection_name} entries must be objects.")
+            uri = resource.get("uri")
+            if uri is None:
+                continue
+            _ensure(isinstance(uri, str) and uri.strip(), "GLTF resource URI is invalid.")
+            if uri.startswith("data:"):
+                continue
+            reference = _validate_gltf_resource_uri(uri)
+            filename = sanitize_storage_filename(reference.name)
+            _ensure(
+                filename not in seen_filenames,
+                "GLTF companion filenames must be unique.",
+            )
+            seen_filenames.add(filename)
+            references.append(reference)
+    return references
 
 
 def _validate_filename(filename):
@@ -296,9 +409,13 @@ def _read_prefix(uploaded_file, limit):
     return header
 
 
-def _detect_format(extension, header):
+def _detect_format(extension, header, uploaded_file=None, size_bytes=None):
     if extension in {".tif", ".tiff"}:
-        return _detect_tiff_format(header)
+        return _detect_tiff_format(
+            header,
+            uploaded_file=uploaded_file,
+            size_bytes=size_bytes,
+        )
     if extension == ".png":
         _ensure(header.startswith(_PNG_SIGNATURE), "Invalid PNG signature.")
         return FileFormat.PNG
@@ -308,7 +425,7 @@ def _detect_format(extension, header):
     if extension == ".kml":
         _validate_kml(header)
         return FileFormat.KML
-    if extension == ".geojson":
+    if extension in {".geojson", ".json", ".geo.json"}:
         _validate_geojson(header)
         return FileFormat.GEOJSON
     if extension == ".obj":
@@ -335,28 +452,72 @@ def _detect_format(extension, header):
     raise FileValidationError("Unsupported file extension.")
 
 
-def _detect_tiff_format(header):
+def _detect_tiff_format(header, uploaded_file=None, size_bytes=None):
     signature = header[:4]
     _ensure(signature in _TIFF_SIGNATURES, "Invalid TIFF signature.")
 
     if signature in {b"II+\x00", b"MM\x00+"}:
         return FileFormat.TIFF
 
+    _ensure(len(header) >= 8, "Incomplete TIFF header.")
     endian = "<" if signature == b"II*\x00" else ">"
     ifd_offset = struct.unpack(f"{endian}I", header[4:8])[0]
-    entry_count_offset = ifd_offset
-    _ensure(len(header) >= entry_count_offset + 2, "Incomplete TIFF header.")
-    entry_count = struct.unpack(f"{endian}H", header[entry_count_offset : entry_count_offset + 2])[0]
-    entries_offset = entry_count_offset + 2
-    needed_length = entries_offset + (entry_count * 12)
-    _ensure(len(header) >= needed_length, "Incomplete TIFF metadata.")
+
+    size_bytes = size_bytes if size_bytes is not None else len(header)
+    _ensure(ifd_offset + 2 <= size_bytes, "Incomplete TIFF header.")
+
+    entry_count_data = _read_tiff_bytes(
+        header=header,
+        uploaded_file=uploaded_file,
+        offset=ifd_offset,
+        size=2,
+        size_bytes=size_bytes,
+    )
+    entry_count = struct.unpack(f"{endian}H", entry_count_data)[0]
+    entries_offset = ifd_offset + 2
+    entries_size = entry_count * 12
+    _ensure(
+        entries_size <= MAX_VALIDATION_BYTES,
+        "TIFF IFD directory exceeds validation read limit.",
+    )
+    needed_length = entries_offset + entries_size
+    _ensure(needed_length <= size_bytes, "Incomplete TIFF metadata.")
+
+    entries = _read_tiff_bytes(
+        header=header,
+        uploaded_file=uploaded_file,
+        offset=entries_offset,
+        size=entries_size,
+        size_bytes=size_bytes,
+    )
 
     for index in range(entry_count):
-        start = entries_offset + (index * 12)
-        tag = struct.unpack(f"{endian}H", header[start : start + 2])[0]
+        start = index * 12
+        tag = struct.unpack(f"{endian}H", entries[start : start + 2])[0]
         if tag == 34735:
             return FileFormat.GEOTIFF
     return FileFormat.TIFF
+
+
+def _read_tiff_bytes(*, header, uploaded_file, offset, size, size_bytes):
+    _ensure(offset >= 0 and size >= 0, "Incomplete TIFF metadata.")
+    _ensure(offset + size <= size_bytes, "Incomplete TIFF metadata.")
+    if offset + size <= len(header):
+        return header[offset : offset + size]
+
+    _ensure(uploaded_file is not None, "Incomplete TIFF metadata.")
+    return _read_exact_bytes(uploaded_file, offset=offset, size=size)
+
+
+def _read_exact_bytes(uploaded_file, *, offset, size):
+    current_position = uploaded_file.tell()
+    try:
+        uploaded_file.seek(offset)
+        data = uploaded_file.read(size)
+    finally:
+        uploaded_file.seek(current_position)
+    _ensure(len(data) == size, "Incomplete TIFF metadata.")
+    return data
 
 
 def _validate_kml(header):
@@ -376,9 +537,27 @@ def _validate_geojson(header):
 
 
 def _validate_gltf(header):
+    _load_gltf_payload(header)
+
+
+def _load_gltf_payload(header):
     payload = _load_json_text(header, "Malformed GLTF content.")
+    _ensure(isinstance(payload, dict), "GLTF must be a JSON object.")
     asset = payload.get("asset")
     _ensure(isinstance(asset, dict), "GLTF asset metadata is required.")
+    return payload
+
+
+def _validate_gltf_resource_uri(uri: str) -> PurePosixPath:
+    if "\\" in uri or ":" in uri or uri.startswith(("/", "\\")) or any(
+        marker in uri for marker in ("?", "#")
+    ):
+        raise FileValidationError("GLTF resource URI must be a relative file path.")
+
+    path = PurePosixPath(uri)
+    if not path.name or path.is_absolute() or ".." in path.parts:
+        raise FileValidationError("GLTF resource URI must not escape the upload bundle.")
+    return path
 
 
 def _validate_obj(header):

@@ -14,7 +14,14 @@ from apps.audit.services import record_audit_event
 from apps.audit.tasks import dispatch_file_download_audit_event
 from apps.files.models import FileFormat, SurveyFile, SurveyFileAsset
 from apps.files.storage import PrivateR2StorageAdapter
-from apps.files.validation import FileValidationError, validate_obj_asset_upload, validate_upload
+from apps.files.validation import (
+    FileValidationError,
+    get_gltf_external_resource_references,
+    sanitize_storage_filename,
+    validate_gltf_asset_upload,
+    validate_obj_asset_upload,
+    validate_upload,
+)
 from apps.processing.services import (
     create_queued_processing_job,
     register_processing_dispatch_on_commit,
@@ -65,11 +72,13 @@ def admit_uploaded_file(
 ):
     _validate_upload_actor(actor=actor, survey=survey)
     _validate_survey_accepts_uploads(survey=survey)
+    asset_files = list(asset_files or [])
 
     validated_upload = validate_upload(uploaded_file, declared_mime_type)
-    validated_assets = _validate_obj_related_assets(
+    validated_assets = _validate_related_assets(
         primary_upload=validated_upload,
-        asset_files=asset_files or [],
+        primary_file=uploaded_file,
+        asset_files=asset_files,
     )
     total_incoming_size_bytes = validated_upload.size_bytes + sum(
         asset.size_bytes for asset in validated_assets
@@ -93,7 +102,7 @@ def admit_uploaded_file(
             file_obj=uploaded_file,
             content_type=validated_upload.mime_type,
         )
-        for validated_asset, asset_file in zip(validated_assets, asset_files or [], strict=False):
+        for validated_asset, asset_file in zip(validated_assets, asset_files, strict=True):
             staged_assets.append(
                 _UploadedAsset(
                     validated_upload=validated_asset,
@@ -328,29 +337,48 @@ def _validate_survey_total_size_limit(*, survey: Survey, incoming_size_bytes: in
         raise ValidationError("Survey exceeds the configured total upload size limit.")
 
 
-def _validate_obj_related_assets(*, primary_upload, asset_files):
-    if primary_upload.file_format != FileFormat.OBJ:
+def _validate_related_assets(*, primary_upload, primary_file, asset_files):
+    if primary_upload.file_format == FileFormat.OBJ:
+        validator = validate_obj_asset_upload
+        asset_label = "OBJ"
+        required_filenames = None
+    elif primary_upload.file_format == FileFormat.GLTF:
+        validator = validate_gltf_asset_upload
+        asset_label = "GLTF"
+        try:
+            required_filenames = {
+                sanitize_storage_filename(reference.name)
+                for reference in get_gltf_external_resource_references(primary_file)
+            }
+        except FileValidationError as exc:
+            raise ValidationError(str(exc)) from exc
+    else:
         if asset_files:
-            raise ValidationError("OBJ assets are allowed only for OBJ primary uploads.")
+            raise ValidationError("Related assets are allowed only for OBJ or GLTF primary uploads.")
         return []
 
     try:
-        validated_assets = [validate_obj_asset_upload(asset_file) for asset_file in asset_files]
+        validated_assets = [validator(asset_file) for asset_file in asset_files]
     except FileValidationError as exc:
         raise ValidationError(str(exc)) from exc
     seen_filenames = set()
     seen_checksums = set()
     for validated_asset, asset_file in zip(validated_assets, asset_files, strict=True):
         if validated_asset.sanitized_filename in seen_filenames:
-            raise ValidationError("Duplicate OBJ asset filename is not allowed.")
+            raise ValidationError(f"Duplicate {asset_label} asset filename is not allowed.")
         seen_filenames.add(validated_asset.sanitized_filename)
 
         asset_file.seek(0)
         checksum = storage_sha256(asset_file)
         asset_file.seek(0)
         if checksum in seen_checksums:
-            raise ValidationError("Duplicate OBJ asset checksum is not allowed.")
+            raise ValidationError(f"Duplicate {asset_label} asset checksum is not allowed.")
         seen_checksums.add(checksum)
+
+    if required_filenames is not None and seen_filenames != required_filenames:
+        raise ValidationError(
+            "GLTF related assets must exactly match the external buffers and images referenced by the GLTF manifest."
+        )
 
     return validated_assets
 

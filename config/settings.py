@@ -100,7 +100,7 @@ DEMO_AUTH_PUBLIC_KEY_PATH = env(
 )
 DEMO_AUTH_TOKEN_TTL_SECONDS = max(
     60,
-    min(env.int("DEMO_AUTH_TOKEN_TTL_SECONDS", default=900), 1800),
+    min(env.int("DEMO_AUTH_TOKEN_TTL_SECONDS", default=1800), 1800),
 )
 
 _hitech_auth_jwt_public_key = env("HITECH_AUTH_JWT_PUBLIC_KEY", default="")
@@ -146,6 +146,11 @@ RATE_LIMIT_RETRY = env("RATE_LIMIT_RETRY")
 STATIC_URL = "/static/"
 STATICFILES_DIRS = [BASE_DIR / "static"]
 STATIC_ROOT = BASE_DIR / "staticfiles"
+if DEBUG:
+    from config.dev_static import enable_dev_static_no_cache
+
+    enable_dev_static_no_cache()
+
 STORAGES = {
     "default": {
         "BACKEND": "django.core.files.storage.FileSystemStorage",
