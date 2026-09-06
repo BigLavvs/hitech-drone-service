@@ -21,6 +21,7 @@ class AuditAction(models.TextChoices):
     PROCESSING_STARTED = "PROCESSING_STARTED", "Processing Started"
     PROCESSING_FAILED = "PROCESSING_FAILED", "Processing Failed"
     PROCESSING_RETRY = "PROCESSING_RETRY", "Processing Retry"
+    PROCESSING_RECOVERY = "PROCESSING_RECOVERY", "Processing Recovery"
     PROCESSING_COMPLETED = "PROCESSING_COMPLETED", "Processing Completed"
     APPROVAL_SUBMITTED = "APPROVAL_SUBMITTED", "Approval Submitted"
     APPROVAL_APPROVED = "APPROVAL_APPROVED", "Approval Approved"

@@ -8,6 +8,6 @@ psycopg[binary]>=3.2,<4.0
 celery[redis]>=5.4,<6.0
 boto3>=1.35,<2.0
 whitenoise>=6.9,<7.0
-rasterio
-trimesh
-fast-simplification
+rasterio>=1.4,<2.0
+trimesh>=4.0,<6.0
+fast-simplification>=0.1,<0.2

@@ -150,6 +150,25 @@ class ModelDeliveryApiTests(APITestCase):
             f"surveys/{self.survey.pk}/files/{self.converted_gltf_file.pk}/model-metadata.json"
         )
 
+    @patch("apps.models3d.services.PrivateR2StorageAdapter")
+    def test_published_attempt_supplies_metadata_and_converted_model(self, storage_factory):
+        prefix = f"surveys/{self.survey.pk}/files/{self.mesh_file.pk}/attempts/" + "b" * 32 + "/"
+        self.mesh_file.preview_path = prefix + "preview.glb"
+        self.mesh_file.converted_path = prefix + "model.glb"
+        self.mesh_file.save(update_fields=["preview_path", "converted_path"])
+        fake_storage = FakePrivateStorageAdapter(json_objects={
+            prefix + "model-metadata.json": b'{"display_format":"GLB","vertex_count":99}',
+            self.point_metadata_key: b'{"display_format":"POTREE"}',
+            self.converted_gltf_metadata_key: b'{"display_format":"GLB"}',
+        })
+        storage_factory.return_value = fake_storage
+        with self.auth_settings():
+            self.authenticate(self.viewer)
+            response = self.client.get(f"/api/v1/surveys/{self.survey.pk}/models")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()[0]["vertex_count"], 99)
+        self.assertEqual(fake_storage.presign_calls[0], (prefix + "model.glb", 300))
+
     def auth_settings(self):
         return override_settings(
             HITECH_AUTH_JWT_PUBLIC_KEY=self.public_key_pem,

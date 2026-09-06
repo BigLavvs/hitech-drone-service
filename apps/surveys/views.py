@@ -42,24 +42,8 @@ class SurveyListCreateAPIView(generics.GenericAPIView):
         query_serializer = SurveyListQuerySerializer(data=request.query_params)
         query_serializer.is_valid(raise_exception=True)
 
-        queryset = get_surveys_visible_to_user(user=request.user)
         query = query_serializer.validated_data
-
-        if "project_id" in query:
-            queryset = queryset.filter(project_id=query["project_id"])
-
-        if "site_id" in query:
-            queryset = queryset.filter(site_id=query["site_id"])
-
-        if "status" in query:
-            queryset = queryset.filter(status=query["status"])
-
-        if "from_date" in query:
-            queryset = queryset.filter(survey_date__gte=query["from_date"])
-
-        if query.get("sort") == "survey_date":
-            ordering = ("survey_date", "id") if query["order"] == "asc" else ("-survey_date", "-id")
-            queryset = queryset.order_by(*ordering)
+        queryset = get_surveys_visible_to_user(user=request.user, filters=query)
 
         page = self.paginate_queryset(queryset)
         serializer = SurveyReadSerializer(page, many=True)

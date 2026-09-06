@@ -99,7 +99,7 @@
 <text x="44.0" y="1354.0" fill="#94a3b8" font-size="9.5">  INVALID_TOKEN</text>
 <text x="44.0" y="1372.0" fill="#94a3b8" font-size="9.5">- No matching active local user: 401 Unauthorized</text>
 <text x="44.0" y="1390.0" fill="#94a3b8" font-size="9.5">- Unsafe request without valid CSRF token: 403 CSRF_FAILURE</text>
-<rect x="611.3" y="1254.0" width="557.3" height="210.0" rx="10" fill="#1e293b" stroke="#334155" stroke-width="1.5" stroke-dasharray="6,4"/>
+<rect x="611.3" y="1254.0" width="557.3" height="246.0" rx="10" fill="#1e293b" stroke="#334155" stroke-width="1.5" stroke-dasharray="6,4"/>
 <text x="625.3" y="1278.0" fill="#e2e8f0" font-size="12" font-weight="700">Module Interactions (Drone Mapping Service):</text>
 <text x="625.3" y="1300.0" fill="#94a3b8" font-size="9.5">- Access Control Module never issues tokens; it only</text>
 <text x="625.3" y="1318.0" fill="#94a3b8" font-size="9.5">  validates externally-issued RS256 JWTs</text>
@@ -110,6 +110,10 @@
 <text x="625.3" y="1408.0" fill="#94a3b8" font-size="9.5">- Project-level access scoping is enforced by each target</text>
 <text x="625.3" y="1426.0" fill="#94a3b8" font-size="9.5">  module (Projects, Surveys, Files, etc.), not globally</text>
 <text x="625.3" y="1444.0" fill="#94a3b8" font-size="9.5">  by Access Control Module</text>
+<text x="625.3" y="1462.0" fill="#94a3b8" font-size="9.5">- Assessment-only /api/v1/demo-auth/session may issue</text>
+<text x="625.3" y="1480.0" fill="#94a3b8" font-size="9.5">  the same HttpOnly JWT cookie only when ENABLE_DEMO_AUTH=true</text>
+<text x="625.3" y="1462.0" fill="#94a3b8" font-size="9.5">- Assessment-only /api/v1/demo-auth/session may issue</text>
+<text x="625.3" y="1480.0" fill="#94a3b8" font-size="9.5">  the same HttpOnly JWT cookie only when ENABLE_DEMO_AUTH=true</text>
 <rect x="1192.7" y="1254.0" width="557.3" height="174.0" rx="10" fill="#1e293b" stroke="#334155" stroke-width="1.5" stroke-dasharray="6,4"/>
 <text x="1206.7" y="1278.0" fill="#e2e8f0" font-size="12" font-weight="700">Legend:</text>
 <text x="1206.7" y="1300.0" fill="#94a3b8" font-size="9.5">- Solid arrow: request / call</text>

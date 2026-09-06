@@ -4,7 +4,6 @@ from django.core.exceptions import ObjectDoesNotExist
 from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 
-from apps.projects.models import Project, Site
 from apps.projects.serializers import _reject_unknown_fields
 from apps.surveys.models import Survey, SurveyStatus
 
@@ -39,16 +38,14 @@ class SurveyReadSerializer(serializers.ModelSerializer):
 
     @extend_schema_field(serializers.CharField(allow_null=True))
     def get_rejection_reason(self, obj: Survey):
-        try:
-            approval = obj.approval
-        except ObjectDoesNotExist:
-            return None
-        return approval.rejection_reason
+        from apps.approvals.services import get_survey_rejection_reason
+
+        return get_survey_rejection_reason(survey_id=obj.pk)
 
 
 class SurveyCreateSerializer(serializers.Serializer):
-    project_id = serializers.PrimaryKeyRelatedField(source="project", queryset=Project.objects.all())
-    site_id = serializers.PrimaryKeyRelatedField(source="site", queryset=Site.objects.all())
+    project_id = serializers.IntegerField(min_value=1)
+    site_id = serializers.IntegerField(min_value=1)
     name = serializers.CharField(max_length=255, required=True)
     survey_date = serializers.DateField(required=True)
     drone_model = serializers.CharField(
@@ -86,7 +83,20 @@ class SurveyCreateSerializer(serializers.Serializer):
                 "notes",
             },
         )
-        return super().to_internal_value(data)
+        values = super().to_internal_value(data)
+        from apps.projects.services import get_project_by_id, get_site_for_project
+
+        try:
+            project = get_project_by_id(project_id=values.pop("project_id"))
+        except ObjectDoesNotExist as exc:
+            raise serializers.ValidationError({"project_id": ["Invalid pk."]}) from exc
+        try:
+            site = get_site_for_project(project=project, site_id=values.pop("site_id"))
+        except ObjectDoesNotExist as exc:
+            raise serializers.ValidationError({"site_id": ["Invalid pk."]}) from exc
+        values["project"] = project
+        values["site"] = site
+        return values
 
 
 class SurveyUpdateSerializer(serializers.Serializer):

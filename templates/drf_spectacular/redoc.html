@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    {% block head %}
+    <title>{{ title|default:"Redoc" }}</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style nonce="{{ request.csp_nonce }}">
+      body { margin: 0; padding: 0; }
+    </style>
+    <script nonce="{{ request.csp_nonce }}">
+      (() => {
+        const nonce = document.currentScript.nonce;
+        const originalCreateElement = Document.prototype.createElement;
+        const addStyleNonce = (element) => {
+          if (element?.nodeType === 1 && element.localName === "style") {
+            element.setAttribute("nonce", nonce);
+          }
+          return element;
+        };
+        Document.prototype.createElement = function (name, options) {
+          return addStyleNonce(originalCreateElement.call(this, name, options));
+        };
+        for (const method of ["appendChild", "insertBefore", "replaceChild"]) {
+          const original = Node.prototype[method];
+          Node.prototype[method] = function (...args) {
+            addStyleNonce(args[0]);
+            if (method === "replaceChild") addStyleNonce(args[1]);
+            return original.apply(this, args);
+          };
+        }
+      })();
+    </script>
+    {% endblock head %}
+  </head>
+  <body>
+    {% block body %}
+    <div id="redoc-container"></div>
+    <script src="{{ redoc_standalone }}"></script>
+    <script nonce="{{ request.csp_nonce }}">
+      const redocSettings = {{ settings|default:"{}"|safe }};
+      Redoc.init("{{ schema_url }}", redocSettings, document.getElementById('redoc-container'))
+    </script>
+    {% endblock body %}
+  </body>
+</html>

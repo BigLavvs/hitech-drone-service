@@ -1,3 +1,5 @@
+from dataclasses import dataclass
+
 from django.db import transaction
 
 from django.core.exceptions import PermissionDenied, ValidationError
@@ -5,10 +7,17 @@ from django.core.exceptions import PermissionDenied, ValidationError
 from apps.access_control.models import User, UserRole
 from apps.audit.models import AuditAction
 from apps.audit.services import record_audit_event
-from apps.projects.models import Project
 from apps.access_control.demo_access import DemoUserSpec
 
 _UNSET = object()
+
+
+@dataclass(frozen=True)
+class LocalUserSnapshot:
+    id: int
+    email: str
+    role: str
+    is_active: bool = True
 
 
 def resolve_active_user_from_external_identity(
@@ -60,6 +69,69 @@ def get_local_users_for_admin(*, actor: User):
 def get_local_user_for_admin(*, actor: User, user_id: int) -> User:
     _require_administrator(actor)
     return User.objects.get(pk=user_id)
+
+
+def get_local_user_by_id(*, user_id: int) -> User:
+    return User.objects.get(pk=user_id)
+
+
+def get_local_user_snapshots_by_ids(*, user_ids) -> dict[int, LocalUserSnapshot]:
+    normalized_ids = list(dict.fromkeys(user_ids))
+    if not normalized_ids:
+        return {}
+
+    return {
+        row["id"]: LocalUserSnapshot(
+            id=row["id"],
+            email=row["email"],
+            role=row["role"],
+            is_active=row["is_active"],
+        )
+        for row in User.objects.filter(pk__in=normalized_ids).values(
+            "id", "email", "role", "is_active"
+        )
+    }
+
+
+def get_active_assignable_project_users(*, exclude_user_ids=None):
+    queryset = User.objects.filter(
+        is_active=True,
+        role__in={UserRole.SURVEY_ENGINEER, UserRole.VIEWER},
+    )
+    if exclude_user_ids is not None:
+        queryset = queryset.exclude(pk__in=exclude_user_ids)
+    return tuple(
+        LocalUserSnapshot(
+            id=row["id"],
+            email=row["email"],
+            role=row["role"],
+            is_active=row["is_active"],
+        )
+        for row in queryset.order_by("email", "id").values(
+            "id", "email", "role", "is_active"
+        )
+    )
+
+
+def get_active_assignable_project_users_for_project(*, project):
+    from apps.projects.services import get_project_member_user_ids
+
+    return get_active_assignable_project_users(
+        exclude_user_ids=get_project_member_user_ids(project_id=project.pk)
+    )
+
+
+def upsert_demo_user(*, spec) -> User:
+    user, _created = User.objects.update_or_create(
+        external_id=spec.external_id,
+        defaults={
+            "email": spec.email,
+            "role": spec.role,
+            "is_active": True,
+            "is_staff": spec.role == UserRole.ADMINISTRATOR,
+        },
+    )
+    return user
 
 
 def create_local_user(
@@ -180,7 +252,9 @@ def _ensure_project_manager_ownership_preserved(
     next_role: str,
     next_is_active: bool,
 ) -> None:
-    owns_projects = Project.objects.filter(project_manager=target_user).exists()
+    from apps.projects.services import user_owns_any_project
+
+    owns_projects = user_owns_any_project(user=target_user)
     if not owns_projects:
         return
 

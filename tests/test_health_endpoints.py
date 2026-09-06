@@ -10,6 +10,30 @@ class HealthEndpointTests(SimpleTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json(), {"status": "ok"})
 
+    def test_production_redirects_plain_http_readiness_probe(self):
+        with self.settings(DEBUG=False, SECURE_SSL_REDIRECT=True):
+            response = self.client.get("/ready")
+
+        self.assertEqual(response.status_code, 301)
+        self.assertEqual(response["Location"], "https://testserver/ready")
+
+    @patch("config.health._check_celery_worker", return_value=True)
+    @patch("config.health._check_r2", return_value=True)
+    @patch("config.health._check_redis", return_value=True)
+    @patch("config.health._check_database", return_value=True)
+    def test_forwarded_https_probe_reaches_healthy_readiness_view(
+        self,
+        _mock_db,
+        _mock_redis,
+        _mock_r2,
+        _mock_worker,
+    ):
+        with self.settings(DEBUG=False, SECURE_SSL_REDIRECT=True):
+            response = self.client.get("/ready", HTTP_X_FORWARDED_PROTO="https")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()["status"], "ready")
+
     @patch("config.health._check_celery_worker", return_value=True)
     @patch("config.health._check_r2", return_value=True)
     @patch("config.health._check_redis", return_value=True)
@@ -21,7 +45,7 @@ class HealthEndpointTests(SimpleTestCase):
         _mock_r2,
         _mock_worker,
     ):
-        response = self.client.get("/ready")
+        response = self.client.get("/ready", HTTP_X_FORWARDED_PROTO="https")
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
@@ -48,7 +72,7 @@ class HealthEndpointTests(SimpleTestCase):
         _mock_r2,
         _mock_worker,
     ):
-        response = self.client.get("/ready")
+        response = self.client.get("/ready", HTTP_X_FORWARDED_PROTO="https")
 
         self.assertEqual(response.status_code, 503)
         self.assertEqual(response.json()["status"], "unavailable")

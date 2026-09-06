@@ -1,7 +1,4 @@
-"""Minimal settings for the server-rendered dashboard foundation.
-
-Business applications, environment configuration, and API views are added in later steps.
-"""
+"""Environment-based Django, API, authentication, storage and worker settings."""
 
 import os
 from pathlib import Path
@@ -29,6 +26,9 @@ CSRF_TRUSTED_ORIGINS = env.list(
 )
 
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+CSRF_COOKIE_SECURE = not DEBUG
+SESSION_COOKIE_SECURE = not DEBUG
+SECURE_SSL_REDIRECT = not DEBUG
 
 INSTALLED_APPS = [
     "django.contrib.auth",
@@ -52,6 +52,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
+    "config.middleware.ContentSecurityPolicyMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -86,7 +87,7 @@ DATABASES = {
 }
 DATABASES["default"]["ENGINE"] = "django.contrib.gis.db.backends.postgis"
 
-# Retained for future direct-connection migration and management command use.
+# Used by config.settings_migrations for direct database connections.
 DIRECT_URL = env("DIRECT_URL")
 ENABLE_DEMO_AUTH = env.bool("ENABLE_DEMO_AUTH", default=False)
 DEMO_AUTH_PRIVATE_KEY = env("DEMO_AUTH_PRIVATE_KEY", default="")
@@ -129,6 +130,36 @@ CELERY_ACCEPT_CONTENT = ["json"]
 CELERY_TASK_SERIALIZER = "json"
 CELERY_RESULT_SERIALIZER = "json"
 CELERY_TIMEZONE = TIME_ZONE
+CELERY_TASK_ACKS_LATE = True
+CELERY_TASK_REJECT_ON_WORKER_LOST = True
+CELERY_WORKER_HIJACK_ROOT_LOGGER = False
+CELERY_BEAT_SCHEDULE = {
+    "reconcile-stale-queued-processing-jobs": {
+        "task": "apps.processing.reconcile_stale_queued_processing_jobs",
+        "schedule": env.int("PROCESSING_DISPATCH_RECONCILE_INTERVAL_SECONDS", default=60),
+    },
+    "reconcile-expired-running-processing-jobs": {
+        "task": "apps.processing.reconcile_expired_running_processing_jobs",
+        "schedule": env.int("PROCESSING_RUNNING_RECONCILE_INTERVAL_SECONDS", default=60),
+    },
+}
+
+PROCESSING_QUEUED_DISPATCH_STALE_AFTER_SECONDS = max(
+    60,
+    env.int("PROCESSING_QUEUED_DISPATCH_STALE_AFTER_SECONDS", default=300),
+)
+PROCESSING_RECONCILE_BATCH_SIZE = max(
+    1,
+    min(env.int("PROCESSING_RECONCILE_BATCH_SIZE", default=25), 100),
+)
+PROCESSING_RUNNING_LEASE_SECONDS = max(
+    300,
+    env.int("PROCESSING_RUNNING_LEASE_SECONDS", default=900),
+)
+PROCESSING_HEARTBEAT_INTERVAL_SECONDS = max(
+    30,
+    min(env.int("PROCESSING_HEARTBEAT_INTERVAL_SECONDS", default=60), PROCESSING_RUNNING_LEASE_SECONDS // 2),
+)
 
 R2_ENDPOINT_URL = env("R2_ENDPOINT_URL")
 R2_ACCESS_KEY_ID = env("R2_ACCESS_KEY_ID")
@@ -142,6 +173,20 @@ MAX_SURVEY_TOTAL_SIZE_BYTES = env.int("MAX_SURVEY_TOTAL_SIZE_BYTES")
 UPLOAD_CHUNK_SIZE_BYTES = env.int("UPLOAD_CHUNK_SIZE_BYTES")
 RATE_LIMIT_UPLOAD = env("RATE_LIMIT_UPLOAD")
 RATE_LIMIT_RETRY = env("RATE_LIMIT_RETRY")
+RATE_LIMIT_LOGIN = env("RATE_LIMIT_LOGIN", default="5/m")
+RATE_LIMIT_GENERAL = env("RATE_LIMIT_GENERAL", default="100/m")
+
+REDIS_CACHE_KEY_PREFIX = env(
+    "REDIS_CACHE_KEY_PREFIX",
+    default="hitech-drone-mapping:cache:",
+)
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.redis.RedisCache",
+        "LOCATION": env("REDIS_URL"),
+        "KEY_PREFIX": REDIS_CACHE_KEY_PREFIX,
+    },
+}
 
 STATIC_URL = "/static/"
 STATICFILES_DIRS = [BASE_DIR / "static"]
@@ -163,9 +208,52 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 REST_FRAMEWORK = {
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+    "DEFAULT_THROTTLE_CLASSES": [
+        "config.throttling.AuthenticatedGeneralRateThrottle",
+    ],
     "DEFAULT_THROTTLE_RATES": {
+        "general": RATE_LIMIT_GENERAL,
+        "login": RATE_LIMIT_LOGIN,
         "upload": RATE_LIMIT_UPLOAD,
         "retry": RATE_LIMIT_RETRY,
+    },
+}
+
+LOG_LEVEL = env("LOG_LEVEL", default="INFO").upper()
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "json": {
+            "()": "config.logging.JsonLogFormatter",
+        },
+    },
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+            "formatter": "json",
+        },
+    },
+    "root": {
+        "handlers": ["console"],
+        "level": LOG_LEVEL,
+    },
+    "loggers": {
+        "django": {
+            "handlers": ["console"],
+            "level": LOG_LEVEL,
+            "propagate": False,
+        },
+        "apps": {
+            "handlers": ["console"],
+            "level": LOG_LEVEL,
+            "propagate": False,
+        },
+        "celery": {
+            "handlers": ["console"],
+            "level": LOG_LEVEL,
+            "propagate": False,
+        },
     },
 }
 

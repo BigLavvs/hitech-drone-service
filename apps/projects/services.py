@@ -1,3 +1,5 @@
+from dataclasses import dataclass
+
 from django.contrib.gis.geos import Point
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.db import transaction
@@ -10,8 +12,27 @@ from apps.projects.models import Project, ProjectMembership, Site
 _UNSET = object()
 
 
+@dataclass(frozen=True)
+class ProjectAccessSnapshot:
+    id: int
+    status: str
+    project_manager_id: int | None
+
+
+@dataclass(frozen=True)
+class ProjectMemberSnapshot:
+    membership_id: int
+    user_id: int
+    email: str
+    role: str
+
+    @property
+    def id(self):
+        return self.user_id
+
+
 def get_projects_visible_to_user(*, user: User):
-    queryset = Project.objects.select_related("project_manager", "created_by").order_by("id")
+    queryset = Project.objects.order_by("id")
 
     if not user.is_active:
         return queryset.none()
@@ -23,14 +44,46 @@ def get_projects_visible_to_user(*, user: User):
         return queryset.filter(project_manager=user)
 
     if user.role in {UserRole.SURVEY_ENGINEER, UserRole.VIEWER}:
-        return queryset.filter(memberships__user=user).distinct()
+        return queryset.filter(memberships__user_id=user.pk).distinct()
 
     return queryset.none()
 
 
+def get_project_ids_visible_to_user(*, user: User):
+    return list(get_projects_visible_to_user(user=user).values_list("id", flat=True))
+
+
+def get_project_access_snapshot(*, project_id: int) -> ProjectAccessSnapshot:
+    try:
+        project = Project.objects.only("id", "status", "project_manager_id").get(pk=project_id)
+    except Project.DoesNotExist:
+        raise
+    return ProjectAccessSnapshot(
+        id=project.pk,
+        status=project.status,
+        project_manager_id=project.project_manager_id,
+    )
+
+
+def user_can_view_project_id(*, user: User, project_id: int) -> bool:
+    try:
+        project = Project.objects.only("id", "status", "project_manager_id").get(pk=project_id)
+    except Project.DoesNotExist:
+        return False
+    return user_can_view_project(user, project)
+
+
+def user_can_manage_project_id(*, user: User, project_id: int) -> bool:
+    try:
+        project = Project.objects.only("id", "project_manager_id").get(pk=project_id)
+    except Project.DoesNotExist:
+        return False
+    return user_can_manage_project(user, project)
+
+
 def get_project_visible_to_user(*, user: User, project_id: int) -> Project:
     project = (
-        Project.objects.select_related("project_manager", "created_by")
+        Project.objects
         .filter(pk=project_id)
         .first()
     )
@@ -45,7 +98,7 @@ def get_project_visible_to_user(*, user: User, project_id: int) -> Project:
 
 def get_project_manageable_by_user(*, user: User, project_id: int) -> Project:
     project = (
-        Project.objects.select_related("project_manager", "created_by")
+        Project.objects
         .filter(pk=project_id)
         .first()
     )
@@ -58,11 +111,57 @@ def get_project_manageable_by_user(*, user: User, project_id: int) -> Project:
     return project
 
 
+def get_project_by_id(*, project_id: int) -> Project:
+    return Project.objects.get(pk=project_id)
+
+
 def get_site_with_project(*, site_id: int) -> Site:
     site = Site.objects.select_related("project").filter(pk=site_id).first()
     if site is None:
         raise Site.DoesNotExist
     return site
+
+
+def get_site_for_project(*, project: Project, site_id: int) -> Site:
+    site = Site.objects.select_related("project").filter(pk=site_id, project=project).first()
+    if site is None:
+        raise Site.DoesNotExist
+    return site
+
+
+def get_project_for_creator_and_name(*, creator: User, name: str) -> Project | None:
+    return (
+        Project.objects
+        .filter(name=name, created_by=creator)
+        .first()
+    )
+
+
+def get_site_for_project_and_name(*, project: Project, name: str) -> Site | None:
+    return Site.objects.filter(project=project, name=name).first()
+
+
+def get_sites_for_project(*, project_id: int):
+    return Site.objects.filter(project_id=project_id).order_by("id")
+
+
+def ensure_project_membership(*, project: Project, user: User, assigned_by: User) -> ProjectMembership:
+    membership, _created = ProjectMembership.objects.get_or_create(
+        project=project,
+        user=user,
+        defaults={"assigned_by": assigned_by},
+    )
+    return membership
+
+
+def user_owns_any_project(*, user: User) -> bool:
+    return Project.objects.filter(project_manager=user).exists()
+
+
+def get_project_member_by_user_id(*, user_id: int) -> User:
+    from apps.access_control.services import get_local_user_by_id
+
+    return get_local_user_by_id(user_id=user_id)
 
 
 def user_can_view_project(user: User, project: Project) -> bool:
@@ -182,6 +281,18 @@ def update_project(
     return project
 
 
+def synchronize_demo_project(*, actor: User, project: Project, project_manager: User) -> Project:
+    """Apply the fixed assessment seed values through the projects owner service."""
+    if not user_can_manage_project(actor, project):
+        raise PermissionDenied("Only active administrators and the owning project manager can update a project.")
+    project.project_manager = project_manager
+    project.status = "active"
+    project.description = "Development-only assessment project for role-based demo access."
+    project.location = "Lagos, Nigeria"
+    project.save(update_fields=["project_manager", "status", "description", "location", "updated_at"])
+    return project
+
+
 def archive_project(*, actor: User, project: Project) -> Project:
     if not user_can_manage_project(actor, project):
         raise PermissionDenied(
@@ -253,23 +364,44 @@ def remove_project_member(*, actor: User, project: Project, member: User) -> Non
 
 def get_project_members(*, actor: User, project: Project):
     _validate_project_membership_actor(actor=actor, project=project)
-    return (
-        ProjectMembership.objects.select_related("user")
-        .filter(project=project)
-        .order_by("user__email", "id")
+    from apps.access_control.services import get_local_user_snapshots_by_ids
+
+    membership_rows = list(
+        ProjectMembership.objects.filter(project_id=project.pk)
+        .order_by("id")
+        .values("id", "user_id")
+    )
+    user_snapshots = get_local_user_snapshots_by_ids(
+        user_ids=[row["user_id"] for row in membership_rows]
+    )
+    return tuple(
+        ProjectMemberSnapshot(
+            membership_id=row["id"],
+            user_id=row["user_id"],
+            email=user_snapshots[row["user_id"]].email,
+            role=user_snapshots[row["user_id"]].role,
+        )
+        for row in sorted(
+            membership_rows,
+            key=lambda row: (user_snapshots[row["user_id"]].email, row["id"]),
+        )
+    )
+
+
+def get_project_member_user_ids(*, project_id: int):
+    return list(
+        ProjectMembership.objects.filter(project_id=project_id).values_list(
+            "user_id", flat=True
+        )
     )
 
 
 def get_available_project_members(*, actor: User, project: Project):
     _validate_project_membership_actor(actor=actor, project=project)
-    return (
-        User.objects.filter(
-            is_active=True,
-            role__in={UserRole.SURVEY_ENGINEER, UserRole.VIEWER},
-        )
-        .exclude(projects_assigned__project=project)
-        .order_by("email", "id")
-    )
+    from apps.access_control.services import get_active_assignable_project_users
+
+    assigned_user_ids = get_project_member_user_ids(project_id=project.pk)
+    return get_active_assignable_project_users(exclude_user_ids=assigned_user_ids)
 
 
 def create_site(

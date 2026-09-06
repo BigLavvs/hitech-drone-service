@@ -9,7 +9,12 @@ from rest_framework.throttling import ScopedRateThrottle
 from apps.access_control.authentication import HitechJWTAuthentication
 from apps.files.serializers import ProcessingJobDetailSerializer
 from apps.processing.models import ProcessingJob
-from apps.processing.services import get_processing_job_visible_to_user, manual_retry_processing_job
+from apps.processing.services import (
+    get_processing_job_for_response,
+    get_processing_job_visible_to_user,
+    manual_retry_processing_job,
+)
+from config.throttling import AuthenticatedGeneralRateThrottle
 
 
 class RetryScopedRateThrottle(ScopedRateThrottle):
@@ -25,13 +30,15 @@ class ProcessingJobDetailAPIView(generics.GenericAPIView):
     serializer_class = ProcessingJobDetailSerializer
 
     def get(self, request, processing_job_id, *args, **kwargs):
-        job = _get_visible_job_or_404(user=request.user, processing_job_id=processing_job_id)
-        return Response(ProcessingJobDetailSerializer(job).data)
+        _get_visible_job_or_404(user=request.user, processing_job_id=processing_job_id)
+        response_snapshot = get_processing_job_for_response(processing_job_id=processing_job_id)
+        return Response(ProcessingJobDetailSerializer(response_snapshot).data)
 
 
 class ProcessingJobRetryAPIView(generics.GenericAPIView):
     authentication_classes = [HitechJWTAuthentication]
     permission_classes = [permissions.IsAuthenticated]
+    throttle_classes = [AuthenticatedGeneralRateThrottle]
     throttle_scope = "retry"
     serializer_class = ProcessingJobDetailSerializer
 
@@ -46,13 +53,16 @@ class ProcessingJobRetryAPIView(generics.GenericAPIView):
         except DjangoValidationError as exc:
             raise _to_drf_validation_error(exc) from exc
 
-        job = ProcessingJob.objects.select_related("file", "file__processing_job").get(pk=job.pk)
-        return Response(ProcessingJobDetailSerializer(job).data, status=status.HTTP_202_ACCEPTED)
+        response_snapshot = get_processing_job_for_response(processing_job_id=job.pk)
+        return Response(
+            ProcessingJobDetailSerializer(response_snapshot).data,
+            status=status.HTTP_202_ACCEPTED,
+        )
 
     def get_throttles(self):
         if self.request.method == "POST":
-            return [RetryScopedRateThrottle()]
-        return []
+            return [self.throttle_classes[0](), RetryScopedRateThrottle()]
+        return super().get_throttles()
 
 
 def _get_visible_job_or_404(*, user, processing_job_id: int):

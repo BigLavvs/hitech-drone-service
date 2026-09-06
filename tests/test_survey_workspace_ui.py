@@ -57,7 +57,18 @@ class SurveyWorkspaceTemplateTests(SimpleTestCase):
 )
 class SurveyWorkspaceJavaScriptTests(SimpleTestCase):
     def test_survey_workspace_contains_client_side_upload_filtering_hooks(self):
-        script = Path("static/js/survey-workspace.js").read_text(encoding="utf-8")
+        survey_workspace_paths = [
+            Path("static/js/survey-workspace.js"),
+            Path("static/js/survey-workspace/dependencies.js"),
+            Path("static/js/survey-workspace/controller.js"),
+            Path("static/js/survey-workspace/data.js"),
+            Path("static/js/survey-workspace/rendering.js"),
+            Path("static/js/survey-workspace/measurements.js"),
+            Path("static/js/survey-workspace/uploads.js"),
+            Path("static/js/survey-workspace/actions.js"),
+            Path("static/js/survey-workspace/utilities.js"),
+        ]
+        script = "\n".join(path.read_text(encoding="utf-8") for path in survey_workspace_paths)
         helper = Path("static/js/modules/gltf-bundle.js").read_text(encoding="utf-8")
 
         self.assertIn(

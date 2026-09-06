@@ -6,7 +6,7 @@ from django.contrib.gis.geos import Point
 from rest_framework import serializers
 
 from apps.access_control.models import User
-from apps.projects.models import Project, ProjectMembership, Site
+from apps.projects.models import Project, Site
 
 
 class ProjectReadSerializer(serializers.ModelSerializer):
@@ -37,12 +37,7 @@ class ProjectWriteSerializer(serializers.Serializer):
         allow_null=True,
         required=False,
     )
-    project_manager_id = serializers.PrimaryKeyRelatedField(
-        source="project_manager",
-        queryset=User.objects.all(),
-        required=False,
-        allow_null=True,
-    )
+    project_manager_id = serializers.IntegerField(required=False, allow_null=True)
 
     def validate_name(self, value):
         if not value.strip():
@@ -55,27 +50,33 @@ class ProjectWriteSerializer(serializers.Serializer):
             data=data,
             allowed_fields={"name", "description", "location", "project_manager_id"},
         )
-        return super().to_internal_value(data)
+        values = super().to_internal_value(data)
+        if "project_manager_id" in values and values["project_manager_id"] is None:
+            values["project_manager"] = values.pop("project_manager_id")
+        elif values.get("project_manager_id") is not None:
+            from apps.access_control.services import get_local_user_by_id
+
+            try:
+                values["project_manager"] = get_local_user_by_id(user_id=values.pop("project_manager_id"))
+            except User.DoesNotExist as exc:
+                raise serializers.ValidationError({"project_manager_id": ["Invalid pk."]}) from exc
+        return values
 
 
-class ProjectMemberReadSerializer(serializers.ModelSerializer):
-    id = serializers.IntegerField(source="user_id")
-    email = serializers.EmailField(source="user.email")
-    role = serializers.CharField(source="user.role")
-
-    class Meta:
-        model = ProjectMembership
-        fields = ("id", "email", "role")
+class ProjectMemberReadSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    email = serializers.EmailField()
+    role = serializers.CharField()
 
 
-class ProjectMemberCandidateSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = ("id", "email", "role")
+class ProjectMemberCandidateSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    email = serializers.EmailField()
+    role = serializers.CharField()
 
 
 class ProjectMemberCreateSerializer(serializers.Serializer):
-    user_id = serializers.PrimaryKeyRelatedField(source="user", queryset=User.objects.all())
+    user_id = serializers.IntegerField()
 
     def to_internal_value(self, data):
         _reject_unknown_fields(
@@ -83,7 +84,14 @@ class ProjectMemberCreateSerializer(serializers.Serializer):
             data=data,
             allowed_fields={"user_id"},
         )
-        return super().to_internal_value(data)
+        values = super().to_internal_value(data)
+        from apps.access_control.services import get_local_user_by_id
+
+        try:
+            values["user"] = get_local_user_by_id(user_id=values.pop("user_id"))
+        except User.DoesNotExist as exc:
+            raise serializers.ValidationError({"user_id": ["Invalid pk."]}) from exc
+        return values
 
 
 @extend_schema_field(

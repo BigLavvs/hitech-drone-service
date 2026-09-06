@@ -12,6 +12,7 @@ from rest_framework.exceptions import AuthenticationFailed, PermissionDenied
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.response import Response
 from rest_framework.serializers import ValidationError as DRFValidationError
+from rest_framework.throttling import ScopedRateThrottle
 from rest_framework.views import APIView
 
 from apps.access_control.authentication import HitechJWTAuthentication
@@ -33,6 +34,18 @@ from apps.access_control.services import (
     get_seeded_demo_user,
     update_local_user,
 )
+
+
+class LoginScopedRateThrottle(ScopedRateThrottle):
+    scope = "login"
+
+    def allow_request(self, request, view):
+        if not settings.ENABLE_DEMO_AUTH:
+            return True
+        return super().allow_request(request, view)
+
+    def get_rate(self):
+        return settings.RATE_LIMIT_LOGIN
 
 
 class AuthValidateView(APIView):
@@ -62,6 +75,8 @@ class AuthValidateView(APIView):
 class DemoSessionCreateView(APIView):
     authentication_classes: list[type[BaseAuthentication]] = []
     permission_classes = [permissions.AllowAny]
+    throttle_classes = [LoginScopedRateThrottle]
+    throttle_scope = "login"
 
     @extend_schema(
         summary="Create an assessment-only demo session",
@@ -73,11 +88,11 @@ class DemoSessionCreateView(APIView):
         },
     )
     def post(self, request):
-        if not getattr(request, "_dont_enforce_csrf_checks", False):
-            _enforce_request_csrf(request)
-
         if not settings.ENABLE_DEMO_AUTH:
             raise Http404
+
+        if not getattr(request, "_dont_enforce_csrf_checks", False):
+            _enforce_request_csrf(request)
 
         serializer = DemoSessionCreateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)

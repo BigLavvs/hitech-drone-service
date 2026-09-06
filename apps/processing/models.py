@@ -17,6 +17,13 @@ class ProcessingJob(models.Model):
     completed_at = models.DateTimeField(blank=True, null=True)
     error_message = models.TextField(blank=True, null=True)
     celery_task_id = models.CharField(max_length=255, blank=True, null=True)
+    dispatch_status = models.CharField(max_length=50, default="pending")
+    dispatch_last_attempt_at = models.DateTimeField(blank=True, null=True)
+    dispatch_available_at = models.DateTimeField(blank=True, null=True)
+    dispatch_failure_count = models.IntegerField(default=0)
+    lease_token = models.CharField(max_length=255, blank=True, null=True)
+    lease_expires_at = models.DateTimeField(blank=True, null=True)
+    last_heartbeat_at = models.DateTimeField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -26,6 +33,9 @@ class ProcessingJob(models.Model):
             models.Index(fields=["file"]),
             models.Index(fields=["status"]),
             models.Index(fields=["celery_task_id"]),
+            models.Index(fields=["dispatch_status"]),
+            models.Index(fields=["dispatch_available_at"]),
+            models.Index(fields=["lease_expires_at"]),
         ]
 
     def __str__(self) -> str:

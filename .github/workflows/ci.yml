@@ -1,0 +1,102 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    services:
+      postgres:
+        image: postgis/postgis:16-3.5
+        env:
+          POSTGRES_USER: hitech_ci
+          POSTGRES_PASSWORD: disposable-ci-password
+          POSTGRES_DB: hitech_ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U hitech_ci -d hitech_ci"
+          --health-interval 10s --health-timeout 5s --health-retries 5
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s --health-timeout 5s --health-retries 5
+    # Synthetic values only. Never inject deployment secrets into this job.
+    env:
+      DJANGO_SETTINGS_MODULE: config.settings_test
+      DJANGO_SECRET_KEY: ci-only-not-for-deployment-0123456789abcdefghijklmnopqrstuvwxyz
+      DEBUG: "True"
+      ALLOWED_HOSTS: localhost,127.0.0.1,testserver
+      DATABASE_URL: postgresql://hitech_ci:disposable-ci-password@127.0.0.1:5432/hitech_ci
+      DIRECT_URL: postgresql://hitech_ci:disposable-ci-password@127.0.0.1:5432/hitech_ci
+      ENABLE_DEMO_AUTH: "False"
+      HITECH_AUTH_JWT_PUBLIC_KEY: ""
+      DEMO_AUTH_PRIVATE_KEY: ""
+      R2_ENDPOINT_URL: https://storage.example.invalid
+      R2_ACCESS_KEY_ID: ci-only
+      R2_SECRET_ACCESS_KEY: ci-only
+      R2_BUCKET_NAME: ci-only
+      REDIS_URL: redis://127.0.0.1:6379/0
+      CELERY_BROKER_URL: redis://127.0.0.1:6379/1
+      CELERY_RESULT_BACKEND: redis://127.0.0.1:6379/2
+      MAX_FILE_SIZE_BYTES: "10737418240"
+      MAX_SURVEY_TOTAL_SIZE_BYTES: "53687091200"
+      UPLOAD_CHUNK_SIZE_BYTES: "8388608"
+      RATE_LIMIT_UPLOAD: 10/m
+      RATE_LIMIT_RETRY: 5/m
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.12"
+          cache: pip
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: "22"
+      - name: Install geospatial system libraries
+        run: sudo apt-get update && sudo apt-get install -y gdal-bin libgdal-dev libproj-dev
+      - name: Install Python dependencies
+        run: python -m pip install -r requirements.txt
+      - name: Check dependency compatibility
+        run: python -m pip check
+      - name: Check disposable Redis service
+        run: python -c "from redis import Redis; assert Redis.from_url('redis://127.0.0.1:6379/0', socket_connect_timeout=3).ping()"
+      - name: Check application configuration
+        run: python manage.py check --settings=config.settings_test
+      - name: Check migration consistency
+        run: python manage.py makemigrations --check --dry-run --settings=config.settings_test
+      - name: Collect static files
+        run: python manage.py collectstatic --noinput --settings=config.settings_test
+      - name: Run Django suite against disposable PostGIS
+        run: python manage.py test --noinput --verbosity 2 --settings=config.settings_test
+      - name: Check GLTF folder-selection helper
+        run: node tests/verify_gltf_folder_flow.mjs
+      - name: Check first-party JavaScript syntax
+        run: find static/js -name '*.js' -print0 | xargs -0 -n1 node --check
+
+  container-build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - name: Build application image without deployment credentials
+        run: docker build --tag hitech-drone-mapping:ci .

@@ -134,11 +134,13 @@ The assessment documents and approved architecture remain the source of truth. R
 
 ### 2026-08-09 — Processing retry semantics
 
-**Decision:** A processing job has one initial attempt and up to three automatic retries, for a maximum of four total attempts. `retry_count` counts retries only, beginning at zero. Automatic retry delays are 5, 15, and 45 minutes.
+**Historical entry:** This entry established the initial-attempt-plus-three-automatic-retry model. It is retained for provenance only. The active schedule, recovery rules, and manual-retry policy are recorded in the later processing recovery decision below and do not come from this historical entry.
 
-**Reason:** The approved implementation document explicitly specifies three retries and all three backoff delays. Treating those as only three total attempts would discard the documented 45-minute retry.
+**Superseded:** The original delay and manual-retry wording is no longer operational. The current implementation uses the later documented assessment policy.
 
-**Impact:** A job becomes permanently failed only after the initial attempt and all three retries fail. Manual retry is allowed only for a permanently failed job whose retry count remains below the configured limit, as required by the later retry workflow.
+**Reason:** The four-attempt cycle remains part of the approved model, while the assessment-time schedule and explicit new-cycle manual recovery policy were decided later.
+
+**Impact:** A job becomes permanently failed only after the initial attempt and all three retries fail. See the later processing recovery decision for current manual-retry authorization and cycle behavior.
 
 ### 2026-08-09 — Project membership management
 
@@ -168,9 +170,9 @@ The assessment documents and approved architecture remain the source of truth. R
 
 ### 2026-08-09 — Database connection used by automated tests
 
-**Decision:** Automated database tests use a separate, explicit `config.settings_test` settings module, backed by `DATABASE_URL_TEST` and `DIRECT_URL_TEST`. They must never use the development runtime database configuration.
+**Decision:** Automated database tests use a separate, explicit `config.settings_test` settings module. This entry is superseded by the 2026-09-04 test database clarification below for the exact environment variable names.
 
-**Reason:** The approved documentation requires a separate PostGIS test database. Mirroring the explicit migration-settings approach prevents accidental testing against the development database.
+**Reason:** The approved documentation requires tests to run with Django's isolated test database semantics while preserving the PostGIS backend.
 
 **Impact:** Database tests must be run with the test settings module. The test database configuration must preserve Django's PostGIS backend.
 
@@ -345,3 +347,23 @@ The assessment documents and approved architecture remain the source of truth. R
 **Reason:** The project owner approved this temporary assessment-time deviation to provide faster feedback and recovery during a time-constrained assessment demonstration.
 
 **Impact:** Only the automatic retry wait schedule changes. Existing retry counts, permanent-failure threshold, audit events, Celery retry flow, manual retry permissions, UI/API contracts, and processing, storage, and authorization behaviour remain unchanged.
+
+### 2026-09-04 - Processing dispatch, lease recovery, and manual retry cycles
+
+**Decision:** Processing job state remains reconstructible from PostgreSQL. A queued job that was committed but not successfully dispatched is recovered by a bounded Celery beat reconciliation task after a conservative stale-queued threshold. Running jobs use explicit database lease and heartbeat fields; only the scheduled recovery task may requeue an expired running lease. Duplicate Celery deliveries still check the existing `ProcessingJob` row and do not process completed work or concurrently process an actively leased running job.
+
+**Manual recovery policy:** `retry_count` counts automatic retries in the current processing cycle. When an authorised Survey Engineer assigned to the project or an Administrator manually retries a permanently failed job, the manual action starts a new automatic retry cycle by resetting `retry_count` to zero. The audit trail records `automatic: false`, the previous counter, and that a new automatic cycle started. Repeated manual recovery is permitted only as another explicit operator action through the existing authorised, rate-limited endpoint.
+
+**Impact:** The 2, 5, and 10 minute assessment retry schedule remains unchanged. Dispatch reconciliation, running lease recovery, automatic retry, manual retry, and permanent failure are distinguishable in immutable audit records. API responses expose only safe processing state such as `dispatch_status`; raw Redis, R2, database, and provider errors remain internal.
+
+### 2026-09-04 - Nonce-based Content Security Policy
+
+**Decision:** The Django application emits a per-response nonce-based Content Security Policy. The existing inline import map in `templates/base.html` receives that nonce. `script-src` does not use `unsafe-inline`.
+
+**Impact:** The policy permits same-origin application assets and API calls, the pinned jsDelivr Three.js and Leaflet resources already used by the application, and the configured R2 delivery hosts for existing signed map/model/file delivery. It must not be broadened to arbitrary hosts or blanket `https:` sources.
+
+### 2026-09-04 - Test database environment variable clarification
+
+**Decision:** `config.settings_test` uses the normal `DATABASE_URL` and `DIRECT_URL` environment variables. Django must still create and use its isolated test database according to normal Django test-runner semantics.
+
+**Impact:** Do not reintroduce `DATABASE_URL_TEST` or `DIRECT_URL_TEST`. Test commands continue to use `--settings=config.settings_test`, and the configured PostGIS backend remains mandatory.

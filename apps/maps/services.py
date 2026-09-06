@@ -12,11 +12,12 @@ from apps.audit.models import AuditAction
 from apps.audit.services import record_audit_event
 from apps.files.models import FileFormat, FileType, SurveyFile
 from apps.files.object_keys import build_map_tile_key, build_map_tile_metadata_key
-from apps.files.services import DOWNLOAD_URL_EXPIRY_SECONDS
+from apps.files.services import DOWNLOAD_URL_EXPIRY_SECONDS, get_ready_survey_file, get_ready_survey_files
 from apps.files.storage import PrivateR2StorageAdapter
 from apps.maps.models import Measurement, MeasurementType
-from apps.projects.services import user_can_view_project
+from apps.projects.services import user_can_view_project_id
 from apps.surveys.models import Survey
+from apps.surveys.services import get_survey_visible_to_user, get_survey_with_project
 
 
 MAP_SOURCE_FORMATS = {
@@ -37,14 +38,19 @@ class MapTileRedirectResult:
 
 def get_measurements_visible_to_user(*, actor: User, survey_id: int):
     survey = _get_visible_survey(actor=actor, survey_id=survey_id)
-    return survey.measurements.select_related("created_by").order_by("-created_at", "-id")
+    return Measurement.objects.filter(
+        survey_id=survey.pk
+    ).order_by("-created_at", "-id")
+
+
+def measurement_exists_for_survey(*, survey, name: str) -> bool:
+    return Measurement.objects.filter(survey_id=survey.pk, name=name).exists()
 
 
 def get_measurement_visible_to_user(*, actor: User, survey_id: int, measurement_id: int) -> Measurement:
     survey = _get_visible_survey(actor=actor, survey_id=survey_id)
     measurement = (
-        Measurement.objects.select_related("survey", "survey__project", "created_by")
-        .filter(pk=measurement_id, survey=survey)
+        Measurement.objects.filter(pk=measurement_id, survey_id=survey.pk)
         .first()
     )
     if measurement is None:
@@ -86,8 +92,8 @@ def create_measurement(
             entity_type="measurement",
             entity_id=measurement.pk,
             user=actor,
-            project=survey.project,
-            survey=survey,
+            project_id=survey.project_id,
+            survey_id=survey.pk,
         )
 
     return measurement
@@ -96,9 +102,7 @@ def create_measurement(
 def delete_measurement(*, actor: User, survey_id: int, measurement_id: int) -> None:
     survey = _get_survey_for_measurement_deletion(actor=actor, survey_id=survey_id)
     measurement = (
-        Measurement.objects.select_related("survey", "survey__project")
-        .filter(pk=measurement_id, survey=survey)
-        .first()
+        Measurement.objects.filter(pk=measurement_id, survey_id=survey.pk).first()
     )
     if measurement is None:
         raise Measurement.DoesNotExist
@@ -111,8 +115,8 @@ def delete_measurement(*, actor: User, survey_id: int, measurement_id: int) -> N
             entity_type="measurement",
             entity_id=entity_id,
             user=actor,
-            project=survey.project,
-            survey=survey,
+            project_id=survey.project_id,
+            survey_id=survey.pk,
         )
 
 
@@ -121,20 +125,14 @@ def get_survey_map_layers_for_user(*, actor, survey_id: int, storage=None):
 
     storage = storage or PrivateR2StorageAdapter()
     descriptors = []
-    for survey_file in (
-        SurveyFile.objects.filter(
-            survey=survey,
-            file_type=FileType.TWO_D,
-            status="ready",
-        )
-        .order_by("id")
-    ):
+    for survey_file in get_ready_survey_files(survey_id=survey.pk, file_type=FileType.TWO_D):
         if survey_file.format in RASTER_TILE_FORMATS:
             metadata = _load_private_json(
                 storage=storage,
                 storage_key=build_map_tile_metadata_key(
                     survey_id=survey_file.survey_id,
                     file_id=survey_file.pk,
+                    published_path=survey_file.preview_path or survey_file.converted_path,
                 ),
             )
             descriptors.append(
@@ -165,19 +163,15 @@ def get_survey_map_layers_for_user(*, actor, survey_id: int, storage=None):
 
 
 def get_map_tile_redirect_for_user(*, actor, file_id: int, z: int, x: int, y: int, storage=None):
-    survey_file = (
-        SurveyFile.objects.select_related("survey", "survey__project")
-        .filter(
-            pk=file_id,
-            file_type=FileType.TWO_D,
-            status="ready",
-            format__in=RASTER_TILE_FORMATS,
-        )
-        .first()
+    survey_file = get_ready_survey_file(
+        file_id=file_id,
+        file_type=FileType.TWO_D,
+        file_formats=RASTER_TILE_FORMATS,
     )
-    if survey_file is None:
-        raise SurveyFile.DoesNotExist
-    if not user_can_view_project(actor, survey_file.survey.project):
+    from apps.surveys.services import get_survey_workflow_snapshot
+
+    workflow = get_survey_workflow_snapshot(survey_id=survey_file.survey_id)
+    if not user_can_view_project_id(user=actor, project_id=workflow.project_id):
         raise PermissionDenied("You do not have permission to access this survey.")
 
     storage = storage or PrivateR2StorageAdapter()
@@ -186,6 +180,7 @@ def get_map_tile_redirect_for_user(*, actor, file_id: int, z: int, x: int, y: in
         storage_key=build_map_tile_metadata_key(
             survey_id=survey_file.survey_id,
             file_id=survey_file.pk,
+            published_path=survey_file.preview_path or survey_file.converted_path,
         ),
     )
     _validate_tile_request(metadata=metadata, z=z, x=x, y=y)
@@ -197,6 +192,7 @@ def get_map_tile_redirect_for_user(*, actor, file_id: int, z: int, x: int, y: in
             z=z,
             x=x,
             y=y,
+            published_path=survey_file.preview_path or survey_file.converted_path,
         ),
         expires_in=DOWNLOAD_URL_EXPIRY_SECONDS,
     )
@@ -229,18 +225,14 @@ def _validate_tile_request(*, metadata: dict, z: int, x: int, y: int):
 
 
 def _get_visible_survey(*, actor: User, survey_id: int) -> Survey:
-    survey = Survey.objects.select_related("project").filter(pk=survey_id).first()
-    if survey is None:
-        raise Survey.DoesNotExist
-    if not user_can_view_project(actor, survey.project):
-        raise PermissionDenied("You do not have permission to access this survey.")
-    return survey
+    return get_survey_visible_to_user(user=actor, survey_id=survey_id)
 
 
 def _get_survey_for_measurement_deletion(*, actor: User, survey_id: int) -> Survey:
-    survey = Survey.objects.select_related("project").filter(pk=survey_id).first()
-    if survey is None:
-        raise Survey.DoesNotExist
+    survey = get_survey_with_project(survey_id=survey_id)
+    from apps.surveys.services import get_survey_workflow_snapshot
+
+    workflow = get_survey_workflow_snapshot(survey_id=survey_id)
 
     if not actor.is_active:
         raise PermissionDenied(
@@ -250,7 +242,7 @@ def _get_survey_for_measurement_deletion(*, actor: User, survey_id: int) -> Surv
     if actor.role == UserRole.ADMINISTRATOR:
         return survey
 
-    if actor.role == UserRole.PROJECT_MANAGER and survey.project.project_manager_id == actor.pk:
+    if actor.role == UserRole.PROJECT_MANAGER and workflow.project_manager_id == actor.pk:
         return survey
 
     raise PermissionDenied(

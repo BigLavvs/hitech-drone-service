@@ -7,7 +7,7 @@
   <meta name="color-scheme" content="light">
   <title>{% block title %}{{ page_title|default:"Hitech Drone Mapping" }}{% endblock %}</title>
   <link rel="stylesheet" href="{% static 'css/app.css' %}">
-  <script type="importmap">
+  <script type="importmap" nonce="{{ request.csp_nonce }}">
     {
       "imports": {
         "three": "https://cdn.jsdelivr.net/npm/three@0.167.1/build/three.module.js",

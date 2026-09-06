@@ -7,6 +7,7 @@ from django.core.exceptions import PermissionDenied, ValidationError
 from django.db import transaction
 from django.db.models import Sum
 from django.db.models.functions import Coalesce
+from django.utils import timezone
 
 from apps.access_control.models import User, UserRole
 from apps.audit.models import AuditAction
@@ -22,13 +23,8 @@ from apps.files.validation import (
     validate_obj_asset_upload,
     validate_upload,
 )
-from apps.processing.services import (
-    create_queued_processing_job,
-    register_processing_dispatch_on_commit,
-)
-from apps.projects.models import ProjectMembership
-from apps.projects.services import user_can_view_project
 from apps.surveys.models import Survey, SurveyStatus
+from apps.surveys.services import get_survey_visible_to_user
 
 ALLOWED_UPLOAD_SURVEY_STATUSES = {
     SurveyStatus.DRAFT,
@@ -39,6 +35,7 @@ ALLOWED_UPLOAD_SURVEY_STATUSES = {
 }
 
 DOWNLOAD_URL_EXPIRY_SECONDS = 300
+_UNSET = object()
 logger = logging.getLogger(__name__)
 
 
@@ -61,6 +58,74 @@ class SurveyFileDownloadResult:
     download_url: str
 
 
+@dataclass(frozen=True)
+class SurveyFileReadiness:
+    file_count: int
+    all_files_ready: bool
+
+
+@dataclass(frozen=True)
+class ProcessingFileAssetSnapshot:
+    original_filename: str
+    stored_filename: str
+    sha256_checksum: str
+    storage_path: str
+    mime_type: str
+
+
+@dataclass(frozen=True)
+class ProcessingFileSnapshot:
+    id: int
+    survey_id: int
+    original_filename: str
+    stored_filename: str
+    file_type: str
+    format: str
+    mime_type: str
+    sha256_checksum: str
+    size_bytes: int
+    status: str
+    created_at: object
+    updated_at: object
+    storage_path: str
+    preview_path: str | None
+    converted_path: str | None
+    assets: tuple[ProcessingFileAssetSnapshot, ...]
+
+    @property
+    def pk(self):
+        return self.id
+
+
+@dataclass(frozen=True)
+class ReadySurveyFileSnapshot:
+    id: int
+    survey_id: int
+    original_filename: str
+    format: str
+    storage_path: str
+    converted_path: str | None
+    preview_path: str | None
+
+    @property
+    def pk(self):
+        return self.id
+
+
+@dataclass(frozen=True)
+class SurveyFileListSnapshot:
+    id: int
+    original_filename: str
+    file_type: str
+    format: str
+    mime_type: str
+    size_bytes: int
+    status: str
+    created_at: object
+    updated_at: object
+    processing_job: object | None
+
+
 def admit_uploaded_file(
     *,
     actor: User,
@@ -70,8 +135,12 @@ def admit_uploaded_file(
     declared_mime_type=None,
     storage=None,
 ):
-    _validate_upload_actor(actor=actor, survey=survey)
-    _validate_survey_accepts_uploads(survey=survey)
+    from apps.surveys.services import get_survey_workflow_snapshot
+    from apps.processing.services import create_queued_processing_job, register_processing_dispatch_on_commit
+
+    workflow = get_survey_workflow_snapshot(survey_id=survey.pk)
+    _validate_upload_actor(actor=actor, survey=workflow)
+    _validate_survey_accepts_uploads(survey=workflow)
     asset_files = list(asset_files or [])
 
     validated_upload = validate_upload(uploaded_file, declared_mime_type)
@@ -84,7 +153,7 @@ def admit_uploaded_file(
         asset.size_bytes for asset in validated_assets
     )
     _validate_survey_total_size_limit(
-        survey=survey,
+        survey_id=survey.pk,
         incoming_size_bytes=total_incoming_size_bytes,
     )
 
@@ -116,34 +185,34 @@ def admit_uploaded_file(
             )
 
         with transaction.atomic():
-            locked_survey = (
-                Survey.objects.select_for_update()
-                .select_related("project")
-                .get(pk=survey.pk)
-            )
+            from apps.surveys.services import lock_survey_for_workflow
+
+            locked_survey = lock_survey_for_workflow(survey_id=survey.pk)
             _validate_survey_accepts_uploads(survey=locked_survey)
             _validate_survey_total_size_limit(
-                survey=locked_survey,
+                survey_id=locked_survey.id,
                 incoming_size_bytes=total_incoming_size_bytes,
             )
 
             duplicate_file = (
-                SurveyFile.objects.select_related("survey", "survey__project")
+                SurveyFile.objects
                 .filter(
-                    survey=locked_survey,
+                    survey_id=locked_survey.id,
                     sha256_checksum=staged_upload.sha256_checksum,
                 )
                 .first()
             )
             if duplicate_file is not None:
+                from apps.processing.services import get_processing_job_for_file
+
                 duplicate_result = UploadAdmissionResult(
                     survey_file=duplicate_file,
-                    processing_job=duplicate_file.processing_job,
+                    processing_job=get_processing_job_for_file(file_id=duplicate_file.pk),
                     created=False,
                 )
             else:
                 survey_file = SurveyFile.objects.create(
-                    survey=locked_survey,
+                    survey_id=locked_survey.id,
                     original_filename=validated_upload.original_filename,
                     stored_filename=validated_upload.sanitized_filename,
                     file_type=validated_upload.file_type,
@@ -195,8 +264,8 @@ def admit_uploaded_file(
                     entity_type="survey_file",
                     entity_id=survey_file.pk,
                     user=actor,
-                    project=locked_survey.project,
-                    survey=locked_survey,
+                    project_id=locked_survey.project_id,
+                    survey_id=locked_survey.id,
                     details={
                         "filename": survey_file.original_filename,
                         "size_bytes": survey_file.size_bytes,
@@ -204,9 +273,13 @@ def admit_uploaded_file(
                     },
                 )
 
-                locked_survey.status = SurveyStatus.UPLOADING
-                locked_survey.processing_status = "queued"
-                locked_survey.save(update_fields=["status", "processing_status", "updated_at"])
+                from apps.surveys.services import update_survey_processing_state
+
+                update_survey_processing_state(
+                    survey_id=locked_survey.id,
+                    status=SurveyStatus.UPLOADING,
+                    processing_status="queued",
+                )
 
                 register_processing_dispatch_on_commit(processing_job_id=processing_job.pk)
 
@@ -232,17 +305,24 @@ def admit_uploaded_file(
 
 
 def get_survey_files_visible_to_user(*, actor: User, survey_id: int):
-    survey = (
-        Survey.objects.select_related("project")
-        .prefetch_related("files__processing_job")
-        .filter(pk=survey_id)
-        .first()
-    )
-    if survey is None:
-        raise Survey.DoesNotExist
-    if not user_can_view_project(actor, survey.project):
+    from apps.projects.services import user_can_view_project_id
+    from apps.processing.services import get_processing_job_summaries_for_file_ids
+    from apps.surveys.services import get_survey_workflow_snapshot
+
+    workflow = get_survey_workflow_snapshot(survey_id=survey_id)
+    if not user_can_view_project_id(user=actor, project_id=workflow.project_id):
         raise PermissionDenied("You do not have permission to access this survey.")
-    return survey.files.select_related("processing_job").order_by("id")
+    rows = list(
+        SurveyFile.objects.filter(survey_id=survey_id).order_by("id").values(
+            "id", "original_filename", "file_type", "format", "mime_type", "size_bytes",
+            "status", "created_at", "updated_at",
+        )
+    )
+    summaries = get_processing_job_summaries_for_file_ids(file_ids=[row["id"] for row in rows])
+    return tuple(
+        SurveyFileListSnapshot(**row, processing_job=summaries.get(row["id"]))
+        for row in rows
+    )
 
 
 def get_survey_file_download_for_user(
@@ -252,20 +332,16 @@ def get_survey_file_download_for_user(
     file_id: int,
     storage=None,
 ):
-    survey = (
-        Survey.objects.select_related("project")
-        .filter(pk=survey_id)
-        .first()
-    )
-    if survey is None:
-        raise Survey.DoesNotExist
+    from apps.projects.services import user_can_view_project_id
+    from apps.surveys.services import get_survey_workflow_snapshot
 
-    if not user_can_view_project(actor, survey.project):
+    survey = get_survey_workflow_snapshot(survey_id=survey_id)
+    if not user_can_view_project_id(user=actor, project_id=survey.project_id):
         raise PermissionDenied("You do not have permission to access this survey.")
 
     survey_file = (
-        SurveyFile.objects.select_related("survey", "survey__project")
-        .filter(pk=file_id, survey=survey)
+        SurveyFile.objects
+        .filter(pk=file_id, survey_id=survey_id)
         .first()
     )
     if survey_file is None:
@@ -282,13 +358,13 @@ def get_survey_file_download_for_user(
     dispatch_file_download_audit_event(
         user_id=actor.pk,
         project_id=survey.project_id,
-        survey_id=survey.pk,
+        survey_id=survey_id,
         survey_file_id=survey_file.pk,
     )
     return SurveyFileDownloadResult(survey_file=survey_file, download_url=download_url)
 
 
-def _validate_upload_actor(*, actor: User, survey: Survey):
+def _validate_upload_actor(*, actor: User, survey):
     if not actor.is_active:
         raise PermissionDenied(
             "Only active administrators, the owning project manager, and assigned survey engineers can upload survey files."
@@ -297,13 +373,15 @@ def _validate_upload_actor(*, actor: User, survey: Survey):
     if actor.role == UserRole.ADMINISTRATOR:
         return
 
-    if actor.role == UserRole.PROJECT_MANAGER and survey.project.project_manager_id == actor.pk:
+    if actor.role == UserRole.PROJECT_MANAGER and survey.project_manager_id == actor.pk:
         return
 
-    if actor.role == UserRole.SURVEY_ENGINEER and ProjectMembership.objects.filter(
-        project=survey.project,
+    from apps.projects.services import user_can_view_project_id
+
+    if actor.role == UserRole.SURVEY_ENGINEER and user_can_view_project_id(
         user=actor,
-    ).exists():
+        project_id=survey.project_id,
+    ):
         return
 
     raise PermissionDenied(
@@ -311,23 +389,24 @@ def _validate_upload_actor(*, actor: User, survey: Survey):
     )
 
 
-def _validate_survey_accepts_uploads(*, survey: Survey):
-    if survey.project.status != "active":
+def _validate_survey_accepts_uploads(*, survey):
+    if survey.project_status != "active":
         raise ValidationError("Uploads are not allowed for archived projects.")
 
     if survey.status not in ALLOWED_UPLOAD_SURVEY_STATUSES:
         raise ValidationError("Uploads are not allowed for surveys in the current state.")
 
 
-def _validate_survey_total_size_limit(*, survey: Survey, incoming_size_bytes: int):
+def _validate_survey_total_size_limit(*, survey_id: int | None = None, survey: Survey | None = None, incoming_size_bytes: int):
+    survey_id = survey_id or survey.pk
     current_file_total_size = (
-        SurveyFile.objects.filter(survey=survey).aggregate(
+        SurveyFile.objects.filter(survey_id=survey_id).aggregate(
             total_size=Coalesce(Sum("size_bytes"), 0)
         )["total_size"]
         or 0
     )
     current_asset_total_size = (
-        SurveyFileAsset.objects.filter(survey_file__survey=survey).aggregate(
+        SurveyFileAsset.objects.filter(survey_file__survey_id=survey_id).aggregate(
             total_size=Coalesce(Sum("size_bytes"), 0)
         )["total_size"]
         or 0
@@ -335,6 +414,109 @@ def _validate_survey_total_size_limit(*, survey: Survey, incoming_size_bytes: in
     current_total_size = current_file_total_size + current_asset_total_size
     if current_total_size + incoming_size_bytes > settings.MAX_SURVEY_TOTAL_SIZE_BYTES:
         raise ValidationError("Survey exceeds the configured total upload size limit.")
+
+
+def get_ready_survey_files(*, survey_id: int, file_type: str):
+    return tuple(
+        ReadySurveyFileSnapshot(
+            id=row["id"],
+            survey_id=row["survey_id"],
+            original_filename=row["original_filename"],
+            format=row["format"],
+            storage_path=row["storage_path"],
+            converted_path=row["converted_path"], preview_path=row["preview_path"],
+        )
+        for row in SurveyFile.objects.filter(
+            survey_id=survey_id,
+            file_type=file_type,
+            status="ready",
+        ).order_by("id").values(
+            "id", "survey_id", "original_filename", "format", "storage_path", "converted_path", "preview_path"
+        )
+    )
+
+
+def get_ready_survey_file(*, file_id: int, file_type: str, file_formats: set[str]):
+    survey_file = (
+        SurveyFile.objects
+        .filter(
+            pk=file_id,
+            file_type=file_type,
+            status="ready",
+            format__in=file_formats,
+        )
+        .first()
+    )
+    if survey_file is None:
+        raise SurveyFile.DoesNotExist
+    return ReadySurveyFileSnapshot(
+        id=survey_file.pk,
+        survey_id=survey_file.survey_id,
+        original_filename=survey_file.original_filename,
+        format=survey_file.format,
+        storage_path=survey_file.storage_path,
+        converted_path=survey_file.converted_path, preview_path=survey_file.preview_path,
+    )
+
+
+def get_survey_file_for_processing(*, file_id: int):
+    return SurveyFile.objects.prefetch_related("assets").get(pk=file_id)
+
+
+def get_survey_file_readiness(*, survey_id: int) -> SurveyFileReadiness:
+    statuses = list(SurveyFile.objects.filter(survey_id=survey_id).values_list("status", flat=True))
+    return SurveyFileReadiness(
+        file_count=len(statuses),
+        all_files_ready=bool(statuses) and all(status == "ready" for status in statuses),
+    )
+
+
+def get_survey_file_ids(*, survey_id: int) -> list[int]:
+    return list(
+        SurveyFile.objects.filter(survey_id=survey_id).values_list("id", flat=True)
+    )
+
+
+def get_processing_file_snapshot(*, file_id: int) -> ProcessingFileSnapshot:
+    survey_file = SurveyFile.objects.prefetch_related("assets").get(pk=file_id)
+    return ProcessingFileSnapshot(
+        id=survey_file.pk,
+        survey_id=survey_file.survey_id,
+        original_filename=survey_file.original_filename,
+        stored_filename=survey_file.stored_filename,
+        file_type=survey_file.file_type,
+        format=survey_file.format,
+        mime_type=survey_file.mime_type,
+        sha256_checksum=survey_file.sha256_checksum,
+        size_bytes=survey_file.size_bytes,
+        status=survey_file.status,
+        created_at=survey_file.created_at,
+        updated_at=survey_file.updated_at,
+        storage_path=survey_file.storage_path,
+        preview_path=survey_file.preview_path,
+        converted_path=survey_file.converted_path,
+        assets=tuple(
+            ProcessingFileAssetSnapshot(
+                original_filename=asset.original_filename,
+                stored_filename=asset.stored_filename,
+                sha256_checksum=asset.sha256_checksum,
+                storage_path=asset.storage_path,
+                mime_type=asset.mime_type,
+            )
+            for asset in survey_file.assets.all()
+        ),
+    )
+
+
+def update_file_processing_state(
+    *, file_id: int, status: str, preview_path=_UNSET, converted_path=_UNSET
+):
+    update_fields = {"status": status, "updated_at": timezone.now()}
+    if preview_path is not _UNSET:
+        update_fields["preview_path"] = preview_path
+    if converted_path is not _UNSET:
+        update_fields["converted_path"] = converted_path
+    SurveyFile.objects.filter(pk=file_id).update(**update_fields)
 
 
 def _validate_related_assets(*, primary_upload, primary_file, asset_files):

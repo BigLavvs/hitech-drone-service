@@ -1,4 +1,4 @@
-from django.core.exceptions import ValidationError as DjangoValidationError
+from django.core.exceptions import ObjectDoesNotExist, ValidationError as DjangoValidationError
 from django.http import Http404
 from rest_framework import generics, permissions, status
 from rest_framework.exceptions import PermissionDenied
@@ -7,7 +7,7 @@ from rest_framework.response import Response
 from rest_framework.serializers import ValidationError as DRFValidationError
 
 from apps.access_control.authentication import HitechJWTAuthentication
-from apps.access_control.models import User, UserRole
+from apps.access_control.models import UserRole
 from apps.projects.models import Project, Site
 from apps.projects.serializers import (
     ProjectMemberCandidateSerializer,
@@ -25,10 +25,12 @@ from apps.projects.services import (
     create_site,
     delete_site,
     get_available_project_members,
+    get_project_member_by_user_id,
     get_project_members,
     get_project_manageable_by_user,
     get_projects_visible_to_user,
     get_project_visible_to_user,
+    get_sites_for_project,
     get_site_with_project,
     remove_project_member,
     add_project_member,
@@ -169,8 +171,14 @@ class ProjectMemberListCreateAPIView(generics.GenericAPIView):
         except DjangoValidationError as exc:
             raise _to_drf_validation_error(exc) from exc
 
-        membership = get_project_members(actor=request.user, project=project).get(pk=membership.pk)
-        return Response(ProjectMemberReadSerializer(membership).data, status=status.HTTP_201_CREATED)
+        member_snapshot = next(
+            member for member in get_project_members(actor=request.user, project=project)
+            if member.membership_id == membership.pk
+        )
+        return Response(
+            ProjectMemberReadSerializer(member_snapshot).data,
+            status=status.HTTP_201_CREATED,
+        )
 
 
 class ProjectAvailableMemberListAPIView(generics.GenericAPIView):
@@ -217,7 +225,7 @@ class SiteListCreateAPIView(generics.GenericAPIView):
 
     def get(self, request, project_id, *args, **kwargs):
         project = _get_visible_project_or_404(user=request.user, project_id=project_id)
-        queryset = project.sites.order_by("id")
+        queryset = get_sites_for_project(project_id=project.pk)
         page = self.paginate_queryset(queryset)
         serializer = SiteReadSerializer(page, many=True)
         return self.get_paginated_response(serializer.data)
@@ -329,8 +337,8 @@ def _get_site_or_404(*, site_id: int) -> Site:
 
 def _get_user_or_404(*, user_id: int):
     try:
-        return User.objects.get(pk=user_id)
-    except User.DoesNotExist as exc:
+        return get_project_member_by_user_id(user_id=user_id)
+    except ObjectDoesNotExist as exc:
         raise Http404 from exc
 
 

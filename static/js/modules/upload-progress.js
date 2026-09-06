@@ -1,4 +1,4 @@
-/** Presentation-only helper for the upload workflow to be implemented later. */
+/** Update the accessible upload progress indicator used by the survey workspace. */
 export function updateUploadProgress(element, percent, label = "Uploading") {
   if (!element) return;
   const value = Math.max(0, Math.min(100, Number(percent) || 0));

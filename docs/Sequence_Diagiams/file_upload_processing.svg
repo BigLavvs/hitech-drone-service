@@ -56,7 +56,7 @@
 <text x="2765.2" y="5245.0" text-anchor="middle" fill="#fff" font-size="10.5" font-weight="700">Audit Module</text>
 <line x1="70" y1="162.0" x2="2850" y2="162.0" stroke="#334155" stroke-width="1" stroke-dasharray="4,4"/>
 <rect x="1259.2" y="149.0" width="401.6" height="22" rx="11" fill="#334155"/>
-<text x="1460.0" y="164.0" text-anchor="middle" fill="#cbd5e1" font-size="10.5" font-weight="700">Upload Files (Primary + Optional OBJ Assets), No Duplicate</text>
+<text x="1460.0" y="164.0" text-anchor="middle" fill="#cbd5e1" font-size="10.5" font-weight="700">Upload Files (Primary + Optional OBJ/GLTF Assets), No Duplicate</text>
 <line x1="224.3" y1="216.0" x2="536.3" y2="216.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
 <rect x="234.3" y="192.0" width="292.0" height="18" rx="4" fill="#0f172a"/>
 <text x="380.3" y="205.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">POST /api/v1/surveys/10/files (multipart: file, assets[]) (cookie)</text>
@@ -77,10 +77,10 @@
 <text x="1398.8" y="489.0" text-anchor="middle" fill="#5eead4" font-size="9.5">survey OK</text>
 <path d="M1210.2,554.0 C1256.2,554.0 1256.2,584.0 1210.2,584.0" fill="none" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
 <rect x="1252.2" y="556.0" width="289.3" height="20" rx="5" fill="#1e293b" stroke="#334155"/>
-<text x="1396.9" y="570.0" text-anchor="middle" fill="#94a3b8" font-size="9.5">Validate primary file + confirm assets are OBJ-only</text>
+<text x="1396.9" y="570.0" text-anchor="middle" fill="#94a3b8" font-size="9.5">Validate primary file + confirm OBJ/GLTF asset rules</text>
 <line x1="1273.2" y1="622.0" x2="1750.5" y2="622.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
 <rect x="1377.8" y="598.0" width="268.0" height="18" rx="4" fill="#0f172a"/>
-<text x="1511.8" y="611.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">Stream-upload primary + optional OBJ assets to staging (private)</text>
+<text x="1511.8" y="611.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">Stream-upload primary + optional OBJ/GLTF assets to staging (private)</text>
 <line x1="1750.5" y1="676.0" x2="1273.2" y2="676.0" stroke="#5eead4" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)"/>
 <rect x="1457.6" y="652.0" width="108.4" height="18" rx="4" fill="#0f172a"/>
 <text x="1511.8" y="665.0" text-anchor="middle" fill="#5eead4" font-size="9.5">staging_key(s), etag(s)</text>
@@ -101,7 +101,7 @@
 <text x="1399.0" y="949.0" text-anchor="middle" fill="#5eead4" font-size="9.5">records created (uncommitted)</text>
 <line x1="1273.2" y1="1014.0" x2="1750.5" y2="1014.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
 <rect x="1332.0" y="990.0" width="359.6" height="18" rx="4" fill="#0f172a"/>
-<text x="1511.8" y="1003.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">Promote staged primary + optional OBJ assets to canonical private storage</text>
+<text x="1511.8" y="1003.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">Promote staged primary + optional OBJ/GLTF assets to canonical private storage</text>
 <line x1="1750.5" y1="1068.0" x2="1273.2" y2="1068.0" stroke="#5eead4" stroke-width="1.6" stroke-dasharray="6,4" marker-end="url(#arrow-dashed)"/>
 <rect x="1443.0" y="1044.0" width="137.6" height="18" rx="4" fill="#0f172a"/>
 <text x="1511.8" y="1057.0" text-anchor="middle" fill="#5eead4" font-size="9.5">canonical storage_key(s)</text>
@@ -149,7 +149,7 @@
 <text x="1041.3" y="1813.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">Call Files Module</text>
 <line x1="1273.2" y1="1878.0" x2="1750.5" y2="1878.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
 <rect x="1377.8" y="1854.0" width="268.0" height="18" rx="4" fill="#0f172a"/>
-<text x="1511.8" y="1867.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">Stream-upload primary + optional OBJ assets to staging (private)</text>
+<text x="1511.8" y="1867.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">Stream-upload primary + optional OBJ/GLTF assets to staging (private)</text>
 <path d="M1210.2,1932.0 C1256.2,1932.0 1256.2,1962.0 1210.2,1962.0" fill="none" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
 <rect x="1252.2" y="1934.0" width="230.8" height="20" rx="5" fill="#1e293b" stroke="#334155"/>
 <text x="1367.6" y="1948.0" text-anchor="middle" fill="#94a3b8" font-size="9.5">Compute SHA-256 checksum of primary file</text>
@@ -239,7 +239,7 @@
 <text x="380.3" y="3475.0" text-anchor="middle" fill="#5eead4" font-size="9.5">200 OK {job, file}</text>
 <line x1="70" y1="3526.0" x2="2850" y2="3526.0" stroke="#334155" stroke-width="1" stroke-dasharray="4,4"/>
 <rect x="1298.3" y="3513.0" width="323.5" height="22" rx="11" fill="#334155"/>
-<text x="1460.0" y="3528.0" text-anchor="middle" fill="#cbd5e1" font-size="10.5" font-weight="700">Automatic Retry (Celery backoff: 5m, 15m, 45m)</text>
+<text x="1460.0" y="3528.0" text-anchor="middle" fill="#cbd5e1" font-size="10.5" font-weight="700">Automatic Retry (assessment backoff: 2m, 5m, 10m)</text>
 <path d="M2498.5,3580.0 C2544.5,3580.0 2544.5,3610.0 2498.5,3610.0" fill="none" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
 <rect x="2540.5" y="3582.0" width="220.2" height="20" rx="5" fill="#1e293b" stroke="#334155"/>
 <text x="2650.6" y="3596.0" text-anchor="middle" fill="#94a3b8" font-size="9.5">Processing task raises transient error</text>
@@ -257,7 +257,7 @@
 <text x="2176.3" y="3799.0" text-anchor="middle" fill="#5eead4" font-size="9.5">OK</text>
 <path d="M2498.5,3864.0 C2544.5,3864.0 2544.5,3894.0 2498.5,3894.0" fill="none" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
 <rect x="2540.5" y="3866.0" width="300.0" height="20" rx="5" fill="#1e293b" stroke="#334155"/>
-<text x="2690.5" y="3880.0" text-anchor="middle" fill="#94a3b8" font-size="9.5">Celery schedules retry after backoff (5m / 15m / 45m)</text>
+<text x="2690.5" y="3880.0" text-anchor="middle" fill="#94a3b8" font-size="9.5">Celery schedules assessment retry backoff (2m / 5m / 10m)</text>
 <line x1="2251.5" y1="3932.0" x2="2394.8" y2="3932.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
 <rect x="2261.5" y="3908.0" width="123.4" height="18" rx="4" fill="#0f172a"/>
 <text x="2323.2" y="3921.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">RECEIVE retried task (after backoff delay)</text>
@@ -293,10 +293,10 @@
 <text x="1665.2" y="4475.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">Call Processing Module (manual retry)</text>
 <path d="M2498.5,4540.0 C2544.5,4540.0 2544.5,4570.0 2498.5,4570.0" fill="none" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
 <rect x="2540.5" y="4542.0" width="315.9" height="20" rx="5" fill="#1e293b" stroke="#334155"/>
-<text x="2698.5" y="4556.0" text-anchor="middle" fill="#94a3b8" font-size="9.5">Validate job status=failed + retry_count &lt; max</text>
+<text x="2698.5" y="4556.0" text-anchor="middle" fill="#94a3b8" font-size="9.5">Validate failed job + eligible active operator</text>
 <line x1="2394.8" y1="4608.0" x2="1650.5" y2="4608.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
 <rect x="1851.4" y="4584.0" width="342.5" height="18" rx="4" fill="#0f172a"/>
-<text x="2022.7" y="4597.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">UPDATE job: status=queued, retry_count+=1, error_message=NULL</text>
+<text x="2022.7" y="4597.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">UPDATE job: status=queued, retry_count=0, error_message=NULL</text>
 <line x1="2602.2" y1="4662.0" x2="2702.2" y2="4662.0" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#arrow)"/>
 <rect x="2612.2" y="4638.0" width="80.0" height="18" rx="4" fill="#0f172a"/>
 <text x="2652.2" y="4651.0" text-anchor="middle" fill="#cbd5e1" font-size="9.5">Log PROCESSING_RETRY</text>
@@ -331,12 +331,12 @@
 <text x="44.0" y="5306.0" fill="#e2e8f0" font-size="12" font-weight="700">Error Flows:</text>
 <text x="44.0" y="5328.0" fill="#94a3b8" font-size="9.5">- More than one primary 'file' part, or zero: 400</text>
 <text x="44.0" y="5346.0" fill="#94a3b8" font-size="9.5">  INVALID_UPLOAD_SHAPE</text>
-<text x="44.0" y="5364.0" fill="#94a3b8" font-size="9.5">- Non-OBJ file in 'assets': 400 UNSUPPORTED_ASSET_TYPE</text>
+<text x="44.0" y="5364.0" fill="#94a3b8" font-size="9.5">- Asset invalid for OBJ/GLTF bundle: 400 UNSUPPORTED_ASSET_TYPE</text>
 <text x="44.0" y="5382.0" fill="#94a3b8" font-size="9.5">- Unsupported file type / bad MIME: 400 INVALID_FILE_TYPE</text>
 <text x="44.0" y="5400.0" fill="#94a3b8" font-size="9.5">- File exceeds max size: 400 FILE_TOO_LARGE</text>
 <text x="44.0" y="5418.0" fill="#94a3b8" font-size="9.5">- Manual retry while job is not failed: 400</text>
 <text x="44.0" y="5436.0" fill="#94a3b8" font-size="9.5">  INVALID_STATE</text>
-<text x="44.0" y="5454.0" fill="#94a3b8" font-size="9.5">- Manual retry beyond configured max: 400 RETRY_LIMIT_EXCEEDED</text>
+<text x="44.0" y="5454.0" fill="#94a3b8" font-size="9.5">- Authorized manual retry starts a new automatic retry cycle</text>
 <text x="44.0" y="5472.0" fill="#94a3b8" font-size="9.5">- Upload to unassigned project: 403 Forbidden</text>
 <text x="44.0" y="5490.0" fill="#94a3b8" font-size="9.5">- Unsafe request without valid CSRF token: 403 CSRF_FAILURE</text>
 <rect x="991.3" y="5282.0" width="937.3" height="246.0" rx="10" fill="#1e293b" stroke="#334155" stroke-width="1.5" stroke-dasharray="6,4"/>

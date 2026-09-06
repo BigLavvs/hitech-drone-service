@@ -1,33 +1,20 @@
 import json
 from io import BytesIO
 
-from django.core.exceptions import PermissionDenied
-
-from apps.files.models import FileFormat, FileType, SurveyFile
+from apps.files.models import FileFormat, FileType
 from apps.files.object_keys import build_model_metadata_key
-from apps.files.services import DOWNLOAD_URL_EXPIRY_SECONDS
+from apps.files.services import DOWNLOAD_URL_EXPIRY_SECONDS, get_ready_survey_files
 from apps.files.storage import PrivateR2StorageAdapter
-from apps.projects.services import user_can_view_project
 from apps.surveys.models import Survey
+from apps.surveys.services import get_survey_visible_to_user
 
 
 def get_survey_models_for_user(*, actor, survey_id: int, storage=None):
-    survey = Survey.objects.select_related("project").filter(pk=survey_id).first()
-    if survey is None:
-        raise Survey.DoesNotExist
-    if not user_can_view_project(actor, survey.project):
-        raise PermissionDenied("You do not have permission to access this survey.")
+    survey = get_survey_visible_to_user(user=actor, survey_id=survey_id)
 
     storage = storage or PrivateR2StorageAdapter()
     descriptors = []
-    for survey_file in (
-        SurveyFile.objects.filter(
-            survey=survey,
-            file_type=FileType.THREE_D,
-            status="ready",
-        )
-        .order_by("id")
-    ):
+    for survey_file in get_ready_survey_files(survey_id=survey.pk, file_type=FileType.THREE_D):
         source = _resolve_model_source(survey_file=survey_file)
         if source is None:
             continue
@@ -37,6 +24,7 @@ def get_survey_models_for_user(*, actor, survey_id: int, storage=None):
             storage_key=build_model_metadata_key(
                 survey_id=survey_file.survey_id,
                 file_id=survey_file.pk,
+                published_path=survey_file.preview_path or survey_file.converted_path,
             ),
         )
         descriptors.append(

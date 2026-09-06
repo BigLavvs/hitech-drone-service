@@ -2,19 +2,20 @@
 
 ## Purpose
 
-This guide records the backend work deliberately deferred during the frontend-first steps. Use it before starting each backend task alongside:
+This guide records backend build history, confirmed decisions, and remaining assessment-relevant gaps. Use it before starting backend tasks alongside:
 
-- `Hitech_Drone_Service_System_Architecture.docx`
-- `Hitech_Drone_Service_System_Implementation.docx`
-- `Hitech_Drone_Service_Db_Schema.docx`
+- `System_Architecture.docx`
+- `System_Implementation.docx`
+- `Database_Schema.docx`
 - `Db_Schema_Converted_from_prisma_schema.txt`
-- `AGENTS.md`
+- `DEVELOPMENT_DECISIONS.md`
+- the local `AGENTS.md` guidance when available (gitignored workspace policy)
 
-The documents above remain the source of truth. This file is a build checklist and decision register, not a replacement architecture.
+The documents above remain the source of truth. This file is a historical checklist and decision index, not a replacement architecture.
 
 ## Current State
 
-Steps 1-4 created presentation-only Django template routes and shared UI:
+Historical note: Steps 1-4 originally created presentation-only Django template routes and shared UI for:
 
 - `/login`
 - `/projects`
@@ -22,18 +23,34 @@ Steps 1-4 created presentation-only Django template routes and shared UI:
 - `/projects/{id}/sites/{site_id}`
 - `/surveys/{id}`
 
-They do not query a database, call APIs, authenticate users, enforce permissions, upload files, process data, or write audit records. That is intentional and must change only through documented backend work.
+That early state is no longer the current implementation.
 
-## Required Backend Foundations
+Current implementation summary:
 
-### 1. Configuration and infrastructure
+- Django renders the public/login, project, site, survey workspace, and administrator pages.
+- DRF exposes the versioned `/api/v1` API for auth validation, local users, projects, memberships, sites, surveys, files, processing jobs, approvals, map layers, 3D model descriptors, measurements, and audit logs.
+- PostgreSQL/PostGIS configuration, domain models, migrations, Redis/Celery integration, private R2 storage integration, health/readiness probes, Docker artifacts, and assessment demo-auth tooling are present.
+- Server-side authorization, upload validation, processing dispatch, retry handling, approval workflow guards, measurements, and audit writes are implemented in service modules and covered by focused tests.
+- Browser templates are still shells at render time and rely on JavaScript/API calls for data. Template defaults should not be mistaken for an authorization or data-access layer.
+- GitHub Actions CI is configured with disposable PostGIS/Redis, full Django tests, frontend checks and a separate container build. Its run status must be verified for each revision. No license is selected; deployment dependencies still require owner-provided infrastructure.
 
-- Replace the temporary SQLite-only settings with the documented PostgreSQL + PostGIS/Neon configuration before adding domain models or migrations.
-- Use environment variables for secrets and environment-specific configuration. The current hardcoded development `SECRET_KEY` is temporary and must not survive into authentication, deployment, or production-like work.
-- Add the documented Redis, Celery worker, Celery beat, Cloudflare R2, Docker/Coolify, health-check, and static-asset setup only when their corresponding features are being implemented.
-- Keep development and production database, Redis, R2 bucket, JWT key, and secret values isolated.
+## Backend Foundations Checklist
 
-Status as of 2026-08-09: the Step 1 environment-based PostgreSQL/PostGIS configuration has replaced the temporary SQLite settings. Runtime database configuration now depends on `.env` values for `DJANGO_SECRET_KEY`, `DEBUG`, `ALLOWED_HOSTS`, `DATABASE_URL`, and `DIRECT_URL`. No migrations, domain apps, Redis, Celery, R2, or authentication components have been added in this step.
+The checklist below records the original deferred work. The current-state notes
+and the source documents are authoritative; completed items are not instructions
+to reimplement them.
+
+### 1. Configuration and infrastructure (implemented)
+
+The original SQLite-only configuration was replaced by environment-based
+PostgreSQL/PostGIS settings. Runtime, migration, test, Redis/Celery, R2,
+Docker/Coolify, health-check, and static-asset configuration now live in the
+repository. Keep development, test, and production resources and secrets
+isolated when operating them.
+
+Historical status as of 2026-08-09: the Step 1 environment-based PostgreSQL/PostGIS configuration replaced the temporary SQLite settings. Runtime database configuration depended on `.env` values for `DJANGO_SECRET_KEY`, `DEBUG`, `ALLOWED_HOSTS`, `DATABASE_URL`, and `DIRECT_URL`. No migrations, domain apps, Redis, Celery, R2, or authentication components had been added in that step.
+
+Current status: the runtime and migration settings modules are present. Runtime uses `DATABASE_URL`; migration commands use `config.settings_migrations` and `DIRECT_URL`; automated tests use `config.settings_test` with the normal `DATABASE_URL` and `DIRECT_URL`, while Django applies its isolated test database semantics.
 
 ### 2. Modular Django application structure
 
@@ -126,6 +143,59 @@ Confirmed by the project owner on 2026-08-09. Apply these consistently; do not r
 3. **Site coordinates**: use PostgreSQL/PostGIS with `PointField(srid=4326)`, as shown in the converted Django schema. Do not use JSON coordinates for the Django implementation.
 4. **Viewer measurements**: Viewers with access to the survey may create and read measurements. Only Administrators and Project Managers may delete them.
 
-## Deferred Submission Items
+## Submission And Repository Items
 
-Before final submission, ensure the repository also contains the documented Git/GitHub workflow, Docker configuration, environment template, CI workflow, automated tests, sample data, API documentation, and demonstration video. The current workspace is not a Git repository, so version-control setup remains outstanding.
+Current repository state:
+
+- This workspace is a Git repository.
+- Dockerfile, Compose configuration, sanitized `.env.example`, automated Django tests, assessment seed tooling, public API documentation routes, and source/decision documents are present.
+- `.github/workflows/ci.yml` supplies PostGIS, Redis, required geospatial libraries and synthetic settings; it does not deploy or require Coolify secrets.
+- No license file is present; do not add one until the owner chooses a license.
+- `SECURITY.md` uses the owner-supplied contact `hello@oluwapelumi.xyz` for private reports.
+- The owner still needs to confirm permission to redistribute assessment/source documents. Do not infer permission from public repository visibility.
+- A demonstration video remains an external submission artefact, not a repository feature.
+
+Correction batch status (2026-09-05): the internal Compose readiness request now
+forwards `X-Forwarded-Proto: https`, preserving the production HTTPS redirect and
+the `/ready` 200/503 dependency semantics. The runtime Redis cache uses the existing
+Redis deployment with `REDIS_CACHE_KEY_PREFIX`; test settings use an isolated local
+cache and do not share rate-limit state with live Redis.
+
+Processing, files, surveys, projects, and approvals now exchange explicit snapshots
+and operation-specific service calls for workflow state, relation reads, file
+readiness, processing leases, and cross-module persistence. Controllers and
+serializers consume those results rather than continuing ORM traversal across module
+boundaries. The processing retry schedule remains the approved 2/5/10-minute cycle.
+
+Owner-service map for the corrected runtime paths:
+
+- `projects`: Project, Site, and ProjectMembership queries/writes; project visibility
+  snapshots and member-ID reads used by access control.
+- `surveys`: Survey lifecycle locks/transitions and workflow snapshots; survey
+  metadata and authorization remain survey-owned.
+- `files`: SurveyFile and SurveyFileAsset admission, processing snapshots, file
+  readiness, delivery snapshots, and file-state writes.
+- `processing`: ProcessingJob dispatch, leases, retries, job summaries, and job
+  readiness; it consumes file snapshots and calls file/survey state interfaces.
+- `approvals`: Approval and ApprovalHistory persistence, approval summaries, and
+  archive-history writes; it calls survey workflow interfaces.
+- `maps` and `models3d`: their own Measurement reads/writes and delivery catalogues;
+  ready-file data comes from the files snapshot interface.
+- `audit`: AuditLog writes/reads and the asynchronous download event; cross-domain
+  references are passed as scalar IDs. `select_related` in audit read services is
+  for audit response hydration only.
+
+Remaining direct ORM usage is limited to each owning module, foreign-key schema
+declarations, explicit service inputs, audit response hydration, and test/fixture
+construction. No runtime service/controller/task relies on a foreign reverse manager
+or saves a foreign module's model; no generic cross-module repository or unrestricted
+field-update service was introduced.
+
+## Current Security Configuration Notes
+
+- `DEBUG=False` enables `CSRF_COOKIE_SECURE=True`, `SESSION_COOKIE_SECURE=True`, and `SECURE_SSL_REDIRECT=True`; `SECURE_PROXY_SSL_HEADER` remains configured for Coolify/Traefik.
+- `CSRF_COOKIE_HTTPONLY=False` is intentional because browser JavaScript reads the CSRF cookie and echoes it in `X-CSRFToken`; the JWT cookie remains HttpOnly.
+- Rate limits are environment-configurable through `RATE_LIMIT_LOGIN` (`5/m` default), `RATE_LIMIT_GENERAL` (`100/m` default), `RATE_LIMIT_UPLOAD`, and `RATE_LIMIT_RETRY`.
+- The application emits a nonce-based CSP for the inline import map and permits only same-origin resources, pinned jsDelivr viewer libraries, and configured R2 delivery hosts. Swagger and Redoc templates receive the response nonce and propagate it to library-generated style elements; `style-src-elem` is nonce-based without `unsafe-inline`, and script `unsafe-inline`/`unsafe-eval` remain prohibited.
+- Application, Django request, and Celery logging use dependency-free JSON formatting via Python's standard logging library. Messages, arguments, nested extras, request-like values, exception text, bearer tokens, and signed URLs are sanitized.
+- External uptime monitoring and alerting remain deployment prerequisites; this repository does not implement an external monitoring provider.

@@ -24,23 +24,8 @@ class AuditLogListAPIView(generics.GenericAPIView):
         query_serializer = AuditLogListQuerySerializer(data=request.query_params)
         query_serializer.is_valid(raise_exception=True)
 
-        queryset = get_audit_logs_visible_to_user(user=request.user)
         query = query_serializer.validated_data
-
-        if "project_id" in query:
-            queryset = queryset.filter(project_id=query["project_id"])
-
-        if "survey_id" in query:
-            queryset = queryset.filter(survey_id=query["survey_id"])
-
-        if "action" in query:
-            queryset = queryset.filter(action=query["action"])
-
-        if "from_date" in query:
-            queryset = queryset.filter(timestamp__date__gte=query["from_date"])
-
-        if "to_date" in query:
-            queryset = queryset.filter(timestamp__date__lte=query["to_date"])
+        queryset = get_audit_logs_visible_to_user(user=request.user, filters=query)
 
         page = self.paginate_queryset(queryset)
         serializer = AuditLogReadSerializer(page, many=True)

@@ -180,6 +180,7 @@ class AuditLogSchemaTests(TestCase):
                 "PROCESSING_STARTED",
                 "PROCESSING_FAILED",
                 "PROCESSING_RETRY",
+                "PROCESSING_RECOVERY",
                 "PROCESSING_COMPLETED",
                 "APPROVAL_SUBMITTED",
                 "APPROVAL_APPROVED",
@@ -192,12 +193,13 @@ class AuditLogSchemaTests(TestCase):
             },
         )
 
-    def test_latest_migration_state_includes_processing_completed_action(self):
+    def test_latest_migration_state_includes_processing_completed_and_recovery_actions(self):
         loader = MigrationLoader(connection)
-        state = loader.project_state(("audit", "0003_alter_auditlog_action"))
+        state = loader.project_state(("audit", "0004_add_processing_recovery_action"))
         action_field = state.apps.get_model("audit", "AuditLog")._meta.get_field("action")
 
         self.assertIn(("PROCESSING_COMPLETED", "Processing Completed"), action_field.choices)
+        self.assertIn(("PROCESSING_RECOVERY", "Processing Recovery"), action_field.choices)
 
     def test_file_download_task_writes_required_immutable_audit_row_without_url_or_path_details(self):
         survey_file = SurveyFile.objects.create(

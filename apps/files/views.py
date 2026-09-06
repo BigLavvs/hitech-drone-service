@@ -22,6 +22,8 @@ from apps.files.services import (
 )
 from apps.files.validation import FileValidationError
 from apps.surveys.models import Survey
+from apps.surveys.services import get_survey_workflow_snapshot
+from config.throttling import AuthenticatedGeneralRateThrottle
 
 
 class UploadScopedRateThrottle(ScopedRateThrottle):
@@ -35,6 +37,7 @@ class SurveyFileListCreateAPIView(generics.GenericAPIView):
     authentication_classes = [HitechJWTAuthentication]
     permission_classes = [permissions.IsAuthenticated]
     parser_classes = [MultiPartParser]
+    throttle_classes = [AuthenticatedGeneralRateThrottle]
     throttle_scope = "upload"
     serializer_class = SurveyFileListItemSerializer
 
@@ -92,13 +95,13 @@ class SurveyFileListCreateAPIView(generics.GenericAPIView):
 
     def get_throttles(self):
         if self.request.method == "POST":
-            return [UploadScopedRateThrottle()]
-        return []
+            return [self.throttle_classes[0](), UploadScopedRateThrottle()]
+        return super().get_throttles()
 
 
 def _get_survey_stub_or_404(*, survey_id: int):
     try:
-        return Survey.objects.select_related("project").get(pk=survey_id)
+        return get_survey_workflow_snapshot(survey_id=survey_id)
     except Survey.DoesNotExist as exc:
         raise Http404 from exc
 

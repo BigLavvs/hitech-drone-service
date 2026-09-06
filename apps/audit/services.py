@@ -12,6 +12,8 @@ def record_audit_event(
     user=None,
     project=None,
     survey=None,
+    project_id=None,
+    survey_id=None,
     details=None,
     ip_address=None,
 ) -> AuditLog:
@@ -25,33 +27,45 @@ def record_audit_event(
         entity_type=entity_type,
         entity_id=entity_id,
         user=user,
-        project=project,
-        survey=survey,
+        project_id=project_id if project_id is not None else getattr(project, "pk", None),
+        survey_id=survey_id if survey_id is not None else getattr(survey, "pk", None),
         details=details,
         ip_address=ip_address,
     )
 
 
-def get_audit_logs_visible_to_user(*, user: User):
-    queryset = AuditLog.objects.select_related("user", "project", "survey").order_by("-timestamp", "-id")
+def get_audit_logs_visible_to_user(*, user: User, filters=None):
+    queryset = AuditLog.objects.order_by("-timestamp", "-id")
 
     if not user.is_active:
         return queryset.none()
 
     if user.role == UserRole.ADMINISTRATOR:
-        return queryset
+        pass
+    elif user.role in {
+        UserRole.PROJECT_MANAGER,
+        UserRole.SURVEY_ENGINEER,
+        UserRole.VIEWER,
+    }:
+        from apps.projects.services import get_project_ids_visible_to_user
 
-    if user.role == UserRole.PROJECT_MANAGER:
-        return queryset.filter(project__project_manager=user)
+        queryset = queryset.filter(project_id__in=get_project_ids_visible_to_user(user=user))
+    else:
+        return queryset.none()
 
-    if user.role in {UserRole.SURVEY_ENGINEER, UserRole.VIEWER}:
-        return queryset.filter(project__memberships__user=user).distinct()
-
-    return queryset.none()
+    filters = filters or {}
+    for field_name in ("project_id", "survey_id", "action"):
+        if field_name in filters:
+            queryset = queryset.filter(**{field_name: filters[field_name]})
+    if "from_date" in filters:
+        queryset = queryset.filter(timestamp__date__gte=filters["from_date"])
+    if "to_date" in filters:
+        queryset = queryset.filter(timestamp__date__lte=filters["to_date"])
+    return queryset
 
 
 def get_audit_log_visible_to_user(*, user: User, audit_log_id: int) -> AuditLog:
-    audit_log = AuditLog.objects.select_related("user", "project", "survey").filter(pk=audit_log_id).first()
+    audit_log = AuditLog.objects.filter(pk=audit_log_id).first()
     if audit_log is None:
         raise AuditLog.DoesNotExist
 
