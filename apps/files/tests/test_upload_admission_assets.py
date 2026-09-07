@@ -45,7 +45,7 @@ class UploadAdmissionAssetsMixin:
         )
         texture_asset = TrackingUpload(
             name="albedo.jpeg",
-            content=b"\xff\xd8\xfftexture",
+            content=valid_jpeg_bytes(),
             content_type="image/jpeg",
         )
 

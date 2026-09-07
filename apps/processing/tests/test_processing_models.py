@@ -242,7 +242,7 @@ class ProcessingModelProcessingMixin:
             content=gltf_payload,
         )
         binary_payload = b"external-buffer"
-        texture_payload = b"\xff\xd8\xfftexture"
+        texture_payload = valid_jpeg_bytes()
         binary_key = f"surveys/{self.survey.pk}/files/{survey_file.pk}/assets/scene.bin"
         texture_key = f"surveys/{self.survey.pk}/files/{survey_file.pk}/assets/albedo.jpeg"
         SurveyFileAsset.objects.create(
