@@ -19,7 +19,8 @@ class UploadAdmissionPersistenceMixin:
 
     def test_sha256_is_stored_for_new_upload(self):
         storage = FakePrivateStorageAdapter()
-        upload = self.make_upload(content=b"\x89PNG\r\n\x1a\npayload", name="preview.png", content_type="image/png")
+        upload_content = valid_png_bytes()
+        upload = self.make_upload(content=upload_content, name="preview.png", content_type="image/png")
 
         result = admit_uploaded_file(
             actor=self.admin,
@@ -30,7 +31,7 @@ class UploadAdmissionPersistenceMixin:
 
         self.assertEqual(
             result.survey_file.sha256_checksum,
-            hashlib.sha256(b"\x89PNG\r\n\x1a\npayload").hexdigest(),
+            hashlib.sha256(upload_content).hexdigest(),
         )
 
     @override_settings(MAX_SURVEY_TOTAL_SIZE_BYTES=40)
@@ -147,6 +148,36 @@ class UploadAdmissionPersistenceMixin:
         self.assertIsNone(processing_job.celery_task_id)
         mocked_dispatch.assert_called_once_with(processing_job_id=processing_job.pk)
         mocked_logger.warning.assert_called_once()
+
+    @patch(
+        "apps.processing.services.dispatch._mark_dispatch_failed",
+        side_effect=RuntimeError("dispatch status database unavailable"),
+    )
+    @patch(
+        "apps.processing.services.dispatch.dispatch_processing_job",
+        side_effect=RuntimeError("broker unavailable"),
+    )
+    def test_post_commit_dispatch_status_failure_preserves_canonical_objects_and_rows(
+        self, mocked_dispatch, mocked_mark_failed
+    ):
+        storage = FakePrivateStorageAdapter()
+
+        with self.captureOnCommitCallbacks(execute=True):
+            result = admit_uploaded_file(
+                actor=self.assigned_engineer,
+                survey=self.survey,
+                uploaded_file=self.make_upload(),
+                storage=storage,
+            )
+
+        survey_file = SurveyFile.objects.get(pk=result.survey_file.pk)
+        processing_job = ProcessingJob.objects.get(pk=result.processing_job.pk)
+        self.assertEqual(processing_job.status, "queued")
+        self.assertEqual(survey_file.storage_path, storage.promoted[0][1])
+        self.assertIn(survey_file.storage_path, storage.objects)
+        self.assertEqual(len(storage.uploaded), 1)
+        self.assertEqual(mocked_dispatch.call_count, 1)
+        mocked_mark_failed.assert_called_once_with(processing_job_id=processing_job.pk)
 
     @patch("apps.files.services.record_audit_event", side_effect=RuntimeError("audit write failed"))
     def test_audit_failure_rolls_back_records_and_cleans_storage(self, mocked_record_audit_event):

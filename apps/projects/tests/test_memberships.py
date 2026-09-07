@@ -258,6 +258,35 @@ class ProjectMembershipServiceTests(TestCase):
         self.assertEqual(ProjectMembership.objects.count(), 0)
         self.assertEqual(AuditLog.objects.count(), 0)
 
+    def test_existing_inactive_member_can_be_removed(self):
+        ProjectMembership.objects.create(
+            project=self.project,
+            user=self.inactive_user,
+            assigned_by=self.owner_manager,
+        )
+
+        remove_project_member(actor=self.admin, project=self.project, member=self.inactive_user)
+
+        self.assertFalse(
+            ProjectMembership.objects.filter(project=self.project, user=self.inactive_user).exists()
+        )
+        self.assertEqual(AuditLog.objects.get().details["operation"], "removed")
+
+    def test_existing_role_changed_member_can_be_removed(self):
+        ProjectMembership.objects.create(
+            project=self.project,
+            user=self.survey_engineer,
+            assigned_by=self.owner_manager,
+        )
+        self.survey_engineer.role = UserRole.PROJECT_MANAGER
+        self.survey_engineer.save(update_fields=["role"])
+
+        remove_project_member(actor=self.admin, project=self.project, member=self.survey_engineer)
+
+        self.assertFalse(
+            ProjectMembership.objects.filter(project=self.project, user=self.survey_engineer).exists()
+        )
+
     def test_archived_projects_reject_additions_and_removals_without_audit_events(self):
         ProjectMembership.objects.create(
             project=self.archived_project,

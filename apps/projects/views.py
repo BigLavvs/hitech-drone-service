@@ -1,5 +1,6 @@
 from django.core.exceptions import ObjectDoesNotExist, ValidationError as DjangoValidationError
 from django.http import Http404
+from drf_spectacular.utils import extend_schema
 from rest_framework import generics, permissions, status
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.pagination import LimitOffsetPagination
@@ -37,6 +38,7 @@ from apps.projects.services import (
     update_project,
     update_site,
 )
+from config.schema import paginated_response_serializer
 
 
 class ProjectSiteLimitOffsetPagination(LimitOffsetPagination):
@@ -55,12 +57,14 @@ class ProjectListCreateAPIView(generics.GenericAPIView):
             return ProjectWriteSerializer
         return ProjectReadSerializer
 
+    @extend_schema(operation_id="projects_list", responses={200: paginated_response_serializer("PaginatedProjectRead", ProjectReadSerializer)})
     def get(self, request, *args, **kwargs):
         queryset = get_projects_visible_to_user(user=request.user)
         page = self.paginate_queryset(queryset)
         serializer = ProjectReadSerializer(page, many=True)
         return self.get_paginated_response(serializer.data)
 
+    @extend_schema(operation_id="projects_create", request=ProjectWriteSerializer, responses={201: ProjectReadSerializer})
     def post(self, request, *args, **kwargs):
         serializer = ProjectWriteSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -97,10 +101,12 @@ class ProjectDetailAPIView(generics.GenericAPIView):
             return ProjectWriteSerializer
         return ProjectReadSerializer
 
+    @extend_schema(operation_id="project_retrieve", responses={200: ProjectReadSerializer})
     def get(self, request, project_id, *args, **kwargs):
         project = _get_visible_project_or_404(user=request.user, project_id=project_id)
         return Response(ProjectReadSerializer(project).data)
 
+    @extend_schema(operation_id="project_update", request=ProjectWriteSerializer, responses={200: ProjectReadSerializer})
     def patch(self, request, project_id, *args, **kwargs):
         project = _get_manageable_project_or_404(user=request.user, project_id=project_id)
         serializer = ProjectWriteSerializer(data=request.data, partial=True)
@@ -128,6 +134,7 @@ class ProjectDetailAPIView(generics.GenericAPIView):
 
         return Response(ProjectReadSerializer(project).data)
 
+    @extend_schema(operation_id="project_archive", responses={200: ProjectReadSerializer})
     def delete(self, request, project_id, *args, **kwargs):
         project = _get_manageable_project_or_404(user=request.user, project_id=project_id)
 
@@ -149,6 +156,7 @@ class ProjectMemberListCreateAPIView(generics.GenericAPIView):
             return ProjectMemberCreateSerializer
         return ProjectMemberReadSerializer
 
+    @extend_schema(operation_id="project_members_list", responses={200: ProjectMemberReadSerializer(many=True)})
     def get(self, request, project_id, *args, **kwargs):
         project = _get_manageable_project_or_404(user=request.user, project_id=project_id)
         try:
@@ -157,6 +165,7 @@ class ProjectMemberListCreateAPIView(generics.GenericAPIView):
             raise _to_drf_validation_error(exc) from exc
         return Response(ProjectMemberReadSerializer(memberships, many=True).data)
 
+    @extend_schema(operation_id="project_members_add", request=ProjectMemberCreateSerializer, responses={201: ProjectMemberReadSerializer})
     def post(self, request, project_id, *args, **kwargs):
         project = _get_manageable_project_or_404(user=request.user, project_id=project_id)
         serializer = ProjectMemberCreateSerializer(data=request.data)
@@ -186,6 +195,7 @@ class ProjectAvailableMemberListAPIView(generics.GenericAPIView):
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = ProjectMemberCandidateSerializer
 
+    @extend_schema(operation_id="project_available_members_list", responses={200: ProjectMemberCandidateSerializer(many=True)})
     def get(self, request, project_id, *args, **kwargs):
         project = _get_manageable_project_or_404(user=request.user, project_id=project_id)
         try:
@@ -200,6 +210,7 @@ class ProjectMemberDetailAPIView(generics.GenericAPIView):
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = ProjectMemberReadSerializer
 
+    @extend_schema(operation_id="project_member_remove", responses={204: None})
     def delete(self, request, project_id, user_id, *args, **kwargs):
         project = _get_manageable_project_or_404(user=request.user, project_id=project_id)
 
@@ -223,6 +234,7 @@ class SiteListCreateAPIView(generics.GenericAPIView):
             return SiteWriteSerializer
         return SiteReadSerializer
 
+    @extend_schema(operation_id="project_sites_list", responses={200: paginated_response_serializer("PaginatedSiteRead", SiteReadSerializer)})
     def get(self, request, project_id, *args, **kwargs):
         project = _get_visible_project_or_404(user=request.user, project_id=project_id)
         queryset = get_sites_for_project(project_id=project.pk)
@@ -230,6 +242,7 @@ class SiteListCreateAPIView(generics.GenericAPIView):
         serializer = SiteReadSerializer(page, many=True)
         return self.get_paginated_response(serializer.data)
 
+    @extend_schema(operation_id="project_sites_create", request=SiteWriteSerializer, responses={201: SiteReadSerializer})
     def post(self, request, project_id, *args, **kwargs):
         project = _get_manageable_project_or_404(user=request.user, project_id=project_id)
         serializer = SiteWriteSerializer(data=request.data)
@@ -262,10 +275,12 @@ class SiteDetailAPIView(generics.GenericAPIView):
             return SiteWriteSerializer
         return SiteReadSerializer
 
+    @extend_schema(operation_id="project_site_retrieve", responses={200: SiteReadSerializer})
     def get(self, request, project_id, site_id, *args, **kwargs):
         site = _get_visible_site_or_404(user=request.user, project_id=project_id, site_id=site_id)
         return Response(SiteReadSerializer(site).data)
 
+    @extend_schema(operation_id="project_site_update", request=SiteWriteSerializer, responses={200: SiteReadSerializer})
     def patch(self, request, project_id, site_id, *args, **kwargs):
         site = _get_manageable_site_or_404(user=request.user, project_id=project_id, site_id=site_id)
         serializer = SiteWriteSerializer(data=request.data, partial=True)
@@ -287,6 +302,7 @@ class SiteDetailAPIView(generics.GenericAPIView):
 
         return Response(SiteReadSerializer(site).data)
 
+    @extend_schema(operation_id="project_site_delete", responses={204: None})
     def delete(self, request, project_id, site_id, *args, **kwargs):
         site = _get_manageable_site_or_404(user=request.user, project_id=project_id, site_id=site_id)
 

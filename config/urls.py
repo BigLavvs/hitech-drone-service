@@ -39,17 +39,17 @@ from apps.projects.views import (
 from apps.surveys.views import SurveyDetailAPIView, SurveyListCreateAPIView
 from config.health import health_view, ready_view
 from config.views import (
-    foundation_preview,
     login_view,
     project_detail_view,
     projects_view,
+    root_redirect,
     survey_detail_view,
     site_detail_view,
 )
 
 
 urlpatterns = [
-    path("", foundation_preview, name="foundation-preview"),
+    path("", root_redirect, name="root"),
     path("health", health_view, name="health"),
     path("ready", ready_view, name="ready"),
     path("api/schema", SpectacularAPIView.as_view(), name="api-schema"),

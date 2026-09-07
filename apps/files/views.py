@@ -13,6 +13,7 @@ from apps.access_control.authentication import HitechJWTAuthentication
 from apps.files.models import SurveyFile
 from apps.files.serializers import (
     SurveyFileListItemSerializer,
+    SurveyFileUploadRequestSerializer,
     SurveyFileUploadResponseSerializer,
 )
 from apps.files.services import (
@@ -46,6 +47,10 @@ class SurveyFileListCreateAPIView(generics.GenericAPIView):
             return SurveyFileUploadResponseSerializer
         return SurveyFileListItemSerializer
 
+    @extend_schema(
+        operation_id="survey_files_list",
+        responses={200: SurveyFileListItemSerializer(many=True)},
+    )
     def get(self, request, survey_id, *args, **kwargs):
         try:
             queryset = get_survey_files_visible_to_user(actor=request.user, survey_id=survey_id)
@@ -54,6 +59,16 @@ class SurveyFileListCreateAPIView(generics.GenericAPIView):
 
         return Response(SurveyFileListItemSerializer(queryset, many=True).data)
 
+    @extend_schema(
+        operation_id="survey_files_upload",
+        request=SurveyFileUploadRequestSerializer,
+        responses={
+            200: SurveyFileUploadResponseSerializer,
+            202: SurveyFileUploadResponseSerializer,
+            400: OpenApiResponse(description="Validation error."),
+            415: OpenApiResponse(description="Unsupported media type."),
+        },
+    )
     def post(self, request, survey_id, *args, **kwargs):
         if not request.content_type or not request.content_type.lower().startswith("multipart/form-data"):
             return Response(
@@ -122,8 +137,8 @@ def _validate_multipart_file_only_field(*, request, field_name: str, require_exa
     if not all(isinstance(value, UploadedFile) for value in values):
         raise DRFValidationError(f"The '{field_name}' field must contain only file uploads.")
 
-        if require_exactly_one and len(values) != 1:
-            raise DRFValidationError("Exactly one primary 'file' upload is required.")
+    if require_exactly_one and len(values) != 1:
+        raise DRFValidationError("Exactly one primary 'file' upload is required.")
 
 
 class SurveyFileDownloadAPIView(generics.GenericAPIView):

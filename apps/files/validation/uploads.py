@@ -5,11 +5,13 @@ from django.conf import settings
 from .content import (
     _detect_format,
     _ensure,
-    _load_gltf_payload,
+    _validate_jpeg,
     _validate_gltf_resource_uri,
     _validate_mtl,
+    _validate_png,
+    get_gltf_external_resource_uris,
 )
-from .rules import MAX_VALIDATION_BYTES, _FORMAT_RULES, _JPEG_SIGNATURE, _PNG_SIGNATURE
+from .rules import MAX_VALIDATION_BYTES, _FORMAT_RULES
 from .streams import (
     _get_primary_extension,
     _get_upload_size,
@@ -82,15 +84,15 @@ def validate_obj_asset_upload(uploaded_file, declared_mime_type=None):
     if extension == ".mtl":
         if mime_type not in {"text/plain", "model/mtl", "text/mtl", "application/octet-stream"}:
             raise FileValidationError("Unsupported or mismatched asset MIME type.")
-        _validate_mtl(header)
+        _validate_mtl(uploaded_file=uploaded_file, size_bytes=size_bytes)
     elif extension == ".png":
         if mime_type != "image/png":
             raise FileValidationError("Unsupported or mismatched asset MIME type.")
-        _ensure(header.startswith(_PNG_SIGNATURE), "Invalid PNG signature.")
+        _validate_png(uploaded_file=uploaded_file, size_bytes=size_bytes)
     elif extension in {".jpg", ".jpeg"}:
         if mime_type != "image/jpeg":
             raise FileValidationError("Unsupported or mismatched asset MIME type.")
-        _ensure(header.startswith(_JPEG_SIGNATURE), "Invalid JPEG signature.")
+        _validate_jpeg(uploaded_file=uploaded_file, size_bytes=size_bytes)
     else:
         raise FileValidationError("Unsupported OBJ asset extension.")
 
@@ -125,11 +127,11 @@ def validate_gltf_asset_upload(uploaded_file, declared_mime_type=None):
     elif extension == ".png":
         if mime_type != "image/png":
             raise FileValidationError("Unsupported or mismatched asset MIME type.")
-        _ensure(header.startswith(_PNG_SIGNATURE), "Invalid PNG signature.")
+        _validate_png(uploaded_file=uploaded_file, size_bytes=size_bytes)
     elif extension in {".jpg", ".jpeg"}:
         if mime_type != "image/jpeg":
             raise FileValidationError("Unsupported or mismatched asset MIME type.")
-        _ensure(header.startswith(_JPEG_SIGNATURE), "Invalid JPEG signature.")
+        _validate_jpeg(uploaded_file=uploaded_file, size_bytes=size_bytes)
     else:
         raise FileValidationError("Unsupported GLTF asset extension.")
 
@@ -147,26 +149,17 @@ def get_gltf_external_resource_references(uploaded_file) -> list[PurePosixPath]:
     Browser file inputs expose companion files by basename only. Duplicate referenced
     basenames are therefore rejected so they cannot be confused during worker staging.
     """
-    payload = _load_gltf_payload(_read_prefix(uploaded_file, MAX_VALIDATION_BYTES))
+    size_bytes = _get_upload_size(uploaded_file)
+    raw_references = get_gltf_external_resource_uris(uploaded_file, size_bytes=size_bytes)
     references = []
     seen_filenames = set()
-    for collection_name in ("buffers", "images"):
-        collection = payload.get(collection_name, [])
-        _ensure(isinstance(collection, list), f"GLTF {collection_name} must be an array.")
-        for resource in collection:
-            _ensure(isinstance(resource, dict), f"GLTF {collection_name} entries must be objects.")
-            uri = resource.get("uri")
-            if uri is None:
-                continue
-            _ensure(isinstance(uri, str) and uri.strip(), "GLTF resource URI is invalid.")
-            if uri.startswith("data:"):
-                continue
-            reference = _validate_gltf_resource_uri(uri)
-            filename = sanitize_storage_filename(reference.name)
-            _ensure(
-                filename not in seen_filenames,
-                "GLTF companion filenames must be unique.",
-            )
-            seen_filenames.add(filename)
-            references.append(reference)
+    for uri in raw_references:
+        _ensure(isinstance(uri, str) and uri.strip(), "GLTF resource URI is invalid.")
+        if uri.startswith("data:"):
+            continue
+        reference = _validate_gltf_resource_uri(uri)
+        filename = sanitize_storage_filename(reference.name)
+        _ensure(filename not in seen_filenames, "GLTF companion filenames must be unique.")
+        seen_filenames.add(filename)
+        references.append(reference)
     return references

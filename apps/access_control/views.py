@@ -6,6 +6,7 @@ from django.urls import reverse
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.core.exceptions import ValidationError as DjangoValidationError
 from drf_spectacular.utils import OpenApiResponse, extend_schema
+from config.schema import paginated_response_serializer
 from rest_framework import generics, permissions, status
 from rest_framework.authentication import BaseAuthentication, CSRFCheck
 from rest_framework.exceptions import AuthenticationFailed, PermissionDenied
@@ -141,8 +142,9 @@ class UserListCreateAPIView(generics.GenericAPIView):
         return UserReadSerializer
 
     @extend_schema(
+        operation_id="users_list",
         summary="List local users",
-        responses={200: UserReadSerializer(many=True)},
+        responses={200: paginated_response_serializer("PaginatedUserRead", UserReadSerializer)},
     )
     def get(self, request, *args, **kwargs):
         queryset = get_local_users_for_admin(actor=request.user)
@@ -151,6 +153,7 @@ class UserListCreateAPIView(generics.GenericAPIView):
         return self.get_paginated_response(serializer.data)
 
     @extend_schema(
+        operation_id="users_create",
         summary="Create a local user",
         request=UserCreateSerializer,
         responses={201: UserReadSerializer},

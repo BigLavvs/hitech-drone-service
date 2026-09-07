@@ -134,3 +134,47 @@ class ProcessingCompletionConcurrencyTests(TransactionTestCase):
             list(SurveyFile.objects.filter(survey=self.survey).values_list("status", flat=True)),
             ["ready", "ready"],
         )
+
+    def test_completion_cannot_hide_a_permanently_failed_sibling(self):
+        failed_job = self.jobs[1]
+        failed_file = failed_job.file
+        ProcessingJob.objects.filter(pk=failed_job.pk).update(
+            status="failed", completed_at=timezone.now()
+        )
+        SurveyFile.objects.filter(pk=failed_file.pk).update(status="failed")
+        completing_job = self.jobs[0]
+
+        self.assertTrue(
+            _mark_job_completed(
+                processing_job_id=completing_job.pk,
+                lease_token="worker-1",
+                preview_path="preview-complete",
+                converted_path=None,
+            )
+        )
+
+        self.survey.refresh_from_db()
+        self.assertEqual(self.survey.status, SurveyStatus.FAILED)
+        self.assertEqual(self.survey.processing_status, "failed")
+
+    def test_failed_sibling_remains_visible_when_it_completed_first(self):
+        failed_job = self.jobs[0]
+        failed_file = failed_job.file
+        ProcessingJob.objects.filter(pk=failed_job.pk).update(
+            status="failed", completed_at=timezone.now()
+        )
+        SurveyFile.objects.filter(pk=failed_file.pk).update(status="failed")
+        completing_job = self.jobs[1]
+
+        self.assertTrue(
+            _mark_job_completed(
+                processing_job_id=completing_job.pk,
+                lease_token="worker-2",
+                preview_path="preview-complete",
+                converted_path=None,
+            )
+        )
+
+        self.survey.refresh_from_db()
+        self.assertEqual(self.survey.status, SurveyStatus.FAILED)
+        self.assertEqual(self.survey.processing_status, "failed")

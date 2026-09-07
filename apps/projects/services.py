@@ -115,6 +115,19 @@ def get_project_by_id(*, project_id: int) -> Project:
     return Project.objects.get(pk=project_id)
 
 
+def lock_project_for_update(*, project_id: int, fields=None) -> Project:
+    """Lock a project for a transaction coordinated by the projects owner."""
+    queryset = Project.objects.select_for_update()
+    if fields:
+        queryset = queryset.only(*fields)
+    return queryset.get(pk=project_id)
+
+
+def lock_site_for_update(*, site_id: int) -> Site:
+    """Lock a site for a transaction coordinated by the projects owner."""
+    return Site.objects.select_for_update().get(pk=site_id)
+
+
 def get_site_with_project(*, site_id: int) -> Site:
     site = Site.objects.select_related("project").filter(pk=site_id).first()
     if site is None:
@@ -243,42 +256,51 @@ def update_project(
     location: str | None | object = _UNSET,
     project_manager: User | object = _UNSET,
 ) -> Project:
-    if not user_can_manage_project(actor, project):
-        raise PermissionDenied("Only active administrators and the owning project manager can update a project.")
-
     update_fields: list[str] = []
 
-    if name is not _UNSET:
-        project.name = name
-        update_fields.append("name")
-
-    if description is not _UNSET:
-        project.description = description
-        update_fields.append("description")
-
-    if location is not _UNSET:
-        project.location = location
-        update_fields.append("location")
-
-    if project_manager is not _UNSET:
-        _validate_project_manager(project_manager)
-        project.project_manager = project_manager
-        update_fields.append("project_manager")
-
-    if not update_fields:
-        return project
-
     with transaction.atomic():
-        project.save(update_fields=[*update_fields, "updated_at"])
+        locked_project = lock_project_for_update(project_id=project.pk)
+        if not user_can_manage_project(actor, locked_project):
+            raise PermissionDenied(
+                "Only active administrators and the owning project manager can update a project."
+            )
+
+        if name is not _UNSET:
+            locked_project.name = name
+            update_fields.append("name")
+
+        if description is not _UNSET:
+            locked_project.description = description
+            update_fields.append("description")
+
+        if location is not _UNSET:
+            locked_project.location = location
+            update_fields.append("location")
+
+        if project_manager is not _UNSET:
+            try:
+                from apps.access_control.services import lock_user_for_update
+
+                locked_manager = lock_user_for_update(user_id=project_manager.pk)
+            except User.DoesNotExist as exc:
+                raise ValidationError("Assigned project manager does not exist.") from exc
+            _validate_project_manager(locked_manager)
+            locked_project.project_manager = locked_manager
+            update_fields.append("project_manager")
+
+        if not update_fields:
+            return locked_project
+
+        locked_project.save(update_fields=[*update_fields, "updated_at"])
         record_audit_event(
             action=AuditAction.PROJECT_UPDATED,
             entity_type="project",
-            entity_id=project.pk,
+            entity_id=locked_project.pk,
             user=actor,
-            project=project,
+            project=locked_project,
         )
 
-    return project
+    return locked_project
 
 
 def synchronize_demo_project(*, actor: User, project: Project, project_manager: User) -> Project:
@@ -294,39 +316,43 @@ def synchronize_demo_project(*, actor: User, project: Project, project_manager: 
 
 
 def archive_project(*, actor: User, project: Project) -> Project:
-    if not user_can_manage_project(actor, project):
-        raise PermissionDenied(
-            "Only active administrators and the owning project manager can archive a project."
-        )
-
-    if project.status != "active":
-        raise ValidationError("Only active projects can be archived.")
-
     with transaction.atomic():
-        project.status = "archived"
-        project.save(update_fields=["status", "updated_at"])
+        locked_project = lock_project_for_update(project_id=project.pk)
+        if not user_can_manage_project(actor, locked_project):
+            raise PermissionDenied(
+                "Only active administrators and the owning project manager can archive a project."
+            )
+        if locked_project.status != "active":
+            raise ValidationError("Only active projects can be archived.")
+
+        locked_project.status = "archived"
+        locked_project.save(update_fields=["status", "updated_at"])
         record_audit_event(
             action=AuditAction.PROJECT_ARCHIVED,
             entity_type="project",
-            entity_id=project.pk,
+            entity_id=locked_project.pk,
             user=actor,
-            project=project,
+            project=locked_project,
         )
 
-    return project
+    return locked_project
 
 
 def add_project_member(*, actor: User, project: Project, member: User) -> ProjectMembership:
-    _validate_project_membership_actor(actor=actor, project=project)
-    _validate_project_membership_target(member)
-
-    if ProjectMembership.objects.filter(project=project, user=member).exists():
-        raise ValidationError("User is already a member of this project.")
-
     with transaction.atomic():
+        locked_project = lock_project_for_update(project_id=project.pk)
+        _validate_project_membership_actor(actor=actor, project=locked_project)
+        from apps.access_control.services import lock_user_for_update
+
+        locked_member = lock_user_for_update(user_id=member.pk)
+        _validate_project_membership_target(locked_member)
+
+        if ProjectMembership.objects.filter(project=locked_project, user=locked_member).exists():
+            raise ValidationError("User is already a member of this project.")
+
         membership = ProjectMembership.objects.create(
-            project=project,
-            user=member,
+            project=locked_project,
+            user=locked_member,
             assigned_by=actor,
         )
         record_audit_event(
@@ -334,30 +360,32 @@ def add_project_member(*, actor: User, project: Project, member: User) -> Projec
             entity_type="project",
             entity_id=project.pk,
             user=actor,
-            project=project,
-            details={"operation": "added", "member_id": member.pk},
+            project=locked_project,
+            details={"operation": "added", "member_id": locked_member.pk},
         )
 
     return membership
 
 
 def remove_project_member(*, actor: User, project: Project, member: User) -> None:
-    _validate_project_membership_actor(actor=actor, project=project)
-    _validate_project_membership_target(member)
-
-    try:
-        membership = ProjectMembership.objects.get(project=project, user=member)
-    except ProjectMembership.DoesNotExist as exc:
-        raise ValidationError("User is not a member of this project.") from exc
-
     with transaction.atomic():
+        locked_project = lock_project_for_update(project_id=project.pk)
+        _validate_project_membership_actor(actor=actor, project=locked_project)
+
+        try:
+            membership = ProjectMembership.objects.select_for_update().get(
+                project=locked_project, user_id=member.pk
+            )
+        except ProjectMembership.DoesNotExist as exc:
+            raise ValidationError("User is not a member of this project.") from exc
+
         membership.delete()
         record_audit_event(
             action=AuditAction.PROJECT_UPDATED,
             entity_type="project",
             entity_id=project.pk,
             user=actor,
-            project=project,
+            project=locked_project,
             details={"operation": "removed", "member_id": member.pk},
         )
 
@@ -412,12 +440,13 @@ def create_site(
     coordinates: Point,
     coordinate_reference_system: str = "EPSG:4326",
 ) -> Site:
-    _validate_site_management_actor(actor=actor, project=project)
     validated_coordinates = _validate_site_coordinates(coordinates)
 
     with transaction.atomic():
+        locked_project = lock_project_for_update(project_id=project.pk)
+        _validate_site_management_actor(actor=actor, project=locked_project)
         site = Site.objects.create(
-            project=project,
+            project=locked_project,
             name=name,
             coordinates=validated_coordinates,
             coordinate_reference_system=coordinate_reference_system,
@@ -427,7 +456,7 @@ def create_site(
             entity_type="site",
             entity_id=site.pk,
             user=actor,
-            project=site.project,
+            project=locked_project,
         )
 
     return site
@@ -441,51 +470,58 @@ def update_site(
     coordinates: Point | object = _UNSET,
     coordinate_reference_system: str | object = _UNSET,
 ) -> Site:
-    _validate_site_management_actor(actor=actor, project=site.project)
-
     update_fields: list[str] = []
-
-    if name is not _UNSET:
-        site.name = name
-        update_fields.append("name")
-
-    if coordinates is not _UNSET:
-        site.coordinates = _validate_site_coordinates(coordinates)
-        update_fields.append("coordinates")
-
-    if coordinate_reference_system is not _UNSET:
-        site.coordinate_reference_system = coordinate_reference_system
-        update_fields.append("coordinate_reference_system")
-
-    if not update_fields:
-        return site
+    validated_coordinates = (
+        _validate_site_coordinates(coordinates)
+        if coordinates is not _UNSET else _UNSET
+    )
 
     with transaction.atomic():
-        site.save(update_fields=[*update_fields, "updated_at"])
+        locked_project = lock_project_for_update(project_id=site.project_id)
+        _validate_site_management_actor(actor=actor, project=locked_project)
+        locked_site = lock_site_for_update(site_id=site.pk)
+        if locked_site.project_id != locked_project.pk:
+            raise PermissionDenied("You do not have permission to modify this site.")
+
+        if name is not _UNSET:
+            locked_site.name = name
+            update_fields.append("name")
+        if validated_coordinates is not _UNSET:
+            locked_site.coordinates = validated_coordinates
+            update_fields.append("coordinates")
+        if coordinate_reference_system is not _UNSET:
+            locked_site.coordinate_reference_system = coordinate_reference_system
+            update_fields.append("coordinate_reference_system")
+        if not update_fields:
+            return locked_site
+
+        locked_site.save(update_fields=[*update_fields, "updated_at"])
         record_audit_event(
             action=AuditAction.SITE_UPDATED,
             entity_type="site",
-            entity_id=site.pk,
+            entity_id=locked_site.pk,
             user=actor,
-            project=site.project,
+            project=locked_project,
         )
 
-    return site
+    return locked_site
 
 
 def delete_site(*, actor: User, site: Site) -> None:
-    _validate_site_management_actor(actor=actor, project=site.project)
-
     with transaction.atomic():
-        site_id = site.pk
-        project = site.project
-        site.delete()
+        locked_project = lock_project_for_update(project_id=site.project_id)
+        _validate_site_management_actor(actor=actor, project=locked_project)
+        locked_site = lock_site_for_update(site_id=site.pk)
+        if locked_site.project_id != locked_project.pk:
+            raise PermissionDenied("You do not have permission to modify this site.")
+        site_id = locked_site.pk
+        locked_site.delete()
         record_audit_event(
             action=AuditAction.SITE_DELETED,
             entity_type="site",
             entity_id=site_id,
             user=actor,
-            project=project,
+            project=locked_project,
         )
 
 

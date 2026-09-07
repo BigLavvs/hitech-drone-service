@@ -4,6 +4,11 @@ from apps.files.models import FileFormat, FileType
 
 
 MAX_VALIDATION_BYTES = 262144
+VALIDATION_READ_CHUNK_BYTES = 64 * 1024
+# JPEG validation only hands small, bounded images to the maintained decoder.
+# Larger uploads still receive the streaming structural validation below.
+MAX_JPEG_DECODE_BYTES = 16 * 1024 * 1024
+MAX_JPEG_DECODE_PIXELS = 25_000_000
 
 _TIFF_SIGNATURES = (
     b"II*\x00",

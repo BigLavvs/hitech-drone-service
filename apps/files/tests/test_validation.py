@@ -1,7 +1,13 @@
+import json
+import gc
+import tracemalloc
+
+from django.test import SimpleTestCase
+
 from .support import *
 
 
-class FileValidationTests(TestCase):
+class FileValidationTests(SimpleTestCase):
     def make_upload(self, name, content, content_type):
         return TrackingUpload(name=name, content=content, content_type=content_type)
 
@@ -26,8 +32,8 @@ class FileValidationTests(TestCase):
         cases = [
             ("ortho-geotiff.tif", b"II*\x00\x08\x00\x00\x00\x01\x00\xAF\x87\x03\x00\x01\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00", "image/tiff", FileType.TWO_D, FileFormat.GEOTIFF),
             ("image.tiff", b"II*\x00\x08\x00\x00\x00\x00\x00", "image/tiff", FileType.TWO_D, FileFormat.TIFF),
-            ("preview.png", b"\x89PNG\r\n\x1a\nrest", "image/png", FileType.TWO_D, FileFormat.PNG),
-            ("photo.jpg", b"\xff\xd8\xff\xe0rest", "image/jpeg", FileType.TWO_D, FileFormat.JPEG),
+            ("preview.png", valid_png_bytes(), "image/png", FileType.TWO_D, FileFormat.PNG),
+            ("photo.jpg", valid_jpeg_bytes(), "image/jpeg", FileType.TWO_D, FileFormat.JPEG),
             ("area.kml", b'<?xml version="1.0" encoding="UTF-8"?><kml xmlns="http://www.opengis.net/kml/2.2"><Document/></kml>', "application/vnd.google-earth.kml+xml", FileType.TWO_D, FileFormat.KML),
             ("outline.geojson", b'{"type":"FeatureCollection","features":[]}', "application/geo+json", FileType.TWO_D, FileFormat.GEOJSON),
             ("outline.json", b'{"type":"FeatureCollection","features":[]}', "application/json", FileType.TWO_D, FileFormat.GEOJSON),
@@ -60,7 +66,7 @@ class FileValidationTests(TestCase):
 
     def test_browser_fallback_mime_is_accepted_only_after_strict_content_validation(self):
         cases = [
-            ("map.png", b"\x89PNG\r\n\x1a\nrest", "application/octet-stream", FileType.TWO_D, FileFormat.PNG),
+            ("map.png", valid_png_bytes(), "application/octet-stream", FileType.TWO_D, FileFormat.PNG),
             ("area.kml", b'<?xml version="1.0" encoding="UTF-8"?><kml xmlns="http://www.opengis.net/kml/2.2"><Document/></kml>', "application/octet-stream", FileType.TWO_D, FileFormat.KML),
             ("outline.geojson", b'{"type":"FeatureCollection","features":[]}', "application/octet-stream", FileType.TWO_D, FileFormat.GEOJSON),
             ("outline.json", b'{"type":"FeatureCollection","features":[]}', "text/plain", FileType.TWO_D, FileFormat.GEOJSON),
@@ -85,7 +91,7 @@ class FileValidationTests(TestCase):
                 self.assertEqual(result.file_format, expected_format)
 
         with self.assertRaises(FileValidationError):
-            validate_upload(self.make_upload("photo.jpg", b"\xff\xd8\xff\xe0rest", "text/plain"))
+            validate_upload(self.make_upload("photo.jpg", valid_jpeg_bytes(), "text/plain"))
 
         with self.assertRaises(FileValidationError):
             validate_upload(self.make_upload("scene.glb", b"not-a-glb", "application/octet-stream"))
@@ -95,7 +101,7 @@ class FileValidationTests(TestCase):
 
     def test_conflicting_specific_mime_type_remains_rejected(self):
         with self.assertRaises(FileValidationError):
-            validate_upload(self.make_upload("map.png", b"\x89PNG\r\n\x1a\nrest", "image/jpeg"))
+            validate_upload(self.make_upload("map.png", valid_png_bytes(), "image/jpeg"))
 
     def test_obj_mtl_asset_accepts_browser_generic_mime_only_for_valid_mtl_content(self):
         valid_asset = self.make_upload(
@@ -137,9 +143,9 @@ class FileValidationTests(TestCase):
     def test_unsupported_extensions_and_traversal_filenames_are_rejected(self):
         uploads = [
             self.make_upload("payload.exe", b"MZ", "application/octet-stream"),
-            self.make_upload("../payload.png", b"\x89PNG\r\n\x1a\nrest", "image/png"),
-            self.make_upload(r"..\\payload.png", b"\x89PNG\r\n\x1a\nrest", "image/png"),
-            self.make_upload("folder/payload.png", b"\x89PNG\r\n\x1a\nrest", "image/png"),
+            self.make_upload("../payload.png", valid_png_bytes(), "image/png"),
+            self.make_upload(r"..\\payload.png", valid_png_bytes(), "image/png"),
+            self.make_upload("folder/payload.png", valid_png_bytes(), "image/png"),
         ]
 
         for upload in uploads:
@@ -150,20 +156,336 @@ class FileValidationTests(TestCase):
     @override_settings(MAX_FILE_SIZE_BYTES=4)
     def test_oversize_upload_is_rejected(self):
         with self.assertRaises(FileValidationError):
-            validate_upload(self.make_upload("preview.png", b"\x89PNG\r\n\x1a\nrest", "image/png"))
+            validate_upload(self.make_upload("preview.png", valid_png_bytes() + b"12345", "image/png"))
 
-    def test_validation_reads_only_bounded_prefix(self):
-        large_png = TrackingUpload(
-            name="preview.png",
-            content=b"\x89PNG\r\n\x1a\n" + (b"x" * (MAX_VALIDATION_BYTES + 1024)),
-            content_type="image/png",
-            fail_above=MAX_VALIDATION_BYTES,
+    def test_structured_validation_accepts_valid_content_beyond_legacy_prefix_cap(self):
+        content = json.dumps(
+            {
+                "type": "FeatureCollection",
+                "features": [],
+                "properties": "x" * (MAX_VALIDATION_BYTES + 1024),
+            }
+        ).encode()
+        large_geojson = TrackingUpload(
+            name="large.geojson",
+            content=content,
+            content_type="application/geo+json",
         )
 
-        result = validate_upload(large_png)
+        result = validate_upload(large_geojson)
 
-        self.assertEqual(result.file_format, FileFormat.PNG)
-        self.assertLessEqual(large_png.max_requested_read, MAX_VALIDATION_BYTES)
+        self.assertEqual(result.file_format, FileFormat.GEOJSON)
+        complete_read_sizes = [
+            size for _position, size in large_geojson.read_calls
+            if size != MAX_VALIDATION_BYTES
+        ]
+        self.assertLessEqual(max(complete_read_sizes), VALIDATION_READ_CHUNK_BYTES)
+
+    def test_structured_validation_accepts_below_at_and_above_legacy_prefix_boundary(self):
+        for target_size in (
+            MAX_VALIDATION_BYTES - 512,
+            MAX_VALIDATION_BYTES,
+            MAX_VALIDATION_BYTES + 512,
+        ):
+            with self.subTest(target_size=target_size):
+                properties_size = max(0, target_size - len(b'{"type":"FeatureCollection","features":[],"properties":""}'))
+                content = json.dumps(
+                    {
+                        "type": "FeatureCollection",
+                        "features": [],
+                        "properties": "x" * properties_size,
+                    },
+                    separators=(",", ":"),
+                ).encode()
+                self.assertGreaterEqual(len(content), target_size - 2)
+                self.assertEqual(
+                    validate_upload(
+                        self.make_upload("boundary.geojson", content, "application/geo+json")
+                    ).file_format,
+                    FileFormat.GEOJSON,
+                )
+
+    def test_structured_validation_handles_utf8_split_across_read_chunks_and_truncation(self):
+        content = json.dumps(
+            {
+                "type": "FeatureCollection",
+                "features": [],
+                "properties": "x" * (VALIDATION_READ_CHUNK_BYTES - 20) + "é" * 20,
+            },
+            ensure_ascii=False,
+        ).encode()
+        self.assertEqual(
+            validate_upload(self.make_upload("utf8.geojson", content, "application/geo+json")).file_format,
+            FileFormat.GEOJSON,
+        )
+
+        truncated = TrackingUpload("truncated.geojson", content, "application/geo+json")
+        truncated.size += 1
+        with self.assertRaisesMessage(FileValidationError, "Structured file is truncated."):
+            validate_upload(truncated)
+
+    def test_structured_and_binary_content_requires_complete_validity(self):
+        malformed = [
+            self.make_upload("short.png", b"\x89PNG\r\n\x1a\n", "image/png"),
+            self.make_upload("point.geojson", b'{"type":"Point"}', "application/geo+json"),
+            self.make_upload("not-kml.kml", b"<notkml/>", "application/vnd.google-earth.kml+xml"),
+            self.make_upload("comments.obj", b"# only a comment\n", "model/obj"),
+            self.make_upload("trailing.png", valid_png_bytes() + b"trailing", "image/png"),
+        ]
+        for upload in malformed:
+            with self.subTest(name=upload.name):
+                with self.assertRaises(FileValidationError):
+                    validate_upload(upload)
+
+    def test_images_require_decodable_scan_data(self):
+        self.assertEqual(
+            validate_upload(self.make_upload("interlaced.png", valid_png_bytes(interlaced=True), "image/png")).file_format,
+            FileFormat.PNG,
+        )
+        self.assertEqual(
+            validate_upload(self.make_upload("progressive.jpg", valid_progressive_jpeg_bytes(), "image/jpeg")).file_format,
+            FileFormat.JPEG,
+        )
+        with self.assertRaises(FileValidationError):
+            validate_upload(
+                self.make_upload(
+                    "empty-interlaced.png",
+                    valid_png_bytes(interlaced=True, scan_data=b""),
+                    "image/png",
+                )
+            )
+        with self.assertRaises(FileValidationError):
+            validate_upload(
+                self.make_upload(
+                    "marker-only.jpg",
+                    b"\xff\xd8\xff\xc0\x00\x0b\x08\x00\x01\x00\x01\x01\x01\x11\x00\xff\xda\x00\x08\x01\x01\x00\x00\x3f\x00\xff\xd9",
+                    "image/jpeg",
+                )
+            )
+
+    def test_polygon_rings_are_structurally_complete(self):
+        incomplete = b'{"type":"Polygon","coordinates":[[[0,0]]]} '
+        with self.assertRaises(FileValidationError):
+            validate_upload(self.make_upload("incomplete.geojson", incomplete, "application/geo+json"))
+
+    def test_all_supported_nonempty_geometry_types_are_accepted(self):
+        geometries = {
+            "Point": [1, 2],
+            "MultiPoint": [[1, 2], [3, 4]],
+            "LineString": [[1, 2], [3, 4]],
+            "MultiLineString": [[[1, 2], [3, 4]], [[5, 6], [7, 8]]],
+            "Polygon": [
+                [[0, 0], [4, 0], [4, 4], [0, 0]],
+                [[1, 1], [2, 1], [1, 2], [1, 1]],
+            ],
+            "MultiPolygon": [
+                [[[0, 0], [4, 0], [4, 4], [0, 0]]],
+                [[[10, 10], [14, 10], [14, 14], [10, 10]]],
+            ],
+        }
+
+        for geometry_type, coordinates in geometries.items():
+            with self.subTest(geometry_type=geometry_type):
+                content = json.dumps({"type": geometry_type, "coordinates": coordinates}).encode()
+                result = validate_upload(
+                    self.make_upload("geometry.geojson", content, "application/geo+json")
+                )
+                self.assertEqual(result.file_format, FileFormat.GEOJSON)
+
+        collections = {
+            "FeatureCollection": {
+                "type": "FeatureCollection",
+                "features": [
+                    {"type": "Feature", "geometry": {"type": "Point", "coordinates": [1, 2]}}
+                ],
+            },
+            "Feature": {
+                "type": "Feature",
+                "geometry": {"type": "LineString", "coordinates": [[1, 2], [3, 4]]},
+            },
+            "GeometryCollection": {
+                "type": "GeometryCollection",
+                "geometries": [{"type": "Point", "coordinates": [1, 2]}],
+            },
+        }
+        for geometry_type, payload in collections.items():
+            with self.subTest(geometry_type=geometry_type):
+                result = validate_upload(
+                    self.make_upload("collection.geojson", json.dumps(payload).encode(), "application/geo+json")
+                )
+                self.assertEqual(result.file_format, FileFormat.GEOJSON)
+
+    def test_every_sibling_line_and_ring_is_validated(self):
+        malformed = {
+            "multiline.geojson": {
+                "type": "MultiLineString",
+                "coordinates": [[[0, 0], [1, 1]], [[2, 2]]],
+            },
+            "polygon-hole.geojson": {
+                "type": "Polygon",
+                "coordinates": [
+                    [[0, 0], [4, 0], [4, 4], [0, 0]],
+                    [[1, 1], [2, 1], [1, 2]],
+                ],
+            },
+            "multipolygon.geojson": {
+                "type": "MultiPolygon",
+                "coordinates": [
+                    [[[0, 0], [4, 0], [4, 4], [0, 0]]],
+                    [[[10, 10], [14, 10], [14, 14]]],
+                ],
+            },
+        }
+
+        for name, payload in malformed.items():
+            with self.subTest(name=name), self.assertRaises(FileValidationError):
+                validate_upload(self.make_upload(name, json.dumps(payload).encode(), "application/geo+json"))
+
+    def test_geojson_coordinate_memory_does_not_scale_with_sibling_count(self):
+        uploads = []
+        for position_count in (2_000, 20_000):
+            content = json.dumps(
+                {
+                    "type": "LineString",
+                    "coordinates": [[index % 180, index % 90] for index in range(position_count)],
+                },
+                separators=(",", ":"),
+            ).encode()
+            uploads.append(self.make_upload("many-positions.geojson", content, "application/geo+json"))
+
+        peaks = []
+        for upload in uploads:
+            gc.collect()
+            tracemalloc.start()
+            validate_upload(upload)
+            _current, peak = tracemalloc.get_traced_memory()
+            tracemalloc.stop()
+            peaks.append(peak)
+
+        self.assertLess(peaks[1], 1_024 * 1_024)
+        self.assertLess(peaks[1] - peaks[0], 512 * 1_024)
+
+    def test_json_syntax_is_strict_for_geojson_and_gltf(self):
+        invalid_uploads = [
+            self.make_upload(
+                "trailing.geojson",
+                b'{"type":"FeatureCollection","features":[],}',
+                "application/geo+json",
+            ),
+            self.make_upload(
+                "leading-zero.geojson",
+                b'{"type":"Point","coordinates":[01,2]}',
+                "application/geo+json",
+            ),
+            self.make_upload(
+                "trailing.gltf",
+                b'{"asset":{"version":"2.0",}}',
+                "model/gltf+json",
+            ),
+        ]
+
+        for upload in invalid_uploads:
+            with self.subTest(name=upload.name), self.assertRaises(FileValidationError):
+                validate_upload(upload)
+
+    def test_json_literal_split_across_read_boundary_is_accepted(self):
+        prefix = b'{"type":"Feature","padding":"'
+        suffix = b'","geometry":'
+        content = prefix + b"a" * (VALIDATION_READ_CHUNK_BYTES - 2 - len(prefix) - len(suffix)) + suffix + b"null}"
+
+        result = validate_upload(self.make_upload("boundary.geojson", content, "application/geo+json"))
+
+        self.assertEqual(result.file_format, FileFormat.GEOJSON)
+
+    def test_reproduced_malformed_png_and_jpeg_are_rejected(self):
+        def png_chunk(kind, payload):
+            return (
+                struct.pack(">I", len(payload))
+                + kind
+                + payload
+                + struct.pack(">I", zlib.crc32(kind + payload) & 0xFFFFFFFF)
+            )
+
+        indexed_png_without_palette = (
+            b"\x89PNG\r\n\x1a\n"
+            + png_chunk(b"IHDR", struct.pack(">IIBBBBB", 1, 1, 8, 3, 0, 0, 0))
+            + png_chunk(b"IDAT", zlib.compress(b"\x00\x00"))
+            + png_chunk(b"IEND", b"")
+        )
+        malformed_jpeg = bytes.fromhex(
+            "ffd8ffc00008080001000101ffda0008010100003f0001ffd9"
+        )
+        missing_quantization_table = bytes.fromhex(
+            "ffd8ffc0000b080001000101011100ffda0008010100003f0001ffd9"
+        )
+        valid_jpeg = valid_progressive_jpeg_bytes()
+        scan_marker = valid_jpeg.index(b"\xff\xda")
+        scan_start = scan_marker + 2 + struct.unpack(">H", valid_jpeg[scan_marker + 2 : scan_marker + 4])[0]
+        malformed_scan = valid_jpeg[:scan_start] + b"\xff\xd9"
+
+        for name, content in (
+            ("missing-palette.png", indexed_png_without_palette),
+            ("malformed-components.jpg", malformed_jpeg),
+            ("missing-quantization-table.jpg", missing_quantization_table),
+            ("malformed-scan.jpg", malformed_scan),
+        ):
+            with self.subTest(name=name), self.assertRaises(FileValidationError):
+                validate_upload(self.make_upload(name, content, "image/png" if name.endswith("png") else "image/jpeg"))
+
+    def test_kml_dtd_and_entity_declarations_are_rejected_across_chunks(self):
+        declaration = b'<!DOCTYPE kml [<!ENTITY x "expanded">]>'
+        xml_prefix = b'<?xml version="1.0"?>'
+        cases = [
+            xml_prefix + declaration + b'<kml><name>&x;</name></kml>',
+            xml_prefix
+            + b" " * (VALIDATION_READ_CHUNK_BYTES - len(xml_prefix) - 2)
+            + declaration[:2]
+            + declaration[2:]
+            + b'<kml><name>&x;</name></kml>',
+        ]
+
+        for content in cases:
+            with self.assertRaises(FileValidationError):
+                validate_upload(self.make_upload("entities.kml", content, "application/vnd.google-earth.kml+xml"))
+
+    def test_positive_image_fixtures_independently_decode_strictly(self):
+        import rasterio
+        from rasterio.io import MemoryFile
+
+        fixtures = {
+            "png": valid_png_bytes(),
+            "interlaced-png": valid_png_bytes(interlaced=True),
+            "jpeg": valid_jpeg_bytes(),
+            "progressive-jpeg": valid_progressive_jpeg_bytes(),
+        }
+        for name, content in fixtures.items():
+            with self.subTest(name=name):
+                with rasterio.Env(GDAL_ERROR_ON_LIBJPEG_WARNING="TRUE"):
+                    with MemoryFile(content) as memory:
+                        with memory.open() as dataset:
+                            dataset.read()
+
+    def test_ascii_and_binary_ply_bodies_are_checked(self):
+        ascii_ply = (
+            b"ply\nformat ascii 1.0\nelement vertex 1\n"
+            b"property float x\nproperty float y\nend_header\n1.0 2.0\n"
+        )
+        binary_header = (
+            b"ply\nformat binary_little_endian 1.0\nelement vertex 1\n"
+            b"property float x\nproperty float y\nend_header\n"
+        )
+        binary_ply = binary_header + struct.pack("<ff", 1.0, 2.0)
+
+        self.assertEqual(
+            validate_upload(self.make_upload("points.ply", ascii_ply, "application/ply")).file_format,
+            FileFormat.PLY,
+        )
+        self.assertEqual(
+            validate_upload(self.make_upload("points-binary.ply", binary_ply, "application/ply")).file_format,
+            FileFormat.PLY,
+        )
+        with self.assertRaises(FileValidationError):
+            validate_upload(self.make_upload("truncated.ply", binary_header + b"\x00", "application/ply"))
 
     def test_tiff_with_distant_first_ifd_is_accepted_with_bounded_offset_reads(self):
         first_ifd_offset = MAX_VALIDATION_BYTES + 8192

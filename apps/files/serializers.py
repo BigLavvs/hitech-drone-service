@@ -1,4 +1,15 @@
+from drf_spectacular.utils import extend_schema_field, extend_schema_serializer
 from rest_framework import serializers
+
+
+@extend_schema_serializer(component_name="SurveyFileUpload")
+class SurveyFileUploadRequestSerializer(serializers.Serializer):
+    file = serializers.FileField(required=True)
+    assets = serializers.ListField(
+        child=serializers.FileField(),
+        required=False,
+        allow_empty=True,
+    )
 
 
 class SurveyFileUploadResponseSerializer(serializers.Serializer):
@@ -43,6 +54,7 @@ class ProcessingJobDetailSerializer(serializers.Serializer):
     updated_at = serializers.DateTimeField(source="summary.updated_at")
     file = serializers.SerializerMethodField()
 
+    @extend_schema_field(SurveyFileListItemSerializer)
     def get_file(self, obj):
         file = obj.file
         return {

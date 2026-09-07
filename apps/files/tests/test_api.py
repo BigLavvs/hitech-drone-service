@@ -93,7 +93,9 @@ class SurveyFileApiTests(APITestCase):
         self.client.credentials(HTTP_X_CSRFTOKEN=token)
         return token
 
-    def make_upload(self, name="image.png", content=b"\x89PNG\r\n\x1a\npayload", content_type="image/png"):
+    def make_upload(self, name="image.png", content=None, content_type="image/png"):
+        if content is None:
+            content = valid_png_bytes()
         return SimpleUploadedFile(name=name, content=content, content_type=content_type)
 
     @patch("apps.processing.services.dispatch.dispatch_processing_job_safely")

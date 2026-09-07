@@ -67,6 +67,32 @@ class UploadAdmissionAuthorizationMixin:
         self.assertEqual(storage.uploaded, [])
         self.assertEqual(SurveyFile.objects.count(), 0)
 
+    def test_upload_rechecks_membership_after_storage_staging(self):
+        storage = FakePrivateStorageAdapter()
+        original_upload = storage.upload_to_staging
+
+        def revoke_before_admission(**kwargs):
+            ProjectMembership.objects.filter(
+                project=self.project, user=self.assigned_engineer
+            ).delete()
+            return original_upload(**kwargs)
+
+        storage.upload_to_staging = revoke_before_admission
+
+        with self.assertRaisesMessage(
+            PermissionDenied,
+            "Only active administrators, the owning project manager, and assigned survey engineers can upload survey files.",
+        ):
+            admit_uploaded_file(
+                actor=self.assigned_engineer,
+                survey=self.survey,
+                uploaded_file=self.make_upload(),
+                storage=storage,
+            )
+
+        self.assertEqual(SurveyFile.objects.count(), 0)
+        self.assertEqual(storage.objects, {})
+
     @override_settings(MAX_SURVEY_TOTAL_SIZE_BYTES=1024)
     def test_allowed_and_rejected_survey_states_are_enforced(self):
         allowed_states = (

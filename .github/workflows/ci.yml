@@ -82,6 +82,8 @@ jobs:
         run: python manage.py check --settings=config.settings_test
       - name: Check migration consistency
         run: python manage.py makemigrations --check --dry-run --settings=config.settings_test
+      - name: Validate OpenAPI contract
+        run: python manage.py spectacular --validate --fail-on-warn --settings=config.settings_test
       - name: Collect static files
         run: python manage.py collectstatic --noinput --settings=config.settings_test
       - name: Run Django suite against disposable PostGIS

@@ -36,11 +36,9 @@ class ApprovalSummary:
 
 
 def submit_survey_for_approval(*, actor: User, survey: Survey) -> None:
-    workflow = get_survey_workflow_snapshot(survey_id=survey.pk)
-    _validate_submit_actor(actor=actor, survey=workflow)
-
     with transaction.atomic():
         locked_survey = lock_survey_for_workflow(survey_id=survey.pk)
+        _validate_submit_actor(actor=actor, survey=locked_survey)
         validate_survey_ready_for_submission(survey=locked_survey)
         if Approval.objects.filter(survey_id=locked_survey.id).exists():
             raise ValidationError("Approval already exists for this survey.")
@@ -67,11 +65,9 @@ def submit_survey_for_approval(*, actor: User, survey: Survey) -> None:
 
 
 def approve_survey(*, actor: User, survey: Survey) -> None:
-    workflow = get_survey_workflow_snapshot(survey_id=survey.pk)
-    _validate_review_actor(actor=actor, survey=workflow)
-
     with transaction.atomic():
         locked_survey = lock_survey_for_workflow(survey_id=survey.pk)
+        _validate_review_actor(actor=actor, survey=locked_survey)
         approval = _require_pending_approval(survey=locked_survey)
         validate_survey_readiness(survey=locked_survey)
         update_locked_survey_workflow_state(
@@ -97,11 +93,9 @@ def approve_survey(*, actor: User, survey: Survey) -> None:
 
 
 def reject_survey(*, actor: User, survey: Survey, reason: str) -> None:
-    workflow = get_survey_workflow_snapshot(survey_id=survey.pk)
-    _validate_review_actor(actor=actor, survey=workflow)
-
     with transaction.atomic():
         locked_survey = lock_survey_for_workflow(survey_id=survey.pk)
+        _validate_review_actor(actor=actor, survey=locked_survey)
         approval = _require_pending_approval(survey=locked_survey)
         update_locked_survey_workflow_state(
             survey_id=locked_survey.id,

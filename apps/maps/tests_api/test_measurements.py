@@ -6,12 +6,14 @@ from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
 from django.conf import settings
 from django.contrib.gis.geos import Point
+from django.core.exceptions import ValidationError
 from django.test import override_settings
 from rest_framework.test import APITestCase
 
 from apps.access_control.models import User, UserRole
 from apps.audit.models import AuditAction, AuditLog
 from apps.maps.models import Measurement
+from apps.maps.services import _calculate_area_square_metres, _to_decimal
 from apps.projects.models import Project, ProjectMembership, Site
 from apps.surveys.models import Survey, SurveyStatus
 
@@ -118,6 +120,39 @@ class MeasurementApiTests(APITestCase):
         )
 
         self.list_url = f"/api/v1/surveys/{self.survey.pk}/measurements"
+
+    def test_area_normalizes_dateline_crossing_and_winding(self):
+        dateline_area = _calculate_area_square_metres(
+            [[179.0, 0.0], [-179.0, 0.0], [-179.0, 1.0], [179.0, 1.0]]
+        )
+        ordinary_area = _calculate_area_square_metres(
+            [[1.0, 0.0], [-1.0, 0.0], [-1.0, 1.0], [1.0, 1.0]]
+        )
+        reversed_area = _calculate_area_square_metres(
+            [[179.0, 1.0], [-179.0, 1.0], [-179.0, 0.0], [179.0, 0.0]]
+        )
+
+        self.assertAlmostEqual(float(dateline_area), float(ordinary_area), delta=float(ordinary_area) * 0.01)
+        self.assertAlmostEqual(float(dateline_area), float(reversed_area), delta=float(ordinary_area) * 0.01)
+
+    def test_area_handles_degenerate_and_polar_coordinates_and_rejects_unstorable_values(self):
+        small_square = _calculate_area_square_metres(
+            [[0.0, 0.0], [0.000001, 0.0], [0.000001, 0.000001], [0.0, 0.000001]]
+        )
+        self.assertAlmostEqual(float(small_square), 0.01236435, places=6)
+        self.assertEqual(
+            _calculate_area_square_metres([[0.0, 0.0], [1.0, 0.0], [2.0, 0.0], [0.0, 0.0]]),
+            Decimal("0E-8"),
+        )
+        polar_area = _calculate_area_square_metres(
+            [[-45.0, 89.0], [45.0, 89.0], [45.0, 89.5], [-45.0, 89.5]]
+        )
+        self.assertGreaterEqual(polar_area, Decimal("0"))
+        with self.assertRaisesMessage(
+            ValidationError,
+            "Calculated measurement value exceeds storage precision.",
+        ):
+            _to_decimal(1_000_000_000_000.0)
 
     def auth_settings(self):
         return override_settings(

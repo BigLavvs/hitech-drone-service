@@ -47,6 +47,7 @@ class ProcessingRun:
 class ProcessingJobReadiness:
     job_count: int
     all_jobs_completed: bool
+    has_failed_jobs: bool = False
 
 
 @dataclass(frozen=True)
@@ -99,20 +100,20 @@ def get_survey_job_readiness(*, survey_id: int) -> ProcessingJobReadiness:
     return ProcessingJobReadiness(
         job_count=len(statuses),
         all_jobs_completed=bool(statuses) and all(status == "completed" for status in statuses),
+        has_failed_jobs=any(status == "failed" for status in statuses),
     )
 
 
 def _load_job_context(*, processing_job_id: int, for_update: bool = False):
-    queryset = ProcessingJob.objects
+    job_reference = ProcessingJob.objects.only("file_id").get(pk=processing_job_id)
+    file_snapshot = get_processing_file_snapshot(file_id=job_reference.file_id)
     if for_update:
-        queryset = queryset.select_for_update()
-    job = queryset.get(pk=processing_job_id)
-    file_snapshot = get_processing_file_snapshot(file_id=job.file_id)
-    survey_snapshot = (
-        lock_survey_for_workflow(survey_id=file_snapshot.survey_id)
-        if for_update
-        else get_survey_workflow_snapshot(survey_id=file_snapshot.survey_id)
-    )
+        # Workflow mutations use project -> survey -> processing job order.
+        survey_snapshot = lock_survey_for_workflow(survey_id=file_snapshot.survey_id)
+        job = ProcessingJob.objects.select_for_update().get(pk=processing_job_id)
+    else:
+        survey_snapshot = get_survey_workflow_snapshot(survey_id=file_snapshot.survey_id)
+        job = ProcessingJob.objects.get(pk=processing_job_id)
     return job, file_snapshot, survey_snapshot
 
 
@@ -304,6 +305,8 @@ def _mark_job_running(*, processing_job_id: int, lease_token: str):
         now = timezone.now()
         if job.status != "queued":
             return None
+        if job.dispatch_available_at is not None and job.dispatch_available_at > now:
+            return None
 
         job.status = "running"
         job.progress_percent = 10
@@ -394,8 +397,15 @@ def _mark_job_completed(*, processing_job_id: int, lease_token: str | None = Non
 
         file_readiness = get_survey_file_readiness(survey_id=survey_snapshot.id)
         job_readiness = get_survey_job_readiness(survey_id=survey_snapshot.id)
-        next_status = SurveyStatus.READY if file_readiness.all_files_ready and job_readiness.all_jobs_completed else SurveyStatus.PROCESSING
-        next_processing_status = "completed" if next_status == SurveyStatus.READY else "processing"
+        if file_readiness.has_failed_files or job_readiness.has_failed_jobs:
+            next_status = SurveyStatus.FAILED
+            next_processing_status = "failed"
+        elif file_readiness.all_files_ready and job_readiness.all_jobs_completed:
+            next_status = SurveyStatus.READY
+            next_processing_status = "completed"
+        else:
+            next_status = SurveyStatus.PROCESSING
+            next_processing_status = "processing"
         update_locked_survey_processing_state(
             survey_id=survey_snapshot.id,
             status=next_status,

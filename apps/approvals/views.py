@@ -1,5 +1,6 @@
 from django.core.exceptions import ValidationError as DjangoValidationError
 from django.http import Http404
+from drf_spectacular.utils import OpenApiResponse, extend_schema
 from rest_framework import generics, permissions, status
 from rest_framework.response import Response
 from rest_framework.serializers import ValidationError as DRFValidationError
@@ -28,6 +29,7 @@ class SurveySubmitAPIView(generics.GenericAPIView):
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = EmptyApprovalActionSerializer
 
+    @extend_schema(operation_id="survey_submit_for_approval", request=EmptyApprovalActionSerializer, responses={200: None})
     def post(self, request, survey_id, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -46,6 +48,7 @@ class SurveyApproveAPIView(generics.GenericAPIView):
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = EmptyApprovalActionSerializer
 
+    @extend_schema(operation_id="survey_approve", request=EmptyApprovalActionSerializer, responses={200: None, 409: OpenApiResponse(description="Approval conflict.")})
     def post(self, request, survey_id, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -66,6 +69,7 @@ class SurveyRejectAPIView(generics.GenericAPIView):
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = ApprovalRejectSerializer
 
+    @extend_schema(operation_id="survey_reject", request=ApprovalRejectSerializer, responses={200: None, 409: OpenApiResponse(description="Approval conflict.")})
     def post(self, request, survey_id, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -90,6 +94,7 @@ class SurveyArchiveAPIView(generics.GenericAPIView):
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = SurveyReadSerializer
 
+    @extend_schema(operation_id="survey_archive", request=None, responses={200: SurveyReadSerializer})
     def post(self, request, survey_id, *args, **kwargs):
         survey = _get_visible_survey_or_404(user=request.user, survey_id=survey_id)
 
@@ -106,6 +111,7 @@ class SurveyApprovalDetailAPIView(generics.GenericAPIView):
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = ApprovalSummarySerializer
 
+    @extend_schema(operation_id="survey_approval_retrieve", responses={200: ApprovalSummarySerializer})
     def get(self, request, survey_id, *args, **kwargs):
         survey = _get_visible_survey_or_404(user=request.user, survey_id=survey_id)
 

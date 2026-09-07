@@ -1,5 +1,6 @@
 from django.core.exceptions import ValidationError as DjangoValidationError
 from django.http import Http404
+from drf_spectacular.utils import extend_schema
 from rest_framework import generics, permissions, status
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.response import Response
@@ -20,6 +21,7 @@ from apps.surveys.services import (
     get_surveys_visible_to_user,
     update_survey,
 )
+from config.schema import paginated_response_serializer
 
 
 class SurveyLimitOffsetPagination(LimitOffsetPagination):
@@ -38,6 +40,7 @@ class SurveyListCreateAPIView(generics.GenericAPIView):
             return SurveyCreateSerializer
         return SurveyReadSerializer
 
+    @extend_schema(operation_id="surveys_list", responses={200: paginated_response_serializer("PaginatedSurveyRead", SurveyReadSerializer)})
     def get(self, request, *args, **kwargs):
         query_serializer = SurveyListQuerySerializer(data=request.query_params)
         query_serializer.is_valid(raise_exception=True)
@@ -49,6 +52,7 @@ class SurveyListCreateAPIView(generics.GenericAPIView):
         serializer = SurveyReadSerializer(page, many=True)
         return self.get_paginated_response(serializer.data)
 
+    @extend_schema(operation_id="surveys_create", request=SurveyCreateSerializer, responses={201: SurveyReadSerializer})
     def post(self, request, *args, **kwargs):
         serializer = SurveyCreateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -84,10 +88,12 @@ class SurveyDetailAPIView(generics.GenericAPIView):
             return SurveyUpdateSerializer
         return SurveyReadSerializer
 
+    @extend_schema(operation_id="survey_retrieve", responses={200: SurveyReadSerializer})
     def get(self, request, survey_id, *args, **kwargs):
         survey = _get_visible_survey_or_404(user=request.user, survey_id=survey_id)
         return Response(SurveyReadSerializer(survey).data)
 
+    @extend_schema(operation_id="survey_update", request=SurveyUpdateSerializer, responses={200: SurveyReadSerializer})
     def patch(self, request, survey_id, *args, **kwargs):
         survey = _get_visible_survey_or_404(user=request.user, survey_id=survey_id)
         serializer = SurveyUpdateSerializer(data=request.data, partial=True)

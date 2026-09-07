@@ -277,6 +277,24 @@ class ApprovalWorkflowServiceTests(TestCase):
         self.assertEqual(rejection_history.reason, "Missing overlap.")
         self.assertEqual(audit.action, AuditAction.APPROVAL_REJECTED)
 
+    def test_approval_rechecks_current_project_owner_after_initial_authorization(self) -> None:
+        original_lock = __import__("apps.approvals.services", fromlist=["lock_survey_for_workflow"]).lock_survey_for_workflow
+
+        def transfer_before_lock(*, survey_id):
+            Project.objects.filter(pk=self.project.pk).update(project_manager=self.other_manager)
+            return original_lock(survey_id=survey_id)
+
+        with patch("apps.approvals.services.lock_survey_for_workflow", side_effect=transfer_before_lock):
+            with self.assertRaisesMessage(
+                PermissionDenied,
+                "Only an active administrator or the owning project manager can review this survey.",
+            ):
+                approve_survey(actor=self.owner_manager, survey=self.pending_survey)
+
+        self.pending_survey.refresh_from_db()
+        self.assertEqual(self.pending_survey.status, SurveyStatus.PENDING_APPROVAL)
+        self.assertEqual(AuditLog.objects.count(), 0)
+
     def test_archive_requires_reviewed_state_and_preserves_record(self) -> None:
         with self.assertRaises(ValidationError):
             archive_survey_after_review(actor=self.owner_manager, survey=self.pending_survey)

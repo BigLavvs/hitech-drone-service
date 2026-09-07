@@ -98,12 +98,15 @@ class PrivateR2StorageAdapter:
 
     def promote_object(self, *, source_key, destination_key, content_type):
         copy_source = {"Bucket": self.bucket_name, "Key": source_key}
-        self.client.copy_object(
+        self.client.copy(
             Bucket=self.bucket_name,
             Key=destination_key,
             CopySource=copy_source,
-            ContentType=content_type,
-            MetadataDirective="REPLACE",
+            ExtraArgs={
+                "ContentType": content_type,
+                "MetadataDirective": "REPLACE",
+            },
+            Config=self._build_transfer_config(),
         )
         self.delete_object(source_key)
 

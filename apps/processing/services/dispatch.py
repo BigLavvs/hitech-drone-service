@@ -22,14 +22,28 @@ def create_queued_processing_job(*, survey_file=None, file_id: int | None = None
 
 
 def register_processing_dispatch_on_commit(*, processing_job_id: int):
-    transaction.on_commit(lambda: dispatch_processing_job_safely(processing_job_id=processing_job_id))
+    # Dispatch is deliberately best-effort after the admission transaction has
+    # committed. A callback failure must never make the caller clean up
+    # objects that now have durable SurveyFile/ProcessingJob rows.
+    transaction.on_commit(
+        lambda: dispatch_processing_job_safely(processing_job_id=processing_job_id),
+        robust=True,
+    )
 
 
 def dispatch_processing_job_safely(*, processing_job_id: int) -> DispatchResult:
     try:
         return dispatch_processing_job(processing_job_id=processing_job_id)
     except Exception:
-        _mark_dispatch_failed(processing_job_id=processing_job_id)
+        try:
+            _mark_dispatch_failed(processing_job_id=processing_job_id)
+        except Exception:
+            # The committed job remains queued and is recoverable by beat even
+            # when the status update itself cannot be persisted.
+            logger.exception(
+                "Unable to persist processing dispatch failure.",
+                extra={"processing_job_id": processing_job_id},
+            )
         logger.warning(
             "Processing dispatch unavailable; upload remains queued.",
             extra={"processing_job_id": processing_job_id},
@@ -40,13 +54,29 @@ def dispatch_processing_job_safely(*, processing_job_id: int) -> DispatchResult:
 def dispatch_processing_job(*, processing_job_id: int) -> DispatchResult:
     from apps.files.services import get_processing_file_snapshot
 
-    processing_job = ProcessingJob.objects.only(
-        "id", "file_id", "status", "celery_task_id"
-    ).get(pk=processing_job_id)
-    if processing_job.status != "queued":
-        return DispatchResult(dispatched=False, celery_task_id=processing_job.celery_task_id)
+    with transaction.atomic():
+        processing_job = ProcessingJob.objects.select_for_update().only(
+            "id", "file_id", "status", "celery_task_id", "dispatch_status",
+            "dispatch_available_at",
+        ).get(pk=processing_job_id)
+        now = timezone.now()
+        if processing_job.status != "queued":
+            return DispatchResult(dispatched=False, celery_task_id=processing_job.celery_task_id)
+        if (
+            processing_job.dispatch_available_at is not None
+            and processing_job.dispatch_available_at > now
+        ):
+            return DispatchResult(dispatched=False, celery_task_id=processing_job.celery_task_id)
+        if processing_job.dispatch_status == "dispatched" and processing_job.celery_task_id:
+            return DispatchResult(dispatched=False, celery_task_id=processing_job.celery_task_id)
 
-    file_snapshot = get_processing_file_snapshot(file_id=processing_job.file_id)
+        file_snapshot = get_processing_file_snapshot(file_id=processing_job.file_id)
+        processing_job.dispatch_status = "dispatching"
+        processing_job.dispatch_last_attempt_at = now
+        processing_job.save(
+            update_fields=["dispatch_status", "dispatch_last_attempt_at", "updated_at"]
+        )
+
     if file_snapshot.file_type == "TWO_D":
         from apps.processing.tasks import process_2d_file
 
@@ -57,7 +87,11 @@ def dispatch_processing_job(*, processing_job_id: int) -> DispatchResult:
         async_result = process_3d_file.apply_async(args=[processing_job.pk])
 
     now = timezone.now()
-    ProcessingJob.objects.filter(pk=processing_job.pk).update(
+    ProcessingJob.objects.filter(
+        pk=processing_job.pk,
+        status="queued",
+        dispatch_status="dispatching",
+    ).update(
         celery_task_id=async_result.id,
         dispatch_status="dispatched",
         dispatch_last_attempt_at=now,
@@ -69,7 +103,11 @@ def dispatch_processing_job(*, processing_job_id: int) -> DispatchResult:
 
 def _mark_dispatch_failed(*, processing_job_id: int):
     now = timezone.now()
-    ProcessingJob.objects.filter(pk=processing_job_id, status="queued").update(
+    ProcessingJob.objects.filter(
+        pk=processing_job_id,
+        status="queued",
+        dispatch_status="dispatching",
+    ).update(
         dispatch_status="failed",
         dispatch_last_attempt_at=now,
         dispatch_available_at=now,
@@ -83,22 +121,30 @@ def reconcile_stale_queued_processing_jobs() -> dict:
     cutoff = now - timedelta(seconds=settings.PROCESSING_QUEUED_DISPATCH_STALE_AFTER_SECONDS)
     claimed_jobs = []
 
-    with transaction.atomic():
-        candidates = (
-            ProcessingJob.objects.select_for_update(skip_locked=True)
+    candidate_ids = list(
+        ProcessingJob.objects
             .filter(status="queued")
             .filter(
                 Q(dispatch_available_at__isnull=True, updated_at__lte=cutoff)
                 | Q(dispatch_available_at__lte=cutoff)
             )
-            .order_by("updated_at", "pk")[: settings.PROCESSING_RECONCILE_BATCH_SIZE]
-        )
-        for processing_job in candidates:
-            from apps.surveys.services import get_survey_workflow_snapshot
+            .order_by("updated_at", "pk")
+            .values_list("pk", flat=True)[: settings.PROCESSING_RECONCILE_BATCH_SIZE]
+    )
+    for processing_job_id in candidate_ids:
+        with transaction.atomic():
+            from apps.surveys.services import lock_survey_for_workflow
             from apps.files.services import get_processing_file_snapshot
 
-            file_snapshot = get_processing_file_snapshot(file_id=processing_job.file_id)
-            survey_snapshot = get_survey_workflow_snapshot(survey_id=file_snapshot.survey_id)
+            file_id = ProcessingJob.objects.only("file_id").get(pk=processing_job_id).file_id
+            file_snapshot = get_processing_file_snapshot(file_id=file_id)
+            survey_snapshot = lock_survey_for_workflow(survey_id=file_snapshot.survey_id)
+            processing_job = ProcessingJob.objects.select_for_update().get(pk=processing_job_id)
+            if processing_job.status != "queued" or not (
+                (processing_job.dispatch_available_at is None and processing_job.updated_at <= cutoff)
+                or (processing_job.dispatch_available_at is not None and processing_job.dispatch_available_at <= cutoff)
+            ):
+                continue
             processing_job.dispatch_status = "recovering"
             processing_job.dispatch_last_attempt_at = now
             processing_job.dispatch_available_at = now
@@ -130,22 +176,29 @@ def reconcile_expired_running_processing_jobs() -> dict:
     recovered_job_ids = []
     failed_permanently = 0
 
-    with transaction.atomic():
-        candidates = (
-            ProcessingJob.objects.select_for_update(skip_locked=True)
+    candidate_ids = list(
+        ProcessingJob.objects
             .filter(status="running")
             .filter(Q(lease_expires_at__isnull=True) | Q(lease_expires_at__lte=now))
-            .order_by("lease_expires_at", "pk")[: settings.PROCESSING_RECONCILE_BATCH_SIZE]
-        )
-        for processing_job in candidates:
+            .order_by("lease_expires_at", "pk")
+            .values_list("pk", flat=True)[: settings.PROCESSING_RECONCILE_BATCH_SIZE]
+    )
+    for processing_job_id in candidate_ids:
+        with transaction.atomic():
             from apps.files.services import get_processing_file_snapshot, update_file_processing_state
             from apps.surveys.services import (
                 lock_survey_for_workflow,
                 update_locked_survey_processing_state,
             )
 
-            file_snapshot = get_processing_file_snapshot(file_id=processing_job.file_id)
+            file_id = ProcessingJob.objects.only("file_id").get(pk=processing_job_id).file_id
+            file_snapshot = get_processing_file_snapshot(file_id=file_id)
             survey_snapshot = lock_survey_for_workflow(survey_id=file_snapshot.survey_id)
+            processing_job = ProcessingJob.objects.select_for_update().get(pk=processing_job_id)
+            if processing_job.status != "running" or not (
+                processing_job.lease_expires_at is None or processing_job.lease_expires_at <= now
+            ):
+                continue
             if processing_job.retry_count >= MAX_AUTOMATIC_RETRIES:
                 processing_job.status = "failed"
                 processing_job.progress_percent = min(processing_job.progress_percent, 99)

@@ -38,11 +38,14 @@ class SecurityConfigurationTests(SimpleTestCase):
 
     def test_security_middleware_redirects_and_accepts_forwarded_https(self):
         with override_settings(DEBUG=False, SECURE_SSL_REDIRECT=True):
-            redirected = self.client.get("/")
-            forwarded = self.client.get("/", HTTP_X_FORWARDED_PROTO="https")
+            redirected = self.client.get("/projects")
+            forwarded = self.client.get("/projects", HTTP_X_FORWARDED_PROTO="https")
+            root = self.client.get("/", HTTP_X_FORWARDED_PROTO="https")
 
         self.assertEqual(redirected.status_code, 301)
         self.assertEqual(forwarded.status_code, 200)
+        self.assertEqual(root.status_code, 302)
+        self.assertEqual(root["Location"], "/login")
 
     @override_settings(
         SECURE_SSL_REDIRECT=False,
@@ -54,7 +57,7 @@ class SecurityConfigurationTests(SimpleTestCase):
         },
     )
     def test_csp_header_contains_nonce_and_current_allowed_resource_hosts(self):
-        response = self.client.get("/")
+        response = self.client.get("/projects")
 
         self.assertEqual(response.status_code, 200)
         csp = response["Content-Security-Policy"]

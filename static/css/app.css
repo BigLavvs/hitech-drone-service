@@ -206,10 +206,6 @@ h2 { margin-bottom: 0.25rem; font-size: 1rem; line-height: 1.35; }
 .survey-viewer-metadata-item dd { margin: 0; color: var(--colour-muted); word-break: break-word; }
 .survey-viewer-note-list { padding-left: 1.1rem; margin: 0; color: var(--colour-muted); }
 .leaflet-container { width: 100%; height: 100%; background: #eef3f1; font: inherit; }
-.preview-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
-.preview-card--wide { grid-column: 1 / -1; }
-.preview-copy { margin: 0; color: var(--colour-muted); }
-.preview-form { display: grid; gap: 1rem; }
 .badge-row { display: flex; flex-wrap: wrap; gap: 0.5rem; }
 
 .button { display: inline-flex; align-items: center; justify-content: center; min-height: 2.5rem; padding: 0.5rem 0.9rem; color: var(--colour-ink); font-size: 0.875rem; font-weight: 700; line-height: 1.2; cursor: pointer; background: var(--colour-surface); border: 1px solid var(--colour-border); border-radius: var(--radius-sm); box-shadow: var(--shadow-sm); }
@@ -306,8 +302,6 @@ h2 { margin-bottom: 0.25rem; font-size: 1rem; line-height: 1.35; }
   .page-header { display: grid; }
   .survey-viewer-layout { grid-template-columns: 1fr; min-height: auto; }
   .survey-viewer-stage { min-height: 24rem; }
-  .preview-grid { grid-template-columns: 1fr; }
-  .preview-card--wide { grid-column: auto; }
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -376,12 +376,15 @@ For deployed demos, keep `DEBUG=False`, serve over HTTPS, configure the public v
 - `docker-compose.yml` depends on external PostgreSQL/PostGIS and R2 services rather than provisioning them locally.
 - The external Hitech Auth Service handoff URL is not configured in settings; the implemented authentication boundary is JWT validation, plus the gated assessment demo session path.
 - Resumable `UploadSession` chunk endpoints remain deferred. The implemented upload path is direct multipart admission.
+- JPEGs above 16 MiB or 25 million pixels receive streaming structural validation without full decoding; this does not guarantee decodability or change upload limits.
 - LAS/LAZ point-cloud processing requires an installed PotreeConverter executable configured with `POTREE_CONVERTER_PATH`.
+- The stock application image does not install PotreeConverter, and the frontend does not render Potree outputs; installing the converter alone is not an end-to-end point-cloud viewing capability.
+- The 3D model catalog currently selects full model sources. Generated mesh previews are not a verified lightweight initial-load path.
 - Generated 2D tile output is capped at zoom 12 for assessment-time processing speed.
 - External uptime alerting and production monitoring integrations are deployment prerequisites, not implemented in this repository.
 - High-availability operation, large-file load testing, real converter/R2 integration and disaster-recovery drills are not established by the mocked automated suite.
 
-For private vulnerability reporting, see [SECURITY.md](SECURITY.md).
+For private vulnerability reports, contact hello@oluwapelumi.xyz.
 
 ## Review Or Demonstration Path
 

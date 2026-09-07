@@ -1,22 +1,13 @@
-"""Template-only views for the Step 1 through Step 4 route shells."""
+"""Template-only views for the application route shells."""
 
 from django.conf import settings
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 from django.views.decorators.csrf import ensure_csrf_cookie
 
 
-@ensure_csrf_cookie
-def foundation_preview(request):
-    """Render static UI examples without reading models or calling APIs."""
-    return render(
-        request,
-        "foundation_preview.html",
-        {
-            "active_nav": "projects",
-            "page_title": "Dashboard foundation | Hitech Drone Mapping",
-            "preview_table_headings": ["Column one", "Column two", "Column three"],
-        },
-    )
+def root_redirect(request):
+    """Send the established application entry point to the login page."""
+    return redirect("login")
 
 
 @ensure_csrf_cookie

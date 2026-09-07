@@ -169,6 +169,21 @@ class LeaseSafetyTests(SimpleTestCase):
 
 
 class ProcessingLeaseSafetyMixin:
+    def test_early_duplicate_delivery_cannot_claim_a_scheduled_retry(self):
+        _survey_file, job, _raw_bytes = self.create_file_and_job()
+        due_at = timezone.now() + timedelta(minutes=5)
+        ProcessingJob.objects.filter(pk=job.pk).update(
+            dispatch_available_at=due_at,
+            dispatch_status="dispatched",
+        )
+
+        self.assertIsNone(
+            _mark_job_running(processing_job_id=job.pk, lease_token="early-duplicate")
+        )
+        job.refresh_from_db()
+        self.assertEqual(job.status, "queued")
+        self.assertEqual(job.dispatch_available_at, due_at)
+
     def test_duplicate_queued_delivery_only_one_execution_claims_lease(self):
         _survey_file, processing_job, _raw_bytes = self.create_file_and_job()
 

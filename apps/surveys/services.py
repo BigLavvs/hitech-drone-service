@@ -10,6 +10,8 @@ from apps.projects.models import Project, Site
 from apps.projects.services import (
     get_project_access_snapshot,
     get_project_ids_visible_to_user,
+    lock_project_for_update,
+    lock_site_for_update,
     user_can_manage_project,
     user_can_manage_project_id,
     user_can_view_project,
@@ -65,10 +67,17 @@ def get_survey_workflow_snapshot(*, survey_id: int) -> SurveyWorkflowSnapshot:
 
 
 def lock_survey_for_workflow(*, survey_id: int) -> SurveyWorkflowSnapshot:
+    # Project ownership/archive changes and survey mutations share this lock
+    # order: project -> survey. Authorization is evaluated from the locked
+    # rows, never from a caller-provided snapshot.
+    survey_reference = Survey.objects.only("project_id").get(pk=survey_id)
+    project = lock_project_for_update(
+        project_id=survey_reference.project_id,
+        fields=("id", "status", "project_manager_id"),
+    )
     row = Survey.objects.select_for_update().filter(pk=survey_id).values(
         "id", "project_id", "created_by_id", "status", "processing_status",
     ).get()
-    project = get_project_access_snapshot(project_id=row["project_id"])
     return SurveyWorkflowSnapshot(
         id=row["id"],
         project_id=row["project_id"],
@@ -190,34 +199,36 @@ def create_survey(
     coordinate_reference_system: str | object = _UNSET,
     notes: str | None | object = _UNSET,
 ) -> Survey:
-    _validate_survey_create_actor(actor=actor, project=project)
-
-    if project.status != "active":
-        raise ValidationError("Only active projects can have surveys created.")
-
-    if site.project_id != project.pk:
-        raise ValidationError("Site must belong to the supplied project.")
-
-    survey = Survey(
-        project=project,
-        site=site,
-        name=name,
-        survey_date=survey_date,
-        created_by=actor,
-    )
-
-    for field_name, value in (
-        ("drone_model", drone_model),
-        ("pilot", pilot),
-        ("coordinate_reference_system", coordinate_reference_system),
-        ("notes", notes),
-    ):
-        if value is not _UNSET:
-            setattr(survey, field_name, value)
-
-    survey.full_clean()
-
     with transaction.atomic():
+        locked_project = lock_project_for_update(project_id=project.pk)
+        _validate_survey_create_actor(actor=actor, project=locked_project)
+        if locked_project.status != "active":
+            raise ValidationError("Only active projects can have surveys created.")
+
+        try:
+            locked_site = lock_site_for_update(site_id=site.pk)
+        except Site.DoesNotExist as exc:
+            raise ValidationError("Site does not exist.") from exc
+        if locked_site.project_id != locked_project.pk:
+            raise ValidationError("Site must belong to the supplied project.")
+
+        survey = Survey(
+            project=locked_project,
+            site=locked_site,
+            name=name,
+            survey_date=survey_date,
+            created_by=actor,
+        )
+        for field_name, value in (
+            ("drone_model", drone_model),
+            ("pilot", pilot),
+            ("coordinate_reference_system", coordinate_reference_system),
+            ("notes", notes),
+        ):
+            if value is not _UNSET:
+                setattr(survey, field_name, value)
+
+        survey.full_clean()
         survey.save()
         record_audit_event(
             action=AuditAction.SURVEY_CREATED,
@@ -242,43 +253,41 @@ def update_survey(
     coordinate_reference_system: str | object = _UNSET,
     notes: str | None | object = _UNSET,
 ) -> Survey:
-    workflow = get_survey_workflow_snapshot(survey_id=survey.pk)
-    _validate_survey_update_actor(actor=actor, survey=workflow)
-
-    if workflow.project_status != "active":
-        raise ValidationError("Only active projects can have surveys updated.")
-
-    update_fields: list[str] = []
-
-    for field_name, value in (
-        ("name", name),
-        ("survey_date", survey_date),
-        ("drone_model", drone_model),
-        ("pilot", pilot),
-        ("coordinate_reference_system", coordinate_reference_system),
-        ("notes", notes),
-    ):
-        if value is not _UNSET:
-            setattr(survey, field_name, value)
-            update_fields.append(field_name)
-
-    if not update_fields:
-        return survey
-
-    survey.full_clean()
-
     with transaction.atomic():
-        survey.save(update_fields=[*update_fields, "updated_at"])
+        workflow = lock_survey_for_workflow(survey_id=survey.pk)
+        _validate_survey_update_actor(actor=actor, survey=workflow)
+        if workflow.project_status != "active":
+            raise ValidationError("Only active projects can have surveys updated.")
+
+        locked_survey = Survey.objects.select_for_update().get(pk=survey.pk)
+        update_fields: list[str] = []
+        for field_name, value in (
+            ("name", name),
+            ("survey_date", survey_date),
+            ("drone_model", drone_model),
+            ("pilot", pilot),
+            ("coordinate_reference_system", coordinate_reference_system),
+            ("notes", notes),
+        ):
+            if value is not _UNSET:
+                setattr(locked_survey, field_name, value)
+                update_fields.append(field_name)
+
+        if not update_fields:
+            return locked_survey
+
+        locked_survey.full_clean()
+        locked_survey.save(update_fields=[*update_fields, "updated_at"])
         record_audit_event(
             action=AuditAction.SURVEY_UPDATED,
             entity_type="survey",
-            entity_id=survey.pk,
+            entity_id=locked_survey.pk,
             user=actor,
-            project_id=survey.project_id,
-            survey_id=survey.pk,
+            project_id=locked_survey.project_id,
+            survey_id=locked_survey.pk,
         )
 
-    return survey
+    return locked_survey
 
 
 def synchronize_demo_survey(*, survey: Survey, creator: User, survey_date) -> Survey:
@@ -321,27 +330,19 @@ def validate_survey_readiness(*, survey: Survey) -> None:
 
 def archive_survey_after_review(*, actor: User, survey: Survey) -> Survey:
     from apps.approvals.interfaces import record_survey_archived_history
-    workflow = get_survey_workflow_snapshot(survey_id=survey.pk)
-
-    if not actor.is_active:
-        raise PermissionDenied(
-            "Only an active administrator or the owning project manager can archive this survey."
-        )
-
-    if actor.role == UserRole.ADMINISTRATOR:
-        allowed = True
-    elif actor.role == UserRole.PROJECT_MANAGER:
-        allowed = workflow.project_manager_id == actor.pk
-    else:
-        allowed = False
-
-    if not allowed:
-        raise PermissionDenied(
-            "Only an active administrator or the owning project manager can archive this survey."
-        )
 
     with transaction.atomic():
         locked_survey = lock_survey_for_workflow(survey_id=survey.pk)
+        if not actor.is_active or not (
+            actor.role == UserRole.ADMINISTRATOR
+            or (
+                actor.role == UserRole.PROJECT_MANAGER
+                and locked_survey.project_manager_id == actor.pk
+            )
+        ):
+            raise PermissionDenied(
+                "Only an active administrator or the owning project manager can archive this survey."
+            )
         if locked_survey.status not in {SurveyStatus.APPROVED, SurveyStatus.REJECTED}:
             raise ValidationError("Only approved or rejected surveys can be archived.")
 

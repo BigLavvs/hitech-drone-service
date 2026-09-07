@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.core.exceptions import ValidationError as DjangoValidationError
 from django.http import Http404
+from drf_spectacular.utils import extend_schema
 from rest_framework import generics, permissions, status
 from rest_framework.response import Response
 from rest_framework.serializers import ValidationError as DRFValidationError
@@ -29,6 +30,7 @@ class ProcessingJobDetailAPIView(generics.GenericAPIView):
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = ProcessingJobDetailSerializer
 
+    @extend_schema(operation_id="processing_job_retrieve", responses={200: ProcessingJobDetailSerializer})
     def get(self, request, processing_job_id, *args, **kwargs):
         _get_visible_job_or_404(user=request.user, processing_job_id=processing_job_id)
         response_snapshot = get_processing_job_for_response(processing_job_id=processing_job_id)
@@ -42,6 +44,11 @@ class ProcessingJobRetryAPIView(generics.GenericAPIView):
     throttle_scope = "retry"
     serializer_class = ProcessingJobDetailSerializer
 
+    @extend_schema(
+        operation_id="processing_job_retry",
+        request=None,
+        responses={202: ProcessingJobDetailSerializer},
+    )
     def post(self, request, processing_job_id, *args, **kwargs):
         _get_visible_job_or_404(user=request.user, processing_job_id=processing_job_id)
 

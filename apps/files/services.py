@@ -62,6 +62,7 @@ class SurveyFileDownloadResult:
 class SurveyFileReadiness:
     file_count: int
     all_files_ready: bool
+    has_failed_files: bool = False
 
 
 @dataclass(frozen=True)
@@ -188,6 +189,7 @@ def admit_uploaded_file(
             from apps.surveys.services import lock_survey_for_workflow
 
             locked_survey = lock_survey_for_workflow(survey_id=survey.pk)
+            _validate_upload_actor(actor=actor, survey=locked_survey)
             _validate_survey_accepts_uploads(survey=locked_survey)
             _validate_survey_total_size_limit(
                 survey_id=locked_survey.id,
@@ -468,6 +470,7 @@ def get_survey_file_readiness(*, survey_id: int) -> SurveyFileReadiness:
     return SurveyFileReadiness(
         file_count=len(statuses),
         all_files_ready=bool(statuses) and all(status == "ready" for status in statuses),
+        has_failed_files=any(status == "failed" for status in statuses),
     )
 
 
@@ -577,14 +580,23 @@ def _cleanup_storage_objects(
     staged_asset_keys=None,
     canonical_asset_keys=None,
 ):
-    for asset_key in canonical_asset_keys or []:
-        storage.delete_object(asset_key)
-    if canonical_key:
-        storage.delete_object(canonical_key)
-    for staged_asset_key in staged_asset_keys or []:
-        storage.delete_object(staged_asset_key)
-    if staged_key:
-        storage.delete_object(staged_key)
+    keys = [
+        *(canonical_asset_keys or []),
+        canonical_key,
+        *(staged_asset_keys or []),
+        staged_key,
+    ]
+    for key in keys:
+        if not key:
+            continue
+        try:
+            storage.delete_object(key)
+        except Exception:
+            logger.warning(
+                "Best-effort upload cleanup could not remove an object.",
+                extra={"storage_key": key},
+                exc_info=True,
+            )
 
 
 def storage_sha256(file_obj):

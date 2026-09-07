@@ -1,4 +1,5 @@
 from django.http import Http404
+from drf_spectacular.utils import extend_schema
 from rest_framework import generics, permissions
 from rest_framework.response import Response
 
@@ -13,6 +14,7 @@ class SurveyModelListAPIView(generics.GenericAPIView):
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = ModelDescriptorSerializer
 
+    @extend_schema(operation_id="survey_models_list", responses={200: ModelDescriptorSerializer(many=True)})
     def get(self, request, survey_id, *args, **kwargs):
         try:
             descriptors = get_survey_models_for_user(actor=request.user, survey_id=survey_id)

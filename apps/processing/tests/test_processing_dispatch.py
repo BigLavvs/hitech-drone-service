@@ -30,6 +30,26 @@ class ProcessingDispatchLifecycleMixin:
         self.assertEqual(processing_job.dispatch_failure_count, 1)
         self.assertIsNone(processing_job.celery_task_id)
 
+    def test_late_dispatcher_cannot_overwrite_newer_retry_schedule(self):
+        _survey_file, processing_job, _raw = self.create_file_and_job(file_format=FileFormat.PNG)
+        future_retry = timezone.now() + timedelta(minutes=10)
+
+        def enqueue_then_schedule_retry(*, args):
+            ProcessingJob.objects.filter(pk=processing_job.pk).update(
+                dispatch_status="pending",
+                dispatch_available_at=future_retry,
+            )
+            return SimpleNamespace(id="late-task")
+
+        with patch("apps.processing.tasks.process_2d_file.apply_async", side_effect=enqueue_then_schedule_retry):
+            result = dispatch_processing_job(processing_job_id=processing_job.pk)
+
+        processing_job.refresh_from_db()
+        self.assertTrue(result.dispatched)
+        self.assertEqual(processing_job.dispatch_status, "pending")
+        self.assertEqual(processing_job.dispatch_available_at, future_retry)
+        self.assertIsNone(processing_job.celery_task_id)
+
     def test_reconciliation_redispaches_stale_queued_job_without_new_processing_job(self):
         _survey_file, processing_job, _raw = self.create_file_and_job(file_format=FileFormat.PNG)
         stale_time = timezone.now() - timedelta(seconds=settings.PROCESSING_QUEUED_DISPATCH_STALE_AFTER_SECONDS + 30)

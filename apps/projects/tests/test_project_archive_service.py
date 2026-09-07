@@ -114,6 +114,16 @@ class ArchiveProjectServiceTests(TestCase):
             1,
         )
 
+    def test_stale_active_project_instance_cannot_archive_twice(self):
+        stale_instance = Project.objects.get(pk=self.project.pk)
+
+        archive_project(actor=self.admin, project=self.project)
+
+        with self.assertRaisesMessage(ValidationError, "Only active projects can be archived."):
+            archive_project(actor=self.admin, project=stale_instance)
+
+        self.assertEqual(AuditLog.objects.filter(action=AuditAction.PROJECT_ARCHIVED).count(), 1)
+
     def test_project_archived_audit_record_is_correct(self):
         archive_project(actor=self.admin, project=self.project)
 

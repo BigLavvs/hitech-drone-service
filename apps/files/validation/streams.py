@@ -1,6 +1,6 @@
 from pathlib import PurePosixPath
 
-from .rules import _FORMAT_RULES, _SAFE_FILENAME_RE
+from .rules import VALIDATION_READ_CHUNK_BYTES, _FORMAT_RULES, _SAFE_FILENAME_RE
 from .types import FileValidationError
 
 def sanitize_storage_filename(filename):
@@ -52,6 +52,28 @@ def _read_prefix(uploaded_file, limit):
     header = uploaded_file.read(limit)
     uploaded_file.seek(current_position)
     return header
+
+
+def _iter_content_chunks(uploaded_file, *, size_bytes, content=None, start_offset=0):
+    """Yield an upload in bounded chunks while preserving its file position."""
+    if content is not None:
+        content = content[start_offset:]
+        for offset in range(0, len(content), VALIDATION_READ_CHUNK_BYTES):
+            yield content[offset : offset + VALIDATION_READ_CHUNK_BYTES]
+        return
+
+    current_position = uploaded_file.tell()
+    try:
+        uploaded_file.seek(start_offset)
+        remaining = size_bytes - start_offset
+        while remaining:
+            chunk = uploaded_file.read(min(VALIDATION_READ_CHUNK_BYTES, remaining))
+            if not chunk:
+                raise FileValidationError("Structured file is truncated.")
+            yield chunk
+            remaining -= len(chunk)
+    finally:
+        uploaded_file.seek(current_position)
 
 def _read_exact_bytes(uploaded_file, *, offset, size):
     current_position = uploaded_file.tell()

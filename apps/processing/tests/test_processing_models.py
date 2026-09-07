@@ -1,12 +1,13 @@
 from .support import *
+from apps.files.tests.support import valid_jpeg_bytes, valid_png_bytes
 
 
 class ProcessingModelProcessingMixin:
     @patch("apps.processing.services.execution.PrivateR2StorageAdapter")
     def test_browser_ready_formats_skip_redundant_conversion(self, storage_factory):
         for file_format, payload in (
-            (FileFormat.PNG, b"\x89PNG\r\n\x1a\nrest"),
-            (FileFormat.JPEG, b"\xff\xd8\xff\xe0rest"),
+            (FileFormat.PNG, valid_png_bytes(interlaced=True)),
+            (FileFormat.JPEG, valid_jpeg_bytes()),
             (FileFormat.KML, b'<?xml version="1.0"?><kml xmlns="http://www.opengis.net/kml/2.2"><Document/></kml>'),
             (FileFormat.GEOJSON, b'{"type":"FeatureCollection","features":[]}'),
         ):
@@ -57,7 +58,13 @@ class ProcessingModelProcessingMixin:
     ):
         for file_format, raw_bytes, mime_type in (
             (FileFormat.OBJ, b"# test\nv 0.0 0.0 0.0\nf 1 1 1\n", "model/obj"),
-            (FileFormat.PLY, b"ply\nformat ascii 1.0\nelement vertex 0\nend_header\n", "application/ply"),
+            (
+                FileFormat.PLY,
+                b"ply\nformat ascii 1.0\nelement vertex 1\n"
+                b"property float x\nproperty float y\nproperty float z\n"
+                b"end_header\n0 0 0\n",
+                "application/ply",
+            ),
             (FileFormat.STL, b"solid mesh\nfacet normal 0 0 1\nendfacet\nendsolid mesh\n", "model/stl"),
         ):
             with self.subTest(file_format=file_format):

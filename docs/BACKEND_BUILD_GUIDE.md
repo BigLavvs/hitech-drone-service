@@ -151,7 +151,7 @@ Current repository state:
 - Dockerfile, Compose configuration, sanitized `.env.example`, automated Django tests, assessment seed tooling, public API documentation routes, and source/decision documents are present.
 - `.github/workflows/ci.yml` supplies PostGIS, Redis, required geospatial libraries and synthetic settings; it does not deploy or require Coolify secrets.
 - No license file is present; do not add one until the owner chooses a license.
-- `SECURITY.md` uses the owner-supplied contact `hello@oluwapelumi.xyz` for private reports.
+- Private vulnerability reports use the owner-supplied contact `hello@oluwapelumi.xyz`.
 - The owner still needs to confirm permission to redistribute assessment/source documents. Do not infer permission from public repository visibility.
 - A demonstration video remains an external submission artefact, not a repository feature.
 

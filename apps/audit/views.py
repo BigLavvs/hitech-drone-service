@@ -1,4 +1,5 @@
 from django.http import Http404
+from drf_spectacular.utils import extend_schema
 from rest_framework import generics, permissions
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.response import Response
@@ -7,6 +8,7 @@ from apps.access_control.authentication import HitechJWTAuthentication
 from apps.audit.models import AuditLog
 from apps.audit.serializers import AuditLogListQuerySerializer, AuditLogReadSerializer
 from apps.audit.services import get_audit_log_visible_to_user, get_audit_logs_visible_to_user
+from config.schema import paginated_response_serializer
 
 
 class AuditLogLimitOffsetPagination(LimitOffsetPagination):
@@ -20,6 +22,7 @@ class AuditLogListAPIView(generics.GenericAPIView):
     pagination_class = AuditLogLimitOffsetPagination
     serializer_class = AuditLogReadSerializer
 
+    @extend_schema(operation_id="audit_logs_list", responses={200: paginated_response_serializer("PaginatedAuditLogRead", AuditLogReadSerializer)})
     def get(self, request, *args, **kwargs):
         query_serializer = AuditLogListQuerySerializer(data=request.query_params)
         query_serializer.is_valid(raise_exception=True)
@@ -37,6 +40,7 @@ class AuditLogDetailAPIView(generics.GenericAPIView):
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = AuditLogReadSerializer
 
+    @extend_schema(operation_id="audit_log_retrieve", responses={200: AuditLogReadSerializer})
     def get(self, request, audit_log_id, *args, **kwargs):
         try:
             audit_log = get_audit_log_visible_to_user(user=request.user, audit_log_id=audit_log_id)

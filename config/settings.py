@@ -266,5 +266,9 @@ SPECTACULAR_SETTINGS = {
         "`X-CSRFToken` header."
     ),
     "VERSION": "v1",
+    "COMPONENT_SPLIT_REQUEST": True,
+    "ENUM_NAME_OVERRIDES": {
+        "UserRole": "apps.access_control.models.UserRole.values",
+    },
     "SERVE_PUBLIC": True,
 }

@@ -29,6 +29,7 @@ class SurveyMapLayerListAPIView(generics.GenericAPIView):
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = MapLayerDescriptorSerializer
 
+    @extend_schema(operation_id="survey_map_layers_list", responses={200: MapLayerDescriptorSerializer(many=True)})
     def get(self, request, survey_id, *args, **kwargs):
         try:
             descriptors = get_survey_map_layers_for_user(actor=request.user, survey_id=survey_id)
@@ -48,6 +49,7 @@ class SurveyMeasurementListCreateAPIView(generics.GenericAPIView):
             return MeasurementWriteSerializer
         return MeasurementReadSerializer
 
+    @extend_schema(operation_id="survey_measurements_list", responses={200: MeasurementReadSerializer(many=True)})
     def get(self, request, survey_id, *args, **kwargs):
         try:
             measurements = get_measurements_visible_to_user(actor=request.user, survey_id=survey_id)
@@ -56,6 +58,7 @@ class SurveyMeasurementListCreateAPIView(generics.GenericAPIView):
 
         return Response(MeasurementReadSerializer(measurements, many=True).data)
 
+    @extend_schema(operation_id="survey_measurements_create", request=MeasurementWriteSerializer, responses={201: MeasurementReadSerializer})
     def post(self, request, survey_id, *args, **kwargs):
         serializer = MeasurementWriteSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -81,6 +84,7 @@ class SurveyMeasurementDetailAPIView(generics.GenericAPIView):
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = MeasurementReadSerializer
 
+    @extend_schema(operation_id="survey_measurement_retrieve", responses={200: MeasurementReadSerializer})
     def get(self, request, survey_id, measurement_id, *args, **kwargs):
         try:
             measurement = get_measurement_visible_to_user(
@@ -93,6 +97,7 @@ class SurveyMeasurementDetailAPIView(generics.GenericAPIView):
 
         return Response(MeasurementReadSerializer(measurement).data)
 
+    @extend_schema(operation_id="survey_measurement_delete", responses={204: None})
     def delete(self, request, survey_id, measurement_id, *args, **kwargs):
         try:
             delete_measurement(

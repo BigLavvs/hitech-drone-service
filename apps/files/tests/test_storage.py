@@ -122,7 +122,7 @@ class PrivateR2StorageAdapterTests(TestCase):
 
         client.upload_fileobj.assert_called_once()
         client.put_object.assert_not_called()
-        client.copy_object.assert_not_called()
+        client.copy.assert_not_called()
         client.delete_object.assert_not_called()
         self.assertEqual(
             staged_upload.storage_key,
@@ -180,16 +180,26 @@ class PrivateR2StorageAdapterTests(TestCase):
             content_type="application/vnd.laszip",
         )
 
-        client.copy_object.assert_called_once_with(
-            Bucket="test-bucket",
-            Key="surveys/7/files/99/raw.laz",
-            CopySource={
+        client.copy.assert_called_once()
+        copy_kwargs = client.copy.call_args.kwargs
+        self.assertEqual(copy_kwargs["Bucket"], "test-bucket")
+        self.assertEqual(copy_kwargs["Key"], "surveys/7/files/99/raw.laz")
+        self.assertEqual(
+            copy_kwargs["CopySource"],
+            {
                 "Bucket": "test-bucket",
                 "Key": "surveys/7/staging/upload_Quarterly-Survey-North.laz",
             },
-            ContentType="application/vnd.laszip",
-            MetadataDirective="REPLACE",
         )
+        self.assertEqual(
+            copy_kwargs["ExtraArgs"],
+            {
+                "ContentType": "application/vnd.laszip",
+                "MetadataDirective": "REPLACE",
+            },
+        )
+        self.assertEqual(copy_kwargs["Config"].multipart_threshold, FAKE_R2_SETTINGS["UPLOAD_CHUNK_SIZE_BYTES"])
+        self.assertEqual(copy_kwargs["Config"].multipart_chunksize, FAKE_R2_SETTINGS["UPLOAD_CHUNK_SIZE_BYTES"])
         client.delete_object.assert_called_once_with(
             Bucket="test-bucket",
             Key="surveys/7/staging/upload_Quarterly-Survey-North.laz",
@@ -223,7 +233,7 @@ class PrivateR2StorageAdapterTests(TestCase):
             FAKE_R2_SETTINGS["UPLOAD_CHUNK_SIZE_BYTES"],
         )
         client.put_object.assert_not_called()
-        client.copy_object.assert_not_called()
+        client.copy.assert_not_called()
         client.delete_object.assert_not_called()
 
     @override_settings(**FAKE_R2_SETTINGS)
@@ -262,5 +272,5 @@ class PrivateR2StorageAdapterTests(TestCase):
         )
         self.assertEqual(generated_output.tell(), 0)
         client.put_object.assert_not_called()
-        client.copy_object.assert_not_called()
+        client.copy.assert_not_called()
         client.delete_object.assert_not_called()

@@ -263,12 +263,37 @@ def _calculate_area_square_metres(coordinates: list[list[float]]) -> Decimal:
     else:
         closed_coordinates = coordinates
 
-    total = 0.0
+    # Remove only genuine zero-area rings.  This scale-aware collinearity check
+    # avoids turning very small but valid polygons into zero through an absolute
+    # spherical-area epsilon.
+    unwrapped = [[0.0, 0.0]]
+    first_lon, first_lat = map(math.radians, closed_coordinates[0])
+    unwrapped[0] = [first_lon, first_lat]
+    for previous, current in zip(closed_coordinates, closed_coordinates[1:]):
+        previous_lon = math.radians(previous[0])
+        current_lon = math.radians(current[0])
+        delta_lon = (current_lon - previous_lon + math.pi) % (2.0 * math.pi) - math.pi
+        unwrapped.append([unwrapped[-1][0] + delta_lon, math.radians(current[1])])
+    planar_total = math.fsum(
+        start[0] * end[1] - end[0] * start[1]
+        for start, end in zip(unwrapped, unwrapped[1:])
+    )
+    scale = max(
+        1e-12,
+        max(abs(point[0]) for point in unwrapped),
+        max(abs(point[1]) for point in unwrapped),
+    ) ** 2 * 1e-12
+    if abs(planar_total) <= scale:
+        return Decimal("0E-8")
+
+    terms = []
     for start, end in zip(closed_coordinates, closed_coordinates[1:]):
         lon1, lat1 = map(math.radians, start)
         lon2, lat2 = map(math.radians, end)
-        total += (lon2 - lon1) * (2.0 + math.sin(lat1) + math.sin(lat2))
+        delta_lon = (lon2 - lon1 + math.pi) % (2.0 * math.pi) - math.pi
+        terms.append(delta_lon * (2.0 + math.sin(lat1) + math.sin(lat2)))
 
+    total = math.fsum(terms)
     area = abs(total) * (EARTH_RADIUS_METRES ** 2) / 2.0
     max_area = 4.0 * math.pi * (EARTH_RADIUS_METRES ** 2)
     if area > max_area / 2.0:
@@ -295,4 +320,10 @@ def _great_circle_distance(*, start: list[float], end: list[float]) -> float:
 
 
 def _to_decimal(value: float) -> Decimal:
-    return Decimal(str(value)).quantize(DECIMAL_QUANTIZE_EIGHT_PLACES, rounding=ROUND_HALF_UP)
+    decimal_value = Decimal(str(value)).quantize(
+        DECIMAL_QUANTIZE_EIGHT_PLACES,
+        rounding=ROUND_HALF_UP,
+    )
+    if abs(decimal_value) >= Decimal("1000000000000"):
+        raise ValidationError("Calculated measurement value exceeds storage precision.")
+    return decimal_value

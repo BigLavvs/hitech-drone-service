@@ -75,6 +75,11 @@ def get_local_user_by_id(*, user_id: int) -> User:
     return User.objects.get(pk=user_id)
 
 
+def lock_user_for_update(*, user_id: int) -> User:
+    """Return a user row locked for a caller-owned transaction."""
+    return User.objects.select_for_update().get(pk=user_id)
+
+
 def get_local_user_snapshots_by_ids(*, user_ids) -> dict[int, LocalUserSnapshot]:
     normalized_ids = list(dict.fromkeys(user_ids))
     if not normalized_ids:

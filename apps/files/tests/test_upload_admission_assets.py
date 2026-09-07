@@ -78,7 +78,7 @@ class UploadAdmissionAssetsMixin:
                 ),
                 TrackingUpload(
                     name="unreferenced.png",
-                    content=b"\x89PNG\r\n\x1a\ntexture",
+                    content=valid_png_bytes(),
                     content_type="image/png",
                 ),
             ],
@@ -208,7 +208,7 @@ class UploadAdmissionAssetsMixin:
         )
         second_asset = TrackingUpload(
             name="texture.png",
-            content=b"\x89PNG\r\n\x1a\ntexture",
+            content=valid_png_bytes(),
             content_type="image/png",
         )
         original_upload_to_staging = storage.upload_to_staging
